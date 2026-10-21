@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 — 2026-10-21
+
+- El licenciado ahora opera una **tienda virtual**: el inicio del panel pasa a ser **Tu Tienda**, con el nombre de la
+  tienda (campo nuevo `profiles.store_name`) en el título y en la cabecera, y textos de tienda en vez de usuario.
+- Tu Tienda muestra: gráfica de ventas verificadas de los últimos 6 meses (con tabla de datos), puntos de XP, nivel
+  de rango, prendas en stock, prendas vendidas, total generado con la licencia e inversión acumulada. Todo sale de la
+  base de datos (`store_summary`); donde no hay datos se muestra 0 o un estado vacío.
+- Inventario de la tienda (`store_stock_movements`) e inversión acumulada (`store_investments`): registros de solo
+  inserción que solo el administrador crea desde `/admin/tiendas`, auditados.
+- Migración `20261021000006_stores.sql`, 9 pruebas de base de datos nuevas (71 en total) y pruebas unitarias.
+
 ## 0.2.0 — 2026-10-21
 
 - Página pública renovada: marca, cómo funciona, planes 1–4 desde la base de datos con valores pendientes marcados,

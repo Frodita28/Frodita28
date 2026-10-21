@@ -11,6 +11,8 @@ export type CurrentUser = {
   role: AppRole;
   fullName: string | null;
   publicAlias: string | null;
+  /** Nombre de la tienda virtual del licenciado. */
+  storeName: string | null;
 };
 
 /** Usuario actual con su perfil, o null. El rol se lee de la base de datos, nunca del cliente. */
@@ -22,7 +24,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   if (!user) return null;
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role, full_name, public_alias")
+    .select("role, full_name, public_alias, store_name")
     .eq("id", user.id)
     .single();
   if (!profile) return null;
@@ -32,6 +34,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     role: profile.role as AppRole,
     fullName: profile.full_name,
     publicAlias: profile.public_alias,
+    storeName: profile.store_name,
   };
 });
 

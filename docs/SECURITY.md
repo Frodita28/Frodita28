@@ -20,4 +20,7 @@
   activar una licencia es una función aparte, solo admin, auditada. Los visitantes no leen solicitudes ni eventos.
 - **Planes públicos:** el precio solo se publica con el plan `active` (restricción en la BD); los beneficios
   `pending_approval` no son legibles por anónimos ni licenciados (RLS).
-- **Pruebas de autorización:** `tests/db/applications.test.ts`, `tests/db/security.test.ts`, `sales.test.ts` y el paso 10 de `tests/e2e/flow.mjs`.
+- **Tu Tienda:** inventario e inversión sin escritura directa y de solo inserción; solo el admin los registra
+  (auditado) y solo para cuentas licenciadas; cada licenciado lee únicamente los suyos (RLS); `store_summary`
+  rechaza consultar otra tienda salvo al admin; el nombre de la tienda se cambia solo con `update_my_store`.
+- **Pruebas de autorización:** `tests/db/stores.test.ts`, `tests/db/applications.test.ts`, `tests/db/security.test.ts`, `sales.test.ts` y el paso 10 de `tests/e2e/flow.mjs`.
