@@ -34,7 +34,7 @@ async function createUser({ email, password, name }) {
 
 async function login(page, { email, password }, next = "/panel") {
   await page.goto(`${APP}/login?next=${encodeURIComponent(next)}`);
-  await page.fill("#email", email);
+  await page.fill("#username", email);
   await page.fill("#password", password);
   await page.click("button:has-text('Entrar')");
   await page.waitForURL((u) => u.pathname.startsWith(next));
@@ -74,11 +74,13 @@ try {
   await shot(vp, "08-publico-inicio");
   log("página pública: 4 planes pendientes y preguntas frecuentes");
 
-  // 2. "Solicitar licencia" exige iniciar sesión y vuelve a la solicitud.
+  // 2. Sin registro público: "Solicitar licencia" lleva al contacto; con cuenta asignada, al formulario.
   await vp.click("text=Solicitar licencia");
+  await vp.waitForURL(/#contacto$/);
+  await vp.goto(`${APP}/panel/solicitud`);
   await vp.waitForURL(/\/login\?next=%2Fpanel%2Fsolicitud/);
   await login(vp, APPLICANT, "/panel/solicitud");
-  log("solicitar licencia lleva al acceso y vuelve al formulario");
+  log("solicitar licencia lleva al contacto; con cuenta asignada se llega al formulario");
 
   // 3. El solicitante envía su solicitud.
   await vp.fill("#phone", "+58 414 000 1122");

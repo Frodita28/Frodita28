@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.0 — 2026-10-21
+
+- **Sin registro público:** se eliminan `/registro`, `/recuperar` y `/auth/confirm` (verificación y recuperación por
+  correo). Solo se entra con el **usuario y la contraseña que asigna el administrador**; el formulario de acceso pide
+  usuario y contraseña (también acepta el correo completo de cuentas antiguas). El registro queda desactivado en
+  `supabase/config.toml` y la guía de despliegue indica cómo desactivarlo en el proyecto.
+- Nuevo `/admin/usuarios`: crear cuentas (licenciado, solicitante o administrador; al licenciado se le crea su licencia
+  activa) y asignar contraseñas nuevas. Usa la service role solo en el servidor (`SUPABASE_SERVICE_ROLE_KEY`).
+- Script de uso manual `npm run crear-usuario` (pide la contraseña por teclado) y guía sin terminal en
+  `docs/DESPLIEGUE.md` para crear la cuenta de prueba `tiendita`.
+- Los usuarios cambian su contraseña desde *Contraseña* (`/nueva-clave`) en el panel.
+- La página pública lleva "Solicitar licencia" al contacto para visitantes sin cuenta.
+- Migración `20261021000007_assigned_accounts.sql` (`profiles.username`, `provision_account`, `write_audit_as`),
+  4 pruebas de base de datos nuevas (75 en total), pruebas unitarias y e2e actualizadas.
+
 ## 0.3.0 — 2026-10-21
 
 - El licenciado ahora opera una **tienda virtual**: el inicio del panel pasa a ser **Tu Tienda**, con el nombre de la

@@ -11,9 +11,23 @@
 - **Evidencias:** enlaces solo `http(s)`; capturas PNG/JPG/WEBP ≤5 MB en bucket privado, carpeta por usuario,
   huella SHA-256 para detectar reutilización; el admin las ve con enlaces firmados de 10 minutos.
   Nunca se piden contraseñas de redes sociales.
-- **Sesión:** validada con `auth.getUser()` en el servidor; redirecciones internas saneadas; mensajes de login y
-  recuperación que no revelan si un correo existe; contraseña mínima de 10 caracteres; confirmación de correo.
-- **Secretos:** solo `NEXT_PUBLIC_SUPABASE_URL`/`ANON_KEY` llegan al navegador. La service role key no se usa en la web.
+- **Sin registro público:** no existen `/registro` ni la recuperación por correo; el registro está desactivado también
+  en Supabase Auth (`enable_signup = false` en local y *Allow new users to sign up* apagado en el proyecto), así que
+  nadie puede crear una cuenta con la anon key. Solo entra quien tenga una cuenta creada por el administrador.
+- **Cuentas asignadas:** el usuario se guarda como correo interno (`usuario@usuarios.gallonegro.local`, sin buzón). Se
+  crean con la API de administración de Auth y `provision_account`, función ejecutable **solo por la service role**
+  (revocada a `anon` y `authenticated`) que asigna usuario, rol y licencia y lo audita (`account.provisioned`, con el
+  admin que actúa). Asignar contraseña también queda auditado (`account.password_set`).
+- **Contraseñas:** las asignadas por el admin tienen un mínimo de 6 (el de Supabase) y son **temporales**: la persona
+  debe cambiarla en *Contraseña* (`/nueva-clave`, mínimo 10). La contraseña de prueba `123456` de la cuenta
+  `tiendita` es solo para el entorno de prueba y debe cambiarse antes de cualquier uso real. Ninguna contraseña está
+  escrita en migraciones, semillas ni código: el script `crear-usuario` la pide por teclado.
+- **Sesión:** validada con `auth.getUser()` en el servidor; redirecciones internas saneadas; el login responde
+  "Usuario o contraseña incorrectos" sin revelar si el usuario existe.
+- **Secretos:** solo `NEXT_PUBLIC_SUPABASE_URL`/`ANON_KEY` llegan al navegador. La service role key
+  (`SUPABASE_SERVICE_ROLE_KEY`, sin prefijo `NEXT_PUBLIC_`) solo se lee en el servidor (`src/lib/supabase/admin.ts`,
+  importa `server-only`) y únicamente en las acciones de `/admin/usuarios`, después de `requireAdmin()`. Es opcional:
+  sin ella la app funciona y las cuentas se crean desde el panel de Supabase.
 - **Solicitudes:** sin escritura directa; solo cuentas de solicitante envían (máx. 5 por persona, una abierta);
   validación de cada campo en el servidor y otra vez en Postgres; el solicitante ve solo sus solicitudes y los
   eventos no internos; nadie revisa ni activa su propia solicitud (`CHECK` y verificación en las funciones);
@@ -23,4 +37,4 @@
 - **Tu Tienda:** inventario e inversión sin escritura directa y de solo inserción; solo el admin los registra
   (auditado) y solo para cuentas licenciadas; cada licenciado lee únicamente los suyos (RLS); `store_summary`
   rechaza consultar otra tienda salvo al admin; el nombre de la tienda se cambia solo con `update_my_store`.
-- **Pruebas de autorización:** `tests/db/stores.test.ts`, `tests/db/applications.test.ts`, `tests/db/security.test.ts`, `sales.test.ts` y el paso 10 de `tests/e2e/flow.mjs`.
+- **Pruebas de autorización:** `tests/db/accounts.test.ts`, `tests/db/stores.test.ts`, `tests/db/applications.test.ts`, `tests/db/security.test.ts`, `sales.test.ts` y el paso 10 de `tests/e2e/flow.mjs`.

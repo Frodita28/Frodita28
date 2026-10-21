@@ -4,7 +4,7 @@ Migraciones en `supabase/migrations/` (orden por nombre). Tablas principales:
 
 | Tabla | Propósito |
 | --- | --- |
-| `profiles` | 1:1 con `auth.users`; rol, nombre del responsable, alias público y `store_name` (nombre de la tienda virtual). El rol nunca se toma del registro. |
+| `profiles` | 1:1 con `auth.users`; rol, nombre del responsable, alias público, `store_name` (nombre de la tienda virtual) y `username` (único, minúsculas, 3–30 caracteres `a-z 0-9 . _ -`; el usuario con el que se inicia sesión). El rol nunca se toma de los metadatos de Auth. |
 | `license_plans` | Planes configurables (`pending_confirmation` hasta confirmar condiciones). Incluye productos autorizados, exclusividad, materiales y renovación. Un plan `active` exige precio y moneda. Cambios auditados. |
 | `plan_benefits` | Beneficios por plan: `confirmed`, `contract_only` o `pending_approval` (este último nunca es público). |
 | `license_applications` | Solicitudes: datos comerciales, canales, plan de interés, plan asignado, último mensaje al solicitante, `license_id` al activarse. Una abierta por persona (índice único parcial). |
@@ -31,6 +31,9 @@ Funciones expuestas a la API: `create_sale`, `review_sale`, `cancel_sale`, `upda
 `store_summary`. Internas (sin permiso de ejecución para usuarios):
 `ensure_participations`, `compute_mission_progress`, `recompute_participation`, `recompute_user_missions`,
 `expire_participations`, `run_mission_maintenance`, `log_application_event`, `application_from_payload`.
+Solo service role (servidor de la app, script `crear-usuario` o SQL Editor): `provision_account(p_user, p_username,
+p_role, p_full_name, p_store_name, p_plan_id, p_actor)`, que completa una cuenta creada en Auth (usuario, nombres,
+rol; a un licenciado le crea su licencia activa en el plan indicado o el primero disponible) y `write_audit_as`.
 
 Estados de una solicitud: `submitted` → `in_review` → `needs_info` (vuelve a `submitted` al corregir) → `approved`
 o `rejected`; el solicitante puede retirarla (`withdrawn`) mientras no tenga licencia. Aprobar exige plan; activar

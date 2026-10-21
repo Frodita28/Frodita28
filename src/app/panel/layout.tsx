@@ -10,6 +10,7 @@ export default async function PanelLayout({ children }: LayoutProps<"/panel">) {
     ...(user.role !== "admin" ? [{ href: "/panel/solicitud", label: "Mi solicitud" }] : []),
     { href: "/panel/misiones", label: "Misiones" },
     { href: "/panel/ventas", label: "Ventas" },
+    { href: "/nueva-clave", label: "Contraseña" },
     ...(user.role === "admin" ? [{ href: "/admin", label: "Administración" }] : []),
   ];
   return (

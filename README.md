@@ -18,15 +18,20 @@ cp .env.example .env.local        # pega la URL y la anon key que muestra `supab
 npm run dev                       # http://127.0.0.1:3000
 ```
 
-Correos locales (verificación, recuperación): Mailpit en http://127.0.0.1:54324.
+**Acceso:** no hay registro público. Cada persona entra con el **usuario y la contraseña que le asigna el
+administrador** (Supabase Auth guarda el usuario como el correo interno `usuario@usuarios.gallonegro.local`).
+El admin crea cuentas y asigna contraseñas en `/admin/usuarios` (requiere `SUPABASE_SERVICE_ROLE_KEY` en el servidor),
+o con el script de uso manual:
 
-Crear el primer administrador: regístrate en `/registro`, confirma el correo y ejecuta en la base de datos:
-
-```sql
-update public.profiles set role = 'admin' where id = (select id from auth.users where email = 'tu@correo.com');
+```bash
+NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run crear-usuario -- --usuario fernando --rol admin
+NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run crear-usuario -- --usuario tiendita --rol licensee --tienda "Tiendita"
 ```
 
-Flujo de licencias: la persona se registra y envía su solicitud en `/panel/solicitud`; el admin la revisa en
+La contraseña se pide por teclado (o se toma de la variable `CLAVE`); nunca se guarda en el código. Sin terminal,
+ver [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md) §6 (panel de Supabase + SQL Editor).
+
+Flujo de licencias: el admin crea la cuenta (como solicitante) y la persona envía su solicitud en `/panel/solicitud`; el admin la revisa en
 `/admin/solicitudes` (en revisión, pedir correcciones, aprobar con plan o rechazar) y, con contrato y pago
 formalizados, activa la licencia desde la misma solicitud. Los planes y sus beneficios se editan en `/admin/planes`.
 Cada licenciado opera una tienda virtual: su inicio es **Tu Tienda** (`/panel`), con ventas, XP, rango, stock,
@@ -36,7 +41,7 @@ prendas vendidas, total generado e inversión. El admin registra entregas de pre
 
 | Comando | Qué prueba |
 | --- | --- |
-| `npm run test:db` | 71 pruebas de reglas en Postgres real: RLS, idempotencia de XP, períodos, evidencias, fraude, permisos. Usa `TEST_DATABASE_URL` (un Postgres local vacío; crea bases temporales). |
+| `npm run test:db` | 75 pruebas de reglas en Postgres real: RLS, idempotencia de XP, períodos, evidencias, fraude, permisos. Usa `TEST_DATABASE_URL` (un Postgres local vacío; crea bases temporales). |
 | `npm run test:unit` | Utilidades (zonas horarias, formulario de misiones, progreso). |
 | `node tests/e2e/flow.mjs` | Flujo completo en navegador contra Supabase local y la app en :3000 (ver cabecera del archivo para variables). |
 | `node tests/e2e/applications.mjs` | Página pública, solicitud, correcciones, aprobación, activación de licencia y edición de planes en navegador. |
@@ -49,7 +54,8 @@ supabase/migrations/   esquema, funciones y políticas RLS (fuente de verdad de 
 supabase/seed.sql      planes provisionales, categorías, productos DEMO, las 30 misiones, niveles e insignias
 src/app/page.tsx       página pública (marca, modelo, planes, preguntas frecuentes, contacto)
 src/app/panel/         panel del solicitante y licenciado (inicio, solicitud, misiones, ventas)
-src/app/admin/         panel administrativo (solicitudes, misiones, evidencias, ventas, licencias, planes, XP, auditoría)
+scripts/               SQL único de instalación y creación manual de cuentas
+src/app/admin/         panel administrativo (usuarios, solicitudes, misiones, evidencias, ventas, licencias, planes, XP, auditoría)
 src/lib/               cliente Supabase, sesión, utilidades
 tests/db/              pruebas de base de datos       tests/e2e/  prueba de punta a punta
 docs/                  especificación, arquitectura, base de datos, seguridad, reglas, hoja de ruta
@@ -61,10 +67,9 @@ docs/                  especificación, arquitectura, base de datos, seguridad, 
   para abrir períodos y vencer los cerrados. Sin ella todo sigue funcionando: los períodos se abren al entrar al panel
   o al verificar una venta.
 - **Respaldo:** Supabase hace copias diarias en planes de pago; además `npx supabase db dump --data-only > backup.sql`.
-- **Publicar:** crear el proyecto en Supabase, `npx supabase link` y `npx supabase db push`; en Vercel configurar las
-  variables de `.env.example`. Activar en Supabase Auth la confirmación de correo y añadir la URL del sitio a
-  *Redirect URLs*.
+- **Publicar:** ver [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md). En Supabase Auth hay que **desactivar el registro**
+  (*Allow new users to sign up*).
 
 Documentación: [PROJECT_SPEC](docs/PROJECT_SPEC.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) ·
 [DATABASE](docs/DATABASE.md) · [SECURITY](docs/SECURITY.md) · [BUSINESS_RULES](docs/BUSINESS_RULES.md) ·
-[MISSIONS](docs/MISSIONS.md) · [ROADMAP](docs/ROADMAP.md) · [CHANGELOG](CHANGELOG.md)
+[MISSIONS](docs/MISSIONS.md) · [DESPLIEGUE](docs/DESPLIEGUE.md) · [ROADMAP](docs/ROADMAP.md) · [CHANGELOG](CHANGELOG.md)

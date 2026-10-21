@@ -11,7 +11,8 @@
     "test:db": "npm run test:db:setup && node --import tsx --test --test-concurrency=4 tests/db/*.test.ts",
     "test": "npm run test:db && npm run test:unit",
     "test:unit": "node --import tsx --test src/**/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "crear-usuario": "tsx scripts/crear-usuario.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
