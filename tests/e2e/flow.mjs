@@ -185,7 +185,7 @@ try {
   // 8. El admin crea y duplica una misión desde la app.
   await ap.goto(`${APP}/admin/misiones/nueva`);
   await ap.fill("#code", `E2E${stamp % 10000}`);
-  await ap.fill("#title", "Misión especial de lanzamiento");
+  await ap.fill("#title", `Misión especial ${stamp}`);
   await ap.fill("#category", "Contenido");
   await ap.selectOption("#frequency", "weekly");
   await ap.selectOption("#metric", "approved_evidence_count");
@@ -201,7 +201,7 @@ try {
   log("misión creada por el administrador");
 
   await lp.goto(`${APP}/panel/misiones?tab=weekly`);
-  assert.equal(await lp.locator("article", { hasText: "Misión especial de lanzamiento" }).count(), 1);
+  assert.equal(await lp.locator("article", { hasText: `Misión especial ${stamp}` }).count(), 1);
   log("el licenciado ve la nueva misión");
 
   // 9. Ajuste auditado de XP.
