@@ -1,26 +1,83 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Identidad Gallo Negro: negro obsidiana, marfil, neutros de lino y acento bronce. */
+@theme {
+  --color-obsidian: #0b0b0c;
+  --color-coal: #151517;
+  --color-ash: #232326;
+  --color-smoke: #3a3a3f;
+  --color-ivory: #f4efe6;
+  --color-linen: #d9cfbf;
+  --color-parchment: #a79c8a;
+  --color-bronze: #b08d57;
+  --color-bronze-soft: #d2b483;
+  --color-ok: #7fb685;
+  --color-warn: #d9a441;
+  --color-bad: #d9725f;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-face), var(--font-body), ui-sans-serif, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-obsidian);
+  color: var(--color-ivory);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-bronze);
+  outline-offset: 2px;
+}
+
+@utility card {
+  @apply rounded-xl border border-ash bg-coal p-4 sm:p-5;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50;
+}
+
+@utility btn-primary {
+  @apply btn bg-ivory text-obsidian hover:bg-linen;
+}
+
+@utility btn-bronze {
+  @apply btn bg-bronze text-obsidian hover:bg-bronze-soft;
+}
+
+@utility btn-ghost {
+  @apply btn border border-smoke text-ivory hover:border-linen;
+}
+
+@utility btn-danger {
+  @apply btn border border-bad/60 text-bad hover:bg-bad/10;
+}
+
+@utility input {
+  @apply w-full rounded-lg border border-smoke bg-obsidian px-3 py-2 text-sm text-ivory placeholder:text-parchment/60 focus:border-bronze focus:outline-none;
+}
+
+@utility label {
+  @apply mb-1 block text-xs font-semibold uppercase tracking-wider text-parchment;
+}
+
+@utility eyebrow {
+  @apply text-xs font-semibold uppercase tracking-[0.2em] text-bronze;
+}
+
+@utility table-wrap {
+  @apply overflow-x-auto rounded-xl border border-ash;
+}
+
+@utility table {
+  @apply w-full text-left text-sm;
+  & th {
+    @apply bg-coal px-3 py-2 text-xs font-semibold uppercase tracking-wider text-parchment;
+  }
+  & td {
+    @apply border-t border-ash px-3 py-2 align-top;
+  }
 }
