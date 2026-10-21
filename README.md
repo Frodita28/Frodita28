@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gallo Negro Licencias
 
-## Getting Started
+Plataforma de licenciados de Gallo Negro ("Ropa exclusiva con identidad propia"): cuentas y roles, licencias,
+registro y verificación de ventas, y el **módulo de misiones y XP (Fase 1)**.
 
-First, run the development server:
+Stack: Next.js 16 (App Router, Server Actions) + TypeScript + Tailwind 4, Supabase (Postgres, Auth, RLS, Storage).
+Despliegue previsto: Vercel + Supabase.
+
+## Puesta en marcha local
+
+Requisitos: Node 20+, Docker (para Supabase local) y `psql`.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npx supabase start                # Postgres, Auth, API, Storage y Mailpit locales; aplica migraciones y seed
+cp .env.example .env.local        # pega la URL y la anon key que muestra `supabase start`
+npm run dev                       # http://127.0.0.1:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Correos locales (verificación, recuperación): Mailpit en http://127.0.0.1:54324.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Crear el primer administrador: regístrate en `/registro`, confirma el correo y ejecuta en la base de datos:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```sql
+update public.profiles set role = 'admin' where id = (select id from auth.users where email = 'tu@correo.com');
+```
 
-## Learn More
+Luego, desde `/admin/licencias`, activa licencias para los licenciados.
 
-To learn more about Next.js, take a look at the following resources:
+## Pruebas
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Comando | Qué prueba |
+| --- | --- |
+| `npm run test:db` | 46 pruebas de reglas en Postgres real: RLS, idempotencia de XP, períodos, evidencias, fraude, permisos. Usa `TEST_DATABASE_URL` (un Postgres local vacío; crea bases temporales). |
+| `npm run test:unit` | Utilidades (zonas horarias, formulario de misiones, progreso). |
+| `node tests/e2e/flow.mjs` | Flujo completo en navegador contra Supabase local y la app en :3000 (ver cabecera del archivo para variables). |
+| `npm run lint` · `npm run typecheck` · `npm run build` | Calidad y compilación. |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Estructura
 
-## Deploy on Vercel
+```
+supabase/migrations/   esquema, funciones y políticas RLS (fuente de verdad de las reglas)
+supabase/seed.sql      planes provisionales, categorías, productos DEMO, las 30 misiones, niveles e insignias
+src/app/panel/         panel del licenciado (inicio, misiones, ventas)
+src/app/admin/         panel administrativo (misiones, evidencias, ventas, licencias, XP, auditoría)
+src/lib/               cliente Supabase, sesión, utilidades
+tests/db/              pruebas de base de datos       tests/e2e/  prueba de punta a punta
+docs/                  especificación, arquitectura, base de datos, seguridad, reglas, hoja de ruta
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Mantenimiento
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Tarea diaria:** programar `select public.run_mission_maintenance();` (pg_cron en Supabase, 00:05 hora de Caracas)
+  para abrir períodos y vencer los cerrados. Sin ella todo sigue funcionando: los períodos se abren al entrar al panel
+  o al verificar una venta.
+- **Respaldo:** Supabase hace copias diarias en planes de pago; además `npx supabase db dump --data-only > backup.sql`.
+- **Publicar:** crear el proyecto en Supabase, `npx supabase link` y `npx supabase db push`; en Vercel configurar las
+  variables de `.env.example`. Activar en Supabase Auth la confirmación de correo y añadir la URL del sitio a
+  *Redirect URLs*.
+
+Documentación: [PROJECT_SPEC](docs/PROJECT_SPEC.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) ·
+[DATABASE](docs/DATABASE.md) · [SECURITY](docs/SECURITY.md) · [BUSINESS_RULES](docs/BUSINESS_RULES.md) ·
+[MISSIONS](docs/MISSIONS.md) · [ROADMAP](docs/ROADMAP.md) · [CHANGELOG](CHANGELOG.md)
