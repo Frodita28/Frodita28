@@ -19,4 +19,7 @@ Decisiones:
 - **Formularios sin JavaScript obligatorio:** las acciones redirigen con `?ok=` / `?error=`. Rápido en móvil.
 - Coste: plan gratuito de Supabase y Vercel alcanza para la fase inicial (≤100 licenciados).
 
+Rutas públicas: `/` (marca, planes y preguntas frecuentes) se renderiza con la anon key, que solo puede leer planes no
+inactivos y beneficios publicables. Solicitar exige cuenta: `/panel/solicitud` está protegida por `proxy.ts`.
+
 Tarea programada: `run_mission_maintenance()` (pg_cron) abre períodos y vence los cerrados; es idempotente.

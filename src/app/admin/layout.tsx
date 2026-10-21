@@ -5,10 +5,12 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   const user = await requireAdmin();
   const items = [
     { href: "/admin", label: "Resumen" },
+    { href: "/admin/solicitudes", label: "Solicitudes" },
     { href: "/admin/misiones", label: "Misiones" },
     { href: "/admin/revisiones", label: "Evidencias" },
     { href: "/admin/ventas", label: "Ventas" },
     { href: "/admin/licencias", label: "Licencias" },
+    { href: "/admin/planes", label: "Planes" },
     { href: "/admin/xp", label: "XP y alertas" },
     { href: "/admin/auditoria", label: "Auditoría" },
     { href: "/panel", label: "Volver al panel" },

@@ -44,6 +44,9 @@ export default async function PanelHome({ searchParams }: PageProps<"/panel">) {
             <p className="text-sm text-linen">
               Tu cuenta todavía no tiene una licencia activa. Gallo Negro revisa cada solicitud y activa la licencia
               después de formalizar el contrato y el pago.
+              {user.role === "applicant" && (
+                <Link href="/panel/solicitud" className="btn-bronze mt-4 flex w-full sm:inline-flex sm:w-auto">Ver o enviar mi solicitud</Link>
+              )}
             </p>
           )}
         </section>

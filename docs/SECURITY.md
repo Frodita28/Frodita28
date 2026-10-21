@@ -14,4 +14,10 @@
 - **Sesión:** validada con `auth.getUser()` en el servidor; redirecciones internas saneadas; mensajes de login y
   recuperación que no revelan si un correo existe; contraseña mínima de 10 caracteres; confirmación de correo.
 - **Secretos:** solo `NEXT_PUBLIC_SUPABASE_URL`/`ANON_KEY` llegan al navegador. La service role key no se usa en la web.
-- **Pruebas de autorización:** `tests/db/security.test.ts`, `sales.test.ts` y el paso 10 de `tests/e2e/flow.mjs`.
+- **Solicitudes:** sin escritura directa; solo cuentas de solicitante envían (máx. 5 por persona, una abierta);
+  validación de cada campo en el servidor y otra vez en Postgres; el solicitante ve solo sus solicitudes y los
+  eventos no internos; nadie revisa ni activa su propia solicitud (`CHECK` y verificación en las funciones);
+  activar una licencia es una función aparte, solo admin, auditada. Los visitantes no leen solicitudes ni eventos.
+- **Planes públicos:** el precio solo se publica con el plan `active` (restricción en la BD); los beneficios
+  `pending_approval` no son legibles por anónimos ni licenciados (RLS).
+- **Pruebas de autorización:** `tests/db/applications.test.ts`, `tests/db/security.test.ts`, `sales.test.ts` y el paso 10 de `tests/e2e/flow.mjs`.

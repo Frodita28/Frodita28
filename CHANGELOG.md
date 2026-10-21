@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0 — 2026-10-21
+
+- Página pública renovada: marca, cómo funciona, planes 1–4 desde la base de datos con valores pendientes marcados,
+  beneficios confirmados, reglas claras, preguntas frecuentes y contacto configurable.
+- Solicitudes de licencia: formulario, seguimiento de estado, mensajes del equipo, correcciones y retiro.
+- Revisión administrativa (`/admin/solicitudes`): en revisión, pedir correcciones, aprobar con plan, rechazar, notas
+  internas y activación de licencia como acción separada y auditada.
+- Edición de planes y beneficios sin código (`/admin/planes`), con auditoría de cambios.
+- 16 pruebas de base de datos nuevas (62 en total), pruebas unitarias y prueba de punta a punta `applications.mjs`.
+- Se añade `.env.example`.
+
 ## 0.1.0 — 2026-10-21
 
 - Proyecto Next.js 16 + Supabase con identidad visual Gallo Negro.
