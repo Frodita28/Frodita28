@@ -12,7 +12,8 @@ export default async function AdminHome() {
   const today = todayIn("America/Caracas");
   const monthStart = `${today.slice(0, 8)}01`;
 
-  const [licensees, pendingEvidence, pendingSales, openFlags, { data: ledger }, { data: parts }, { data: plans }] = await Promise.all([
+  const [openApplications, licensees, pendingEvidence, pendingSales, openFlags, { data: ledger }, { data: parts }, { data: plans }] = await Promise.all([
+    supabase.from("license_applications").select("id", { count: "exact", head: true }).in("status", ["submitted", "in_review", "needs_info"]),
     supabase.from("licenses").select("id", { count: "exact", head: true }).eq("status", "active"),
     supabase.from("mission_evidences").select("id", { count: "exact", head: true }).eq("status", "pending"),
     supabase.from("sales").select("id", { count: "exact", head: true }).eq("status", "pending"),
@@ -47,7 +48,8 @@ export default async function AdminHome() {
       <PageTitle eyebrow="Administración" title="Resumen">
         Período analizado: {formatDay(monthStart)} – {formatDay(today)} (hora de Caracas). Todos los datos son reales.
       </PageTitle>
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7">
+        <Kpi label="Solicitudes por resolver" value={openApplications.count ?? 0} href="/admin/solicitudes" />
         <Kpi label="Licenciados activos" value={licensees.count ?? 0} />
         <Kpi label="Evidencias pendientes" value={pendingEvidence.count ?? 0} href="/admin/revisiones" />
         <Kpi label="Ventas por verificar" value={pendingSales.count ?? 0} href="/admin/ventas" />
