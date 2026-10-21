@@ -111,7 +111,7 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
         <Stat label="XP acumulados" value={formatXp(total)} />
         <Stat label="XP este mes" value={formatXp(monthXp)} />
-        <Stat label="Racha diaria" value={`${streak(rows, today)} días`} />
+        <Stat label="Racha diaria" value={`${streak(rows, today)} ${streak(rows, today) === 1 ? "día" : "días"}`} />
         <Stat label="En progreso" value={String(inProgress)} />
         <Stat label="En revisión" value={String(byTab.review.length)} />
       </div>

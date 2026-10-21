@@ -20,13 +20,9 @@ export async function GET(request: NextRequest) {
     ok = !(await supabase.auth.exchangeCodeForSession(code)).error;
   }
 
-  const target = request.nextUrl.clone();
-  target.search = "";
-  if (ok) {
-    target.pathname = next;
-  } else {
-    target.pathname = "/login";
-    target.searchParams.set("error", "El enlace no es válido o expiró");
-  }
+  // Origen público configurado: detrás de un proxy, request.url puede traer el host interno.
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? `${request.headers.get("x-forwarded-proto") ?? "http"}://${request.headers.get("host")}`;
+  const target = new URL(ok ? next : "/login", base);
+  if (!ok) target.searchParams.set("error", "El enlace no es válido o expiró");
   return NextResponse.redirect(target);
 }
