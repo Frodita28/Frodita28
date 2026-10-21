@@ -17,6 +17,8 @@ export type Db = {
   as<T = Record<string, unknown>>(userId: string, text: string, params?: unknown[]): Promise<T[]>;
   /** Consulta como visitante anónimo. */
   anon<T = Record<string, unknown>>(text: string, params?: unknown[]): Promise<T[]>;
+  /** Consulta con la service role (servidor de la app o scripts de administración). */
+  service<T = Record<string, unknown>>(text: string, params?: unknown[]): Promise<T[]>;
   close(): Promise<void>;
 };
 
@@ -31,7 +33,7 @@ export async function freshDb(): Promise<Db> {
   const client = new Client({ connectionString: urlFor(name) });
   await client.connect();
 
-  async function scoped<T>(role: "authenticated" | "anon", userId: string | null, text: string, params?: unknown[]) {
+  async function scoped<T>(role: "authenticated" | "anon" | "service_role", userId: string | null, text: string, params?: unknown[]) {
     await client.query("begin");
     try {
       await client.query(`set local role ${role}`);
@@ -51,6 +53,7 @@ export async function freshDb(): Promise<Db> {
     sql: async (text, params) => (await client.query(text, params)).rows,
     as: (userId, text, params) => scoped("authenticated", userId, text, params),
     anon: (text, params) => scoped("anon", null, text, params),
+    service: (text, params) => scoped("service_role", null, text, params),
     close: async () => {
       await client.end();
       const a = new Client({ connectionString: ADMIN_URL });

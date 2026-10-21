@@ -7,7 +7,6 @@ import assert from "node:assert/strict";
 
 const APP = process.env.APP_URL ?? "http://127.0.0.1:3000";
 const API = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
-const MAILPIT = process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const DB_URL = process.env.DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 const SHOTS = process.argv[2] ?? "/tmp/gn-shots";
@@ -15,7 +14,7 @@ mkdirSync(SHOTS, { recursive: true });
 
 const stamp = Date.now();
 const ADMIN = { email: `admin.${stamp}@gallonegro.test`, password: "AdminSeguro123" };
-const LIC = { email: `ana.${stamp}@test.com`, password: "LicenciadaSegura1", name: "Ana Pérez" };
+const LIC = { username: `ana${stamp}`, email: `ana${stamp}@usuarios.gallonegro.local`, password: "LicenciadaSegura1", name: "Ana Pérez" };
 
 const psql = (sql) => execFileSync("psql", [DB_URL, "-tAc", sql], { encoding: "utf8" }).trim();
 const log = (m) => console.log(`✓ ${m}`);
@@ -31,22 +30,9 @@ async function createAdmin() {
   psql(`update public.profiles set role = 'admin' where id = '${user.id}'`);
 }
 
-async function confirmationLink(email) {
-  for (let i = 0; i < 20; i++) {
-    const list = await (await fetch(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:${email}`)}`)).json();
-    if (list.messages?.length) {
-      const msg = await (await fetch(`${MAILPIT}/api/v1/message/${list.messages[0].ID}`)).json();
-      const m = /(http[^\s"<>]+\/auth\/v1\/verify[^\s"<>]+)/.exec(msg.Text ?? msg.HTML);
-      if (m) return m[1].replace(/&amp;/g, "&");
-    }
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  throw new Error("No llegó el correo de verificación");
-}
-
-async function login(page, { email, password }, next = "/panel") {
+async function login(page, { username, email, password }, next = "/panel") {
   await page.goto(`${APP}/login?next=${encodeURIComponent(next)}`);
-  await page.fill("#email", email);
+  await page.fill("#username", username ?? email);
   await page.fill("#password", password);
   await page.click("button:has-text('Entrar')");
   await page.waitForURL((u) => u.pathname.startsWith(next));
@@ -76,21 +62,29 @@ try {
   await createAdmin();
   log("administrador creado");
 
-  // 1. Registro y verificación de correo del licenciado.
-  await lp.goto(`${APP}/registro`);
-  await lp.fill("#full_name", LIC.name);
-  await lp.fill("#email", LIC.email);
-  await lp.fill("#password", LIC.password);
-  await lp.click("button:has-text('Crear cuenta')");
-  await lp.waitForURL(/\/login\?ok=/);
-  await login(lp, LIC).then(
-    () => assert.fail("no debería poder entrar sin verificar"),
+  // 1. Sin registro público: el admin crea la cuenta y la persona entra con su usuario.
+  assert.equal((await lp.goto(`${APP}/registro`)).status(), 404);
+  const signup = await fetch(`${API}/auth/v1/signup`, {
+    method: "POST",
+    headers: { apikey: process.env.ANON_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({ email: `intruso.${stamp}@test.com`, password: "IntrusoSeguro1" }),
+  });
+  assert.ok(signup.status >= 400, `signup público devolvió ${signup.status}`);
+  await login(ap, ADMIN, "/admin");
+  await ap.goto(`${APP}/admin/usuarios`);
+  await ap.fill("#username", LIC.username);
+  await ap.fill("#password", LIC.password);
+  await ap.selectOption("#role", "applicant");
+  await ap.fill("#full_name", LIC.name);
+  await ap.click("button:has-text('Crear cuenta')");
+  await ap.waitForURL(/ok=/);
+  await login(lp, { ...LIC, password: "incorrecta" }).then(
+    () => assert.fail("no debería entrar con una contraseña errónea"),
     () => {},
   );
-  assert.match(await lp.textContent("[role=alert]"), /Confirma tu correo/);
-  await lp.goto(await confirmationLink(LIC.email));
-  await lp.waitForURL(/\/panel/);
-  log("registro + verificación de correo");
+  assert.match(await lp.textContent("[role=alert]"), /Usuario o contraseña incorrectos/);
+  await login(lp, LIC);
+  log("sin registro público; cuenta creada por el admin y acceso con usuario");
   await lp.goto(`${APP}/panel/misiones`);
   assert.match(await lp.textContent("main"), /Necesitas una licencia activa/);
   log("sin licencia no hay misiones");

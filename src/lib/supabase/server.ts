@@ -6,7 +6,7 @@ import { supabaseEnv } from "./env";
 /**
  * Cliente de Supabase con la sesión del usuario actual.
  * Todas las consultas pasan por RLS con los permisos de ese usuario:
- * la app nunca usa la service role key para operaciones de usuarios.
+ * la service role solo se usa para crear cuentas (ver ./admin.ts).
  */
 export async function createClient() {
   const cookieStore = await cookies();

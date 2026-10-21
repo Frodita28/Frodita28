@@ -5,6 +5,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   const user = await requireAdmin();
   const items = [
     { href: "/admin", label: "Resumen" },
+    { href: "/admin/usuarios", label: "Usuarios" },
     { href: "/admin/solicitudes", label: "Solicitudes" },
     { href: "/admin/misiones", label: "Misiones" },
     { href: "/admin/revisiones", label: "Evidencias" },

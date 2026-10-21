@@ -8,7 +8,7 @@ const VALUES = ["Exclusividad", "Identidad propia", "Disciplina", "Fuerza", "Aut
 
 const STEPS = [
   ["Conoce los planes", "Revisa los planes y sus condiciones publicadas. Lo que aún no está confirmado aparece como pendiente."],
-  ["Envía tu solicitud", "Crea tu cuenta y cuéntanos dónde estás, tu experiencia y por qué canales vendes."],
+  ["Envía tu solicitud", "Escríbenos: Gallo Negro te asigna un usuario y en tu panel nos cuentas dónde estás, tu experiencia y por qué canales vendes."],
   ["Revisión del equipo", "Gallo Negro revisa cada solicitud. Puede pedirte información adicional antes de decidir."],
   ["Contrato y pago", "Si se aprueba, se formalizan por escrito las condiciones del plan, el contrato y el pago."],
   ["Activación", "Solo después el equipo activa tu licencia. Una solicitud aprobada todavía no es una licencia."],
@@ -101,7 +101,12 @@ export default async function Home() {
               autenticidad, dentro de una red de licenciados organizada y transparente.
             </p>
             <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-              <Link href="/panel/solicitud" className="btn-bronze px-6 py-3">Solicitar licencia</Link>
+              {/* Sin registro público: los visitantes piden su cuenta por contacto; quien ya tiene una solicita desde su panel. */}
+              {user ? (
+                <Link href="/panel/solicitud" className="btn-bronze px-6 py-3">Solicitar licencia</Link>
+              ) : (
+                <a href="#contacto" className="btn-bronze px-6 py-3">Solicitar licencia</a>
+              )}
               <a href="#planes" className="btn-ghost px-6 py-3">Ver planes</a>
             </div>
           </div>
@@ -199,15 +204,14 @@ export default async function Home() {
         <section className="border-t border-ash" aria-labelledby="contacto">
           <div className="mx-auto flex max-w-5xl flex-col items-center px-4 py-14 text-center">
             <h2 id="contacto" className="font-display text-xl uppercase">Contacto</h2>
+            <p className="mt-3 max-w-md text-sm text-linen">
+              Las cuentas del portal las asigna Gallo Negro. Escríbenos para solicitar tu licencia y recibir tu usuario.
+            </p>
             {contacts.length > 0 ? (
               <ul className="mt-4 flex flex-wrap justify-center gap-3">
                 {contacts.map((c) => <li key={c.href}><a className="btn-ghost" href={c.href}>{c.label}</a></li>)}
               </ul>
-            ) : (
-              <p className="mt-3 max-w-md text-sm text-linen">
-                Envía tu solicitud y el equipo de Gallo Negro te responderá desde tu panel.
-              </p>
-            )}
+            ) : null}
           </div>
         </section>
       </main>
