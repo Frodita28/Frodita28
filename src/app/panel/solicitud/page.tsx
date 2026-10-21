@@ -109,7 +109,7 @@ function CurrentApplication({ app, plans }: { app: Application; plans: { id: str
           <h2 className="eyebrow">Estado</h2>
           <ApplicationStatusPill status={app.status} />
         </div>
-        <p className="mt-3 text-sm text-linen">{app.license_id ? "Tu licencia está activa. Ya puedes usar tu panel de licenciado." : info.help}</p>
+        <p className="mt-3 text-sm text-linen">{app.license_id ? "Tu licencia está activa. Ya puedes abrir y gestionar tu tienda." : info.help}</p>
         {app.admin_message && (
           <div className={`mt-4 rounded-lg border p-3 text-sm ${app.status === "needs_info" ? "border-warn/60" : "border-ash"}`}>
             <p className="label">Mensaje de Gallo Negro</p>

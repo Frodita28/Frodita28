@@ -14,5 +14,8 @@
   futura y de los últimos 60 días.
 - El licenciado puede anular sus ventas pendientes; solo el admin anula una verificada. Si esa venta ya había
   completado una misión, se abre una alerta y el admin corrige con un ajuste auditado (el historial nunca se borra).
+- Cada licenciado opera una **tienda virtual** bajo su licencia. Las cifras de Tu Tienda nunca se estiman: total
+  generado y prendas vendidas solo cuentan ventas verificadas; stock e inversión solo cuentan lo que el administrador
+  registró. Sin datos se muestra 0. La inversión acumulada no implica ni promete retorno.
 - Recompensas: no se muestran ni se canjean hasta que Gallo Negro las apruebe; nunca canje de XP por dinero sin
   decisión expresa de la empresa.

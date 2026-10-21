@@ -39,7 +39,7 @@ export default async function SalesPage({ searchParams }: PageProps<"/panel/vent
   return (
     <>
       <Flash ok={sp.ok} error={sp.error} />
-      <PageTitle eyebrow="Registro comercial" title="Mis ventas">
+      <PageTitle eyebrow="Registro comercial" title="Ventas de tu tienda">
         Registra cada venta real con una referencia única (número de pedido, chat o factura). Solo las ventas
         verificadas por Gallo Negro cuentan para tus misiones.
       </PageTitle>

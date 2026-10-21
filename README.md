@@ -29,12 +29,14 @@ update public.profiles set role = 'admin' where id = (select id from auth.users 
 Flujo de licencias: la persona se registra y envía su solicitud en `/panel/solicitud`; el admin la revisa en
 `/admin/solicitudes` (en revisión, pedir correcciones, aprobar con plan o rechazar) y, con contrato y pago
 formalizados, activa la licencia desde la misma solicitud. Los planes y sus beneficios se editan en `/admin/planes`.
+Cada licenciado opera una tienda virtual: su inicio es **Tu Tienda** (`/panel`), con ventas, XP, rango, stock,
+prendas vendidas, total generado e inversión. El admin registra entregas de prendas e inversiones en `/admin/tiendas`.
 
 ## Pruebas
 
 | Comando | Qué prueba |
 | --- | --- |
-| `npm run test:db` | 62 pruebas de reglas en Postgres real: RLS, idempotencia de XP, períodos, evidencias, fraude, permisos. Usa `TEST_DATABASE_URL` (un Postgres local vacío; crea bases temporales). |
+| `npm run test:db` | 71 pruebas de reglas en Postgres real: RLS, idempotencia de XP, períodos, evidencias, fraude, permisos. Usa `TEST_DATABASE_URL` (un Postgres local vacío; crea bases temporales). |
 | `npm run test:unit` | Utilidades (zonas horarias, formulario de misiones, progreso). |
 | `node tests/e2e/flow.mjs` | Flujo completo en navegador contra Supabase local y la app en :3000 (ver cabecera del archivo para variables). |
 | `node tests/e2e/applications.mjs` | Página pública, solicitud, correcciones, aprobación, activación de licencia y edición de planes en navegador. |
