@@ -18,8 +18,11 @@
   crean con la API de administración de Auth y `provision_account`, función ejecutable **solo por la service role**
   (revocada a `anon` y `authenticated`) que asigna usuario, rol y licencia y lo audita (`account.provisioned`, con el
   admin que actúa). Asignar contraseña también queda auditado (`account.password_set`).
-- **Contraseñas:** las asignadas por el admin tienen un mínimo de 6 (el de Supabase) y son **temporales**: la persona
-  debe cambiarla en *Contraseña* (`/nueva-clave`, mínimo 10). La contraseña de prueba `123456` de la cuenta
+- **Contraseñas:** las asigna **solo el administrador** en *Administración → Usuarios* (mínimo 6, el de Supabase). La
+  app no ofrece a los usuarios ninguna página ni acción para cambiar su contraseña (se quitó `/nueva-clave` y la
+  acción `updatePassword`). Límite conocido: la API de Supabase Auth sigue permitiendo que una sesión válida cambie
+  su propia contraseña (`PUT /auth/v1/user`) si alguien la llama a mano; Supabase no permite desactivarlo. Si pasa, el
+  admin vuelve a asignarla desde *Usuarios*. La contraseña de prueba `123456` de la cuenta
   `tiendita` es solo para el entorno de prueba y debe cambiarse antes de cualquier uso real. Ninguna contraseña está
   escrita en migraciones, semillas ni código: el script `crear-usuario` la pide por teclado.
 - **Sesión:** validada con `auth.getUser()` en el servidor; redirecciones internas saneadas; el login responde

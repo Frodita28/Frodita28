@@ -28,7 +28,7 @@ export default async function Users({ searchParams }: PageProps<"/admin/usuarios
       <PageTitle eyebrow="Acceso" title="Usuarios">
         No hay registro público: solo entra quien tenga una cuenta creada aquí. Cada persona inicia sesión con su
         usuario y contraseña. Un licenciado nuevo recibe una licencia activa en el plan elegido (o el primero
-        disponible). Entrega las contraseñas por un canal privado y pide que se cambien al entrar.
+        disponible). Entrega las contraseñas por un canal privado: las tiendas no pueden cambiarlas, solo tú desde aquí.
       </PageTitle>
 
       {!ready && (

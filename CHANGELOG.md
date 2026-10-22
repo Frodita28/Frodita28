@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.2 — 2026-10-22
+
+- Se quita **Contraseña** del menú del panel, junto con la página `/nueva-clave` y la acción que cambiaba la
+  contraseña. Las tiendas ya no pueden cambiar su contraseña desde la app: el administrador las asigna y cambia en
+  *Administración → Usuarios*.
+
 ## 0.5.1 — 2026-10-22
 
 - **Más velocidad.** Las funciones de Vercel corren en Oregón (`pdx1`, en `vercel.json`), la misma zona que la base de

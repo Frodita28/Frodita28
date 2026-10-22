@@ -119,8 +119,8 @@ Si ya eras administrador con tu correo real, omite la segunda consulta. Cada alt
 
 Abre la dirección de Vercel → **Portal de licenciados** → usuario `tiendita`, contraseña `123456`.
 
-> **Importante:** `123456` es una contraseña **solo temporal para pruebas**. Antes de cualquier uso real, cámbiala
-> desde **Contraseña** en el panel (mínimo 10 caracteres) o asígnale una nueva desde **Administración → Usuarios**.
+> **Importante:** `123456` es una contraseña **solo temporal para pruebas**. Antes de cualquier uso real, asígnale una
+> nueva desde **Administración → Usuarios**. Las tiendas no pueden cambiar su contraseña: solo el administrador.
 
 ### Después: crear cuentas desde la app
 
