@@ -42,6 +42,10 @@ Si el SQL da error no se aplica nada; copia el mensaje de error y compártelo. E
 
 ## 4. Publicar en Vercel
 
+> **Región:** `vercel.json` fija las funciones en `pdx1` (Oregón) porque el proyecto de Supabase está en `us-west-2`
+> (Oregón). Si creas el proyecto de Supabase en otra región, cambia `regions` en `vercel.json` por la más cercana
+> (p. ej. `us-east-1` → `iad1`, `sa-east-1` → `gru1`): tenerlas lejos hace lenta cada página.
+
 1. Entra a <https://vercel.com/signup> y crea la cuenta con **Continue with GitHub**.
 2. **Add New… → Project** → busca `Frodita28` → **Import**. Si no aparece, pulsa *Adjust GitHub App
    Permissions* y dale acceso a ese repositorio.

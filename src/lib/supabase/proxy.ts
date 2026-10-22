@@ -21,10 +21,11 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  // getUser() valida el token contra Supabase Auth (no solo decodifica la cookie).
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims() refresca la sesión si caducó y verifica la firma del token con las claves
+  // públicas del proyecto (en caché), sin un viaje a Supabase Auth en cada petición.
+  // Aquí solo decide si redirigir a /login: las páginas vuelven a validar con getUser().
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims.sub ? data.claims : null;
 
   const path = request.nextUrl.pathname;
   if (!user && PROTECTED.some((p) => path === p || path.startsWith(`${p}/`))) {
