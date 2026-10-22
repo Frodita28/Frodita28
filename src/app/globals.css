@@ -14,8 +14,16 @@
   --color-ok: #7fb685;
   --color-warn: #d9a441;
   --color-bad: #d9725f;
+  /* Club de licenciatarios (panel de las tiendas): dorado vivo, rojo y violeta de acento. */
+  --color-gold: #e2b23c;
+  --color-gold-soft: #f2c957;
+  --color-blood: #e5484d;
+  --color-violet: #9b6bff;
+  --color-pit: #121214;
+  --color-slab: #1b1b1e;
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display-face), var(--font-body), ui-sans-serif, sans-serif;
+  --font-condensed: var(--font-condensed-face), var(--font-display-face), ui-sans-serif, sans-serif;
 }
 
 html {
@@ -80,4 +88,44 @@ body {
   & td {
     @apply border-t border-ash px-3 py-2 align-top;
   }
+}
+
+/* ---------- Club de licenciatarios: bloques con borde marcado y sombra dura ---------- */
+
+@utility slab {
+  @apply border border-ash bg-slab p-4 shadow-[4px_4px_0_0_#000] sm:p-5;
+}
+
+@utility slab-title {
+  @apply font-display text-lg uppercase leading-tight tracking-wide sm:text-xl;
+}
+
+@utility kicker {
+  @apply text-[11px] font-bold uppercase tracking-[0.12em] text-parchment;
+}
+
+@utility tab {
+  @apply inline-flex items-center gap-2 border border-ash bg-pit px-3 py-2 font-condensed text-lg uppercase leading-none tracking-wide whitespace-nowrap text-linen transition-colors hover:border-gold/60 hover:text-ivory sm:px-4 sm:py-2.5 sm:text-xl;
+  &[aria-current="page"] {
+    @apply border-gold bg-gold text-obsidian;
+  }
+}
+
+@utility chip {
+  @apply inline-flex items-center border border-ash px-3 py-1.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap text-parchment hover:text-ivory;
+  &[aria-current="page"] {
+    @apply border-gold bg-gold text-obsidian;
+  }
+}
+
+@utility btn-gold {
+  @apply btn rounded-none bg-gold font-condensed text-lg tracking-wide text-obsidian uppercase shadow-[3px_3px_0_0_#000] hover:bg-gold-soft;
+}
+
+@utility btn-slab {
+  @apply btn rounded-none border border-smoke bg-pit font-condensed text-lg tracking-wide text-ivory uppercase hover:border-gold;
+}
+
+@utility tag {
+  @apply inline-flex items-center px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider;
 }

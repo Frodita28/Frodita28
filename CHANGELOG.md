@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.6.0 — 2026-10-22
+
+- **Nuevo diseño del panel de la tienda ("Club de licenciatarios")**, inspirado en la referencia que compartió
+  Fernando: cabecera con el emblema GN y el nombre de la tienda, pestañas grandes con iconos, bloques con borde de
+  color y sombra marcada, dorado vivo con rojo y violeta de acento y tipografía condensada (Bebas Neue) en pestañas y
+  botones. Administración conserva su estilo.
+- **Tu Tienda:** cuatro tarjetas principales (ranking actual, XP, rango de licencia con barra al siguiente nivel y
+  squad, que queda como *próximamente*), las cifras de ventas, stock e inversión, botón al punto de venta y el estado
+  de la licencia en español.
+- **Clasificación** (`/panel/clasificacion`): tiendas con licencia activa ordenadas por XP, con buscador. Solo muestra
+  el nombre visible y los XP; la vista por squads queda como *próximamente*. Migración
+  `20261022000009_leaderboard.sql` (`store_leaderboard`) y 3 pruebas de base de datos nuevas (92 en total).
+- **Recompensas** (`/panel/recompensas`): muestra solo las recompensas que Gallo Negro haya aprobado, con el progreso
+  de XP hacia cada una; el canje queda como *próximamente*. Hoy no hay ninguna aprobada, así que se ve el aviso.
+- **Misiones:** encabezado "Misiones y desafíos", tarjetas a lo ancho con categoría, XP, barra y estado; el formulario
+  de evidencia se despliega desde el botón *Enviar evidencia*. **Ventas** y el punto de venta adoptan el nuevo estilo
+  sin cambiar su funcionamiento.
+
 ## 0.5.1 — 2026-10-22
 
 - **Más velocidad.** Las funciones de Vercel corren en Oregón (`pdx1`, en `vercel.json`), la misma zona que la base de

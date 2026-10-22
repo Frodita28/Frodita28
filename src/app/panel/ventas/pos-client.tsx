@@ -76,16 +76,16 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
 
   if (disabled) {
     return (
-      <section className="card mb-6 border-warn/40 text-sm text-warn">
+      <section className="slab mb-6 border-l-4 border-l-warn text-sm text-warn">
         Necesitas una licencia activa para vender desde el punto de venta.
       </section>
     );
   }
 
   return (
-    <section className="card mb-6" aria-labelledby="pos-title">
+    <section className="slab mb-6 border-l-4 border-l-gold" aria-labelledby="pos-title">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 id="pos-title" className="eyebrow">Punto de venta</h2>
+        <h2 id="pos-title" className="slab-title">Punto de venta</h2>
         <span className="text-xs text-parchment">{cart.length} {cart.length === 1 ? "prenda" : "prendas"}</span>
       </div>
 
@@ -94,7 +94,7 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
           {scanning ? (
             <QrScanner onCode={add} onClose={() => setScanning(false)} />
           ) : (
-            <button type="button" className="btn-bronze w-full py-4 text-base" onClick={() => { setNotice(null); setScanning(true); }}>
+            <button type="button" className="btn-gold w-full py-4 text-xl" onClick={() => { setNotice(null); setScanning(true); }}>
               Escanear QR de la prenda
             </button>
           )}
@@ -117,7 +117,7 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
               autoCapitalize="characters"
               spellCheck={false}
             />
-            <button className="btn-ghost whitespace-nowrap" disabled={looking || !manual.trim()}>Agregar</button>
+            <button className="btn-slab whitespace-nowrap" disabled={looking || !manual.trim()}>Agregar</button>
           </form>
           {(notice || looking) && (
             <p role="status" className={`text-sm ${looking ? "text-parchment" : notice?.tone === "ok" ? "text-ok" : "text-bad"}`}>
@@ -129,11 +129,11 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
         <form action={close} className="space-y-3">
           <input type="hidden" name="codes" value={JSON.stringify(cart.map((i) => i.code))} />
           {cart.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-smoke p-4 text-sm text-parchment">
+            <p className="border border-dashed border-smoke p-4 text-sm text-parchment">
               Escanea la etiqueta QR de cada prenda que sale. El precio lo fija Gallo Negro en la etiqueta.
             </p>
           ) : (
-            <ul className="divide-y divide-ash rounded-lg border border-ash">
+            <ul className="divide-y divide-ash border border-ash bg-pit">
               {cart.map((i) => (
                 <li key={i.code} className="flex items-center justify-between gap-3 p-3 text-sm">
                   <div className="min-w-0">
@@ -155,7 +155,7 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
               ))}
               <li className="flex items-center justify-between p-3">
                 <span className="label mb-0">Total</span>
-                <span className="font-display text-xl">{money(total)}</span>
+                <span className="font-display text-xl text-gold">{money(total)}</span>
               </li>
             </ul>
           )}
@@ -176,7 +176,7 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
           <p className="text-xs text-parchment">
             El cliente solo lo ven tú y Gallo Negro; sirve para las misiones de clientes que regresan.
           </p>
-          <button className="btn-primary w-full py-3" disabled={cart.length === 0 || closing || looking}>
+          <button className="btn-gold w-full py-3" disabled={cart.length === 0 || closing || looking}>
             {closing ? "Registrando…" : cart.length === 0 ? "Cerrar venta" : `Cerrar venta · ${money(total)}`}
           </button>
         </form>

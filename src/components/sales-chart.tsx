@@ -33,7 +33,7 @@ export function SalesChart({ months }: { months: StoreMonth[] }) {
                   <div key={m.month} className="group relative flex h-full flex-1 items-end justify-center" title={label}>
                     {m.revenue > 0 && (
                       <div
-                        className="w-3/5 max-w-10 rounded-t bg-bronze transition-colors group-hover:bg-bronze-soft"
+                        className="w-3/5 max-w-10 bg-gold transition-colors group-hover:bg-gold-soft"
                         style={{ height: `${(m.revenue / max) * 100}%` }}
                       />
                     )}
