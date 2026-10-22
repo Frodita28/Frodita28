@@ -1,8 +1,8 @@
 /**
  * Contenido de /panel/licencia: todo texto y toda cifra de la página vive aquí.
  *
- * BORRADOR: las cifras, porcentajes y plazos están pendientes de confirmación por Gallo Negro.
- * Mientras `esBorrador` sea true, la página muestra la etiqueta "VERSIÓN BORRADOR".
+ * Versión 1.0: cifras, porcentajes y plazos confirmados por Gallo Negro el 22 de octubre de 2026.
+ * Si se vuelve a poner `esBorrador` en true, la página muestra la etiqueta "VERSIÓN BORRADOR".
  * El porcentaje de recuperación no se escribe a mano: lo calcula src/lib/licencia.ts con
  * costo = PVP × (1 − margen) y recuperación = inversión / PVP.
  */
@@ -50,9 +50,9 @@ export type Clausula = { titulo: string; texto: string };
 const AMBOS = "Ambos planes";
 
 export const licencia = {
-  version: "0.1",
-  vigenteDesde: "fecha por confirmar",
-  esBorrador: true,
+  version: "1.0",
+  vigenteDesde: "22 de octubre de 2026",
+  esBorrador: false,
 
   encabezado: {
     titulo: "Términos de licencia",
