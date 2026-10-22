@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { loginEmail, ownPasswordSchema } from "@/lib/accounts";
+import { loginEmail } from "@/lib/accounts";
 import { createClient } from "@/lib/supabase/server";
 import { back, safeNext } from "@/lib/redirect";
 
@@ -24,15 +24,6 @@ export async function signIn(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password: parsed.data.password });
   if (error) back(loginPath, "error", "Usuario o contraseña incorrectos");
   redirect(next);
-}
-
-export async function updatePassword(formData: FormData) {
-  const password = ownPasswordSchema.safeParse(formData.get("password"));
-  if (!password.success) back("/nueva-clave", "error", password.error.issues[0].message);
-  const supabase = await createClient();
-  const { error } = await supabase.auth.updateUser({ password: password.data });
-  if (error) back("/nueva-clave", "error", "No se pudo actualizar la contraseña. Intenta de nuevo.");
-  back("/panel", "ok", "Contraseña actualizada");
 }
 
 export async function signOut() {

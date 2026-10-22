@@ -14,13 +14,10 @@ export const usernameSchema = z
   .regex(/^[a-z0-9][a-z0-9._-]{2,29}$/, "Usuario no válido: de 3 a 30 caracteres (letras, números, punto, guion o guion bajo)");
 
 /**
- * Contraseña que asigna el administrador. El mínimo es el de Supabase Auth (6);
- * una contraseña corta es solo temporal y debe cambiarse antes del uso real.
+ * Contraseña que asigna el administrador (los usuarios no pueden cambiarla desde la app).
+ * El mínimo es el de Supabase Auth (6); una contraseña corta es solo para pruebas.
  */
 export const assignedPasswordSchema = z.string().min(6, "La contraseña debe tener al menos 6 caracteres").max(72);
-
-/** Contraseña que elige el propio usuario al cambiarla. */
-export const ownPasswordSchema = z.string().min(10, "La contraseña debe tener al menos 10 caracteres").max(72);
 
 export const accountRoles = ["licensee", "applicant", "admin"] as const;
 export type AccountRole = (typeof accountRoles)[number];

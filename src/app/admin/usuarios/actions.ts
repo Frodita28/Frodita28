@@ -47,5 +47,5 @@ export async function resetAccountPassword(formData: FormData) {
   if (!parsed.success) back(PATH, "error", parsed.error.issues[0].message);
   const result = await setAccountPassword(createAdminClient(), parsed.data.user_id, parsed.data.password, actor.id);
   if ("error" in result) back(PATH, "error", result.error);
-  back(PATH, "ok", "Contraseña asignada. Pide a la persona que la cambie al entrar.");
+  back(PATH, "ok", "Contraseña asignada. Entrégala por un canal privado.");
 }
