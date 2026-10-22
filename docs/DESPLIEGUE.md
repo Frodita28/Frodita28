@@ -29,7 +29,7 @@ node scripts/sql-unico.mjs > instalar.sql
 1. En el proyecto, menú izquierdo → **SQL Editor** → **New query**.
 2. Abre `instalar.sql`, copia todo su contenido y pégalo en el editor.
 3. Pulsa **Run**. Debe terminar con *Success. No rows returned*.
-4. Comprueba: **Table Editor** muestra tablas como `missions` (30 filas) y `license_plans` (4 filas), y en
+4. Comprueba: **Table Editor** muestra tablas como `missions` (29 filas) y `license_plans` (4 filas), y en
    **Storage** existe el bucket `evidences`.
 
 Si el SQL da error no se aplica nada; copia el mensaje de error y compártelo. Ejecútalo solo una vez por proyecto.
@@ -55,7 +55,8 @@ Si el SQL da error no se aplica nada; copia el mensaje de error y compártelo. E
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | la clave pública del paso 3 |
    | `SUPABASE_SERVICE_ROLE_KEY` | *(opcional)* la clave **service_role** / **secret** de **Project Settings → API Keys**. Esta sí con *Type* **Sensitive** / **Secret**. Sin ella todo funciona, pero las cuentas se crean como en el paso 6. |
 
-   `NEXT_PUBLIC_SITE_URL` ya no se usa (no hay correos de verificación ni recuperación); si existe, puedes borrarla.
+   `NEXT_PUBLIC_SITE_URL` es opcional: si pones la dirección pública de la app (la de **Domains**, con `https://`),
+   las etiquetas QR la usan siempre. Si no, usan la dirección desde la que el administrador las imprime.
 5. Pulsa **Deploy** y espera. Al terminar, pulsa **Continue to Dashboard** y anota la dirección en **Domains**.
 6. Si cambias variables después, vuelve a desplegar (**Deployments** → ⋯ en el último → **Redeploy**).
 
@@ -128,11 +129,23 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co SUPABASE_SERVICE_ROLE_KEY=... 
   npm run crear-usuario -- --usuario tiendita --rol licensee --tienda "Tiendita"
 ```
 
+## 6.5 Actualización del punto de venta con QR (2026-10-22)
+
+Si la base de datos se instaló antes de esta versión, en **SQL Editor → New query** pega el contenido de
+`actualizar-punto-de-venta.sql` (es la migración `supabase/migrations/20261022000008_pos_qr.sql`) y pulsa **Run**.
+Retira la misión "La segunda oportunidad" y crea el punto de venta. En un proyecto nuevo no hace falta: ya viene
+dentro de `instalar.sql`.
+
+Para probarlo: como administrador, **Administración → Etiquetas QR** → elige la tienda, el producto, cuántas prendas y
+el precio de venta → **Generar etiquetas** → **Imprimir etiquetas**. Como tienda, **Ventas** → **Escanear QR de la
+prenda** (el navegador pide permiso para la cámara) o escribe el código → **Cerrar venta**. La cámara del navegador
+necesita `https://` (Vercel ya lo da).
+
 ## 7. Opcional: tarea diaria de misiones
 
 **Integrations → Cron** → activa *pg_cron* → **Create job**: nombre `misiones-diarias`, horario `5 4 * * *`
 (00:05 en Caracas = 04:05 UTC), tipo *SQL snippet*: `select public.run_mission_maintenance();`.
-Sin esta tarea la app funciona igual: los períodos se abren al entrar al panel o al verificar una venta.
+Sin esta tarea la app funciona igual: los períodos se abren al entrar al panel o al registrar una venta.
 
 ## Actualizaciones posteriores
 

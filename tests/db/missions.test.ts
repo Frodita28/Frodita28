@@ -52,7 +52,9 @@ describe("Participaciones y períodos", () => {
     const codes = rows.map((r) => r.code).sort();
     assert.ok(codes.includes("D01") && codes.includes("S01") && codes.includes("M10"));
     for (const inactive of ["D07", "D08", "S08", "S09"]) assert.ok(!codes.includes(inactive), inactive);
-    assert.equal(codes.length, 26);
+    // D09 "La segunda oportunidad" se retiró el 2026-10-22.
+    assert.ok(!codes.includes("D09"));
+    assert.equal(codes.length, 25);
   });
 
   it("refrescar varias veces no duplica participaciones", async () => {
@@ -60,7 +62,7 @@ describe("Participaciones y períodos", () => {
     await refresh(db, u);
     await refresh(db, u);
     const [c] = await db.sql<{ n: string }>(`select count(*) as n from public.mission_participations where user_id = $1`, [u]);
-    assert.equal(Number(c.n), 26);
+    assert.equal(Number(c.n), 25);
   });
 
   it("un solicitante sin licencia no recibe misiones ni las ve", async () => {
@@ -137,6 +139,32 @@ describe("Participaciones y períodos", () => {
     );
     assert.deepEqual(d02.map((r) => r.status), ["expired", "available"]);
     assert.equal(await xpTotal(db, u), 100);
+  });
+
+  it("una misión archivada deja de abrirse pero su historial y XP siguen visibles para el licenciado", async () => {
+    const u = await createLicensee(db, "archivada@test.com");
+    await refresh(db, u);
+    const d03 = await participation(db, u, "D03");
+    await db.sql(
+      `insert into public.xp_ledger (user_id, amount, transaction_type, mission_id, participation_id, description, idempotency_key)
+       select $1, 30, 'mission_reward', mission_id, id, 'histórico', 'mission_reward:' || id from public.mission_participations where id = $2`,
+      [u, d03.id],
+    );
+    await db.sql(`update public.mission_participations set status = 'completed', current_progress = 1, completed_at = now() where id = $1`, [d03.id]);
+    await db.sql(`update public.missions set status = 'archived' where code = 'D03'`);
+
+    const other = await createLicensee(db, "nueva-archivada@test.com");
+    await refresh(db, other);
+    assert.equal(await participation(db, other, "D03"), undefined);
+
+    const seen = await db.as<{ code: string; status: string }>(
+      u,
+      `select m.code, m.status from public.mission_participations p join public.missions m on m.id = p.mission_id where m.code = 'D03'`,
+    );
+    assert.deepEqual(seen, [{ code: "D03", status: "archived" }]);
+    assert.equal((await db.as(other, `select 1 from public.missions where code = 'D03'`)).length, 0);
+    assert.equal(await xpTotal(db, u), 30);
+    await db.sql(`update public.missions set status = 'active' where code = 'D03'`);
   });
 
   it("calcula los períodos en la zona horaria de la campaña (semana de lunes a domingo)", async () => {

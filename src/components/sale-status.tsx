@@ -12,16 +12,23 @@ export function SaleStatus({ status }: { status: keyof typeof SALE_STATUS }) {
   return <Pill tone={s.tone}>{s.label}</Pill>;
 }
 
+/** Origen de la venta: punto de venta con QR o registro manual anterior. */
+export function SaleSource({ source }: { source: "pos" | "manual" }) {
+  return source === "pos" ? <Pill tone="bronze">QR</Pill> : <Pill>Manual</Pill>;
+}
+
 export type SaleWithItems = {
   id: string;
   reference: string;
+  source: "pos" | "manual";
+  created_at: string;
   sold_at: string;
   channel: string;
   customer_ref: string | null;
   status: keyof typeof SALE_STATUS;
   rejection_reason: string | null;
   cancel_reason: string | null;
-  sale_items: { quantity: number; unit_price: number; products: { name: string } | null }[];
+  sale_items: { quantity: number; unit_price: number; products: { name: string } | null; garment_units: { code: string } | null }[];
 };
 
 export function saleTotal(s: SaleWithItems) {

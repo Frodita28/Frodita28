@@ -34,19 +34,6 @@ const TABS = [
 ] as const;
 type Tab = (typeof TABS)[number]["key"];
 
-/** Días consecutivos (hasta hoy o ayer) con al menos una misión diaria completada. */
-function streak(rows: Row[], today: string) {
-  const days = new Set(rows.filter((r) => r.missions.frequency === "daily" && r.status === "completed").map((r) => r.period_start));
-  const d = new Date(`${today}T12:00:00Z`);
-  if (!days.has(today)) d.setUTCDate(d.getUTCDate() - 1);
-  let n = 0;
-  while (days.has(d.toISOString().slice(0, 10))) {
-    n++;
-    d.setUTCDate(d.getUTCDate() - 1);
-  }
-  return n;
-}
-
 export default async function MissionsPage({ searchParams }: PageProps<"/panel/misiones">) {
   const sp = await searchParams;
   const tab: Tab = TABS.some((t) => t.key === sp.tab) ? (sp.tab as Tab) : "daily";
@@ -79,7 +66,8 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
 
   const tz = rows[0]?.missions.timezone ?? "America/Caracas";
   const today = todayIn(tz);
-  const isCurrent = (r: Row) => r.period_start <= todayIn(r.missions.timezone) && todayIn(r.missions.timezone) <= r.period_end;
+  // Las misiones retiradas solo aparecen en el historial (completadas, rechazadas, XP).
+  const isCurrent = (r: Row) => r.missions.status === "active" && r.period_start <= todayIn(r.missions.timezone) && todayIn(r.missions.timezone) <= r.period_end;
 
   const byTab: Record<Exclude<Tab, "xp">, Row[]> = {
     daily: rows.filter((r) => r.missions.frequency === "daily" && isCurrent(r)),
@@ -98,7 +86,7 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
     <>
       <Flash ok={sp.ok} error={sp.error ?? (refreshError ? "No se pudieron actualizar tus misiones" : undefined)} />
       <PageTitle eyebrow="Gamificación" title="Misiones">
-        Completa misiones con ventas verificadas y contenido real para sumar XP. Los XP no representan dinero ni
+        Completa misiones con las ventas de tu punto de venta y contenido real para sumar XP. Los XP no representan dinero ni
         garantizan beneficios económicos.
       </PageTitle>
 
@@ -108,10 +96,9 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
         </div>
       )}
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="XP acumulados" value={formatXp(total)} />
         <Stat label="XP este mes" value={formatXp(monthXp)} />
-        <Stat label="Racha diaria" value={`${streak(rows, today)} ${streak(rows, today) === 1 ? "día" : "días"}`} />
         <Stat label="En progreso" value={String(inProgress)} />
         <Stat label="En revisión" value={String(byTab.review.length)} />
       </div>

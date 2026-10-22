@@ -11,7 +11,7 @@ export function SalesChart({ months }: { months: StoreMonth[] }) {
 
   return (
     <figure>
-      <div className="flex gap-2" role="img" aria-label="Ventas verificadas por mes">
+      <div className="flex gap-2" role="img" aria-label="Ventas registradas por mes">
         {!empty && (
           <div className="flex h-44 flex-col justify-between text-right text-[11px] text-parchment" aria-hidden>
             {ticks.map((t) => <span key={t} className="-translate-y-1/2 first:translate-y-0 last:translate-y-0 leading-none">{money(t)}</span>)}
@@ -23,7 +23,7 @@ export function SalesChart({ months }: { months: StoreMonth[] }) {
             {!empty && <div className="absolute inset-x-0 top-1/2 border-t border-ash" aria-hidden />}
             {empty && (
               <p className="absolute inset-0 flex items-center justify-center px-4 text-center text-sm text-parchment">
-                Aún no hay ventas verificadas en estos meses.
+                Aún no hay ventas registradas en estos meses.
               </p>
             )}
             <div className="relative flex h-full items-end">

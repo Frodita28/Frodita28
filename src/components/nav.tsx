@@ -17,7 +17,7 @@ export function AppShell({
 }) {
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <header className="sticky top-0 z-10 border-b border-ash bg-obsidian/95 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b print:hidden border-ash bg-obsidian/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
           <Logo href="/panel" />
           <div className="flex items-center gap-3 text-xs">

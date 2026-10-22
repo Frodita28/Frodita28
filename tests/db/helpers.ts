@@ -19,6 +19,8 @@ export type Db = {
   anon<T = Record<string, unknown>>(text: string, params?: unknown[]): Promise<T[]>;
   /** Consulta con la service role (servidor de la app o scripts de administración). */
   service<T = Record<string, unknown>>(text: string, params?: unknown[]): Promise<T[]>;
+  /** Llama funciones internas (sin permiso para la API) con la identidad de un usuario. */
+  internalAs<T = Record<string, unknown>>(userId: string, text: string, params?: unknown[]): Promise<T[]>;
   close(): Promise<void>;
 };
 
@@ -33,12 +35,12 @@ export async function freshDb(): Promise<Db> {
   const client = new Client({ connectionString: urlFor(name) });
   await client.connect();
 
-  async function scoped<T>(role: "authenticated" | "anon" | "service_role", userId: string | null, text: string, params?: unknown[]) {
+  async function scoped<T>(role: "authenticated" | "anon" | "service_role" | null, userId: string | null, text: string, params?: unknown[]) {
     await client.query("begin");
     try {
-      await client.query(`set local role ${role}`);
+      if (role) await client.query(`set local role ${role}`);
       await client.query(`select set_config('request.jwt.claims', $1, true)`, [
-        JSON.stringify(userId ? { sub: userId, role } : { role }),
+        JSON.stringify(userId ? { sub: userId, role: role ?? "authenticated" } : { role }),
       ]);
       const res = await client.query(text, params);
       await client.query("commit");
@@ -54,6 +56,7 @@ export async function freshDb(): Promise<Db> {
     as: (userId, text, params) => scoped("authenticated", userId, text, params),
     anon: (text, params) => scoped("anon", null, text, params),
     service: (text, params) => scoped("service_role", null, text, params),
+    internalAs: (userId, text, params) => scoped(null, userId, text, params),
     close: async () => {
       await client.end();
       const a = new Client({ connectionString: ADMIN_URL });
@@ -94,7 +97,10 @@ export const SHIRT = "DEMO-CAM-01";
 
 type Item = { sku: string; quantity: number; unitPrice?: number };
 
-/** Registra una venta como el licenciado y devuelve su id. */
+/**
+ * Registra una venta manual (anterior al punto de venta) como el licenciado y devuelve su id.
+ * create_sale ya no está expuesta a la API; las pruebas la usan para ventas con fecha pasada.
+ */
 export async function registerSale(
   db: Db,
   userId: string,
@@ -107,7 +113,7 @@ export async function registerSale(
       unit_price: i.unitPrice ?? 20,
     })),
   );
-  const [row] = await db.as<{ id: string }>(
+  const [row] = await db.internalAs<{ id: string }>(
     userId,
     `select public.create_sale($1, $2, 'instagram', $3, null, $4::jsonb) as id`,
     [opts.reference ?? `REF-${randomUUID().slice(0, 8)}`, opts.soldAt ?? new Date(), opts.customer ?? null, JSON.stringify(items)],
@@ -152,4 +158,27 @@ export async function xpTotal(db: Db, userId: string) {
 
 export async function refresh(db: Db, userId: string) {
   await db.as(userId, `select public.refresh_my_missions()`);
+}
+
+/** Emite prendas con QR para una tienda (como administrador) y devuelve sus códigos. */
+export async function issueUnits(
+  db: Db,
+  adminId: string,
+  storeId: string,
+  opts: { sku?: string; quantity?: number; price?: number; delivery?: boolean } = {},
+) {
+  const product = await productId(db, opts.sku ?? SHIRT);
+  const [{ batch }] = await db.as<{ batch: string }>(
+    adminId,
+    `select public.issue_garment_units($1, $2, $3, $4, $5, null) as batch`,
+    [storeId, product, opts.quantity ?? 1, opts.price ?? 25, opts.delivery ?? true],
+  );
+  const rows = await db.sql<{ code: string }>(`select code from public.garment_units where batch_id = $1 order by code`, [batch]);
+  return rows.map((r) => r.code);
+}
+
+/** Cierra una venta en el punto de venta como el licenciado y devuelve su id. */
+export async function posCheckout(db: Db, userId: string, codes: string[], customer: string | null = null) {
+  const [row] = await db.as<{ id: string }>(userId, `select public.pos_checkout($1, 'presencial', $2, null) as id`, [codes, customer]);
+  return row.id;
 }

@@ -15,7 +15,14 @@ before(async () => {
 });
 after(() => db.close());
 
-describe("Ventas", () => {
+describe("Ventas manuales (anteriores al punto de venta)", () => {
+  it("el registro manual ya no está disponible desde la API", async () => {
+    await assert.rejects(
+      db.as(ana, `select public.create_sale('X-1', now(), 'instagram', null, null, '[]'::jsonb)`),
+      /permission denied/,
+    );
+  });
+
   it("un solicitante sin licencia activa no puede registrar ventas", async () => {
     const applicant = await createUser(db, "solicitante@test.com");
     await assert.rejects(registerSale(db, applicant), /licencia activa/);
