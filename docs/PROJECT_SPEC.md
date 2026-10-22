@@ -9,7 +9,7 @@ Fuente: documento maestro "Gallo Negro Licencias" v1.0 y "Sistema de misiones y 
 | Registro, verificación de correo, inicio de sesión, recuperación de contraseña | Hecho |
 | Roles solicitante / licenciado / administrador; cada licenciado ve solo sus datos | Hecho |
 | Planes 1–4 configurables (provisionales, sin precio) y licencias con estado, plan, territorio, vigencia | Hecho (alta y cambio de estado desde admin) |
-| Registro de ventas con referencia única y verificación por el administrador | Hecho |
+| Ventas por punto de venta con QR único por prenda (etiquetas desde administración, verificación automática) | Hecho |
 | Misiones Fase 1: catálogo en BD, diarias/semanales/mensuales, participaciones por período, progreso, evidencias, revisión manual, XP, historial, panel del licenciado y del administrador | Hecho |
 | Auditoría de acciones críticas y alertas de posible fraude | Hecho |
 | Página pública: marca, cómo funciona, planes 1–4 desde la BD, beneficios confirmados, reglas claras, preguntas frecuentes, contacto configurable | Hecho (entrega 2) |

@@ -34,6 +34,11 @@
   activar una licencia es una función aparte, solo admin, auditada. Los visitantes no leen solicitudes ni eventos.
 - **Planes públicos:** el precio solo se publica con el plan `active` (restricción en la BD); los beneficios
   `pending_approval` no son legibles por anónimos ni licenciados (RLS).
+- **Punto de venta con QR:** las prendas (`garment_units`) no admiten escritura directa; solo el admin las emite o
+  devuelve. `pos_checkout` bloquea las prendas (`FOR UPDATE`) y valida en el servidor que cada QR sea de la tienda que
+  vende y siga disponible, así un QR no puede venderse dos veces ni desde otra tienda, ni siquiera con dos cajas a la
+  vez. El precio sale de la prenda, nunca del navegador. `create_sale` (registro manual) ya no se puede llamar desde
+  la API.
 - **Tu Tienda:** inventario e inversión sin escritura directa y de solo inserción; solo el admin los registra
   (auditado) y solo para cuentas licenciadas; cada licenciado lee únicamente los suyos (RLS); `store_summary`
   rechaza consultar otra tienda salvo al admin; el nombre de la tienda se cambia solo con `update_my_store`.

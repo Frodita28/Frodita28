@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Flash } from "@/components/flash";
 import { PageTitle } from "@/components/nav";
 import { formatDay } from "@/lib/missions";
@@ -44,7 +45,8 @@ export default async function Stores({ searchParams }: PageProps<"/admin/tiendas
       <PageTitle eyebrow="Red de tiendas" title="Tiendas">
         Registra aquí las prendas que entregas a cada tienda y lo que cada licenciado ha invertido. Estos datos alimentan
         “Tu Tienda”: existencias = entregas, devoluciones y ajustes menos prendas de ventas verificadas. Los registros no se
-        editan ni se borran; para corregir, registra un ajuste o una corrección.
+        editan ni se borran; para corregir, registra un ajuste o una corrección. Para que una tienda pueda vender una prenda
+        en su punto de venta, entrégala con su QR desde <Link href="/admin/etiquetas" className="text-bronze underline">Etiquetas QR</Link>.
       </PageTitle>
 
       <div className="grid gap-4 lg:grid-cols-2">

@@ -128,29 +128,37 @@ try {
   // Reutilizar el mismo Reel en D02 queda bloqueado (el formulario ya no se ofrece porque el objetivo está cubierto).
   assert.equal(await lp.locator("article", { hasText: "El primer Reel" }).locator("form").count(), 0);
 
-  // 5. Registrar una venta.
-  await lp.goto(`${APP}/panel/ventas`);
-  await lp.fill("#reference", `IG-${stamp}`);
-  await selectByText(lp, "select[name=product_0]", /Hoodie Obsidiana/);
-  await lp.fill("input[name=quantity_0]", "2");
-  await lp.fill("input[name=price_0]", "35");
+  // 5. El admin entrega dos hoodies con QR y la tienda las vende en su punto de venta.
+  const licId = psql(`select id from public.profiles where username = '${LIC.username}'`);
+  await ap.goto(`${APP}/admin/etiquetas`);
+  await ap.selectOption("select[name=licensee_id]", licId);
+  await selectByText(ap, "#product_id", /Hoodie Obsidiana/);
+  await ap.fill("#quantity", "2");
+  await ap.fill("#unit_price", "35");
+  await ap.click("button:has-text('Generar etiquetas')");
+  await ap.waitForURL(/lote=/);
+  assert.equal(await ap.locator("svg").count() >= 2, true);
+  const codes = psql(`select string_agg(code, ',' order by code) from public.garment_units where licensee_id = '${licId}'`).split(",");
+  log(`etiquetas QR emitidas: ${codes.join(", ")}`);
+
+  await lp.goto(`${APP}/panel/ventas?codigo=${codes[0]}`);
+  await lp.waitForSelector(`text=${codes[0]}`);
+  await lp.fill("#manual-code", codes[1].toLowerCase());
+  await lp.click("button:has-text('Agregar')");
+  await lp.waitForSelector(`text=${codes[1]}`);
   await lp.fill("#customer_ref", "@cliente_uno");
-  await lp.click("button:has-text('Registrar venta')");
-  await lp.waitForURL(/ok=/);
-  // Referencia duplicada
-  await lp.fill("#reference", `ig ${stamp}`.replace(" ", "-"));
-  await selectByText(lp, "select[name=product_0]", /Hoodie Obsidiana/);
-  await lp.fill("input[name=price_0]", "35");
-  await lp.click("button:has-text('Registrar venta')");
-  await lp.waitForURL(/error=/);
-  assert.match(await lp.textContent("[role=alert]"), /Ya registraste una venta/);
-  log("venta registrada y referencia duplicada rechazada");
+  await lp.click("button:has-text('Cerrar venta')");
+  await lp.waitForSelector("text=Venta registrada");
+  // El mismo QR no puede venderse otra vez.
+  await lp.fill("#manual-code", codes[0]);
+  await lp.click("button:has-text('Agregar')");
+  await lp.waitForSelector("text=ya se vendió");
+  log("venta registrada en el punto de venta y QR repetido rechazado");
   await shot(lp, "02-licenciado-ventas");
 
-  // 6. El admin verifica la venta y revisa evidencias.
+  // 6. La venta ya cuenta sin verificación manual; el admin revisa evidencias.
   await ap.goto(`${APP}/admin/ventas`);
-  await ap.locator("tr", { hasText: `IG-${stamp}` }).locator("button:has-text('Verificar')").click();
-  await ap.waitForURL(/ok=/);
+  assert.match(await ap.textContent("main"), new RegExp(codes[0]));
   await ap.goto(`${APP}/admin/revisiones`);
   await shot(ap, "03-admin-evidencias");
   await ap.locator("article", { hasText: "El primer Reel" }).locator("button:has-text('Aprobar')").click();
@@ -160,7 +168,7 @@ try {
   await story.locator("input[name=reason]").fill("El producto no se identifica en la historia");
   await story.locator("button:has-text('Rechazar')").click();
   await ap.waitForURL(/ok=/);
-  log("venta verificada, evidencia aprobada y otra rechazada");
+  log("venta del punto de venta visible para el admin, evidencia aprobada y otra rechazada");
 
   // 7. El licenciado ve su progreso real.
   await lp.goto(`${APP}/panel/misiones`);

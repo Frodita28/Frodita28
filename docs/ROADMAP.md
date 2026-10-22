@@ -4,6 +4,7 @@
 2. ✅ Misiones Fase 1.
 3. ✅ Página pública y solicitudes de licencia con seguimiento, revisión, activación auditada y planes editables.
 4. ✅ Tu Tienda: panel de la tienda virtual con métricas reales, inventario entregado e inversión registrada por el admin.
+4b. ✅ Punto de venta con QR: cada prenda entregada lleva un QR único; la tienda vende escaneándolo y todo se registra solo.
 5. Catálogo real (variantes, precios autorizados), inventario central, pedidos y pagos manuales.
 6. Gastos y resumen financiero del licenciado (activa S09); biblioteca de marca y anuncios.
 7. Misiones Fase 2 (niveles, insignias, rankings, rachas, temporadas, notificaciones).

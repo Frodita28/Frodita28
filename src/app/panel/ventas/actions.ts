@@ -3,56 +3,62 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
+import { normalizeGarmentCode, SALE_CHANNELS, type PosItem } from "@/lib/pos";
 import { back, dbMessage } from "@/lib/redirect";
 import { createClient } from "@/lib/supabase/server";
-import { DEFAULT_TZ, zonedLocalToUtc } from "@/lib/time";
 
-const CHANNELS = ["instagram", "whatsapp", "tiktok", "presencial", "evento", "otro"] as const;
-const MAX_ROWS = 5;
+export type LookupResult = { ok: true; item: PosItem } | { ok: false; error: string };
 
-export async function createSale(formData: FormData) {
+/** Busca una prenda de la propia tienda por su QR (la base de datos valida tienda y estado). */
+export async function lookupGarment(raw: string): Promise<LookupResult> {
   await requireUser("/panel/ventas");
-  const base = z
-    .object({
-      reference: z.string().trim().min(1, "Indica la referencia de la venta").max(80),
-      sold_at: z.string(),
-      channel: z.enum(CHANNELS, { message: "Canal no válido" }),
-      customer_ref: z.string().trim().max(120).optional().default(""),
-      notes: z.string().trim().max(1000).optional().default(""),
-    })
-    .safeParse(Object.fromEntries(formData));
-  if (!base.success) back("/panel/ventas", "error", base.error.issues[0].message);
+  const code = normalizeGarmentCode(raw);
+  if (!code) return { ok: false, error: "Ese código no es un QR de Gallo Negro" };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("pos_lookup", { p_code: code });
+  if (error || !data) return { ok: false, error: dbMessage(error, "No se pudo leer la prenda") };
+  const r = data as { code: string; name: string; sku: string; category: string; unit_price: number | string };
+  return { ok: true, item: { code: r.code, name: r.name, sku: r.sku, category: r.category, unitPrice: Number(r.unit_price) } };
+}
 
-  const soldAt = zonedLocalToUtc(base.data.sold_at, DEFAULT_TZ);
-  if (!soldAt) back("/panel/ventas", "error", "Fecha de venta no válida");
+export type CheckoutState = { ok: boolean; message: string; at: number } | null;
 
-  const item = z.object({
-    product_id: z.string().uuid(),
-    quantity: z.coerce.number().int().min(1).max(1000),
-    unit_price: z.coerce.number().min(0).max(100000),
-  });
-  const items = [];
-  for (let i = 0; i < MAX_ROWS; i++) {
-    const productId = formData.get(`product_${i}`);
-    if (!productId) continue;
-    const parsed = item.safeParse({ product_id: productId, quantity: formData.get(`quantity_${i}`), unit_price: formData.get(`price_${i}`) });
-    if (!parsed.success) back("/panel/ventas", "error", `Revisa la línea ${i + 1}: cantidad o precio no válidos`);
-    items.push(parsed.data);
+const checkoutSchema = z.object({
+  codes: z.array(z.string()).min(1, "Escanea al menos una prenda").max(50, "Máximo 50 prendas por venta"),
+  channel: z.enum(SALE_CHANNELS.map(([v]) => v) as [string, ...string[]], { message: "Canal no válido" }),
+  customer_ref: z.string().trim().max(120),
+  notes: z.string().trim().max(1000),
+});
+
+/** Cierra la venta del punto de venta: las prendas salen del stock y la venta queda registrada. */
+export async function checkoutSale(_prev: CheckoutState, formData: FormData): Promise<CheckoutState> {
+  await requireUser("/panel/ventas");
+  let codes: unknown;
+  try {
+    codes = JSON.parse(String(formData.get("codes") ?? "[]"));
+  } catch {
+    codes = [];
   }
-  if (items.length === 0) back("/panel/ventas", "error", "Agrega al menos un producto");
+  const parsed = checkoutSchema.safeParse({
+    codes,
+    channel: formData.get("channel"),
+    customer_ref: formData.get("customer_ref") ?? "",
+    notes: formData.get("notes") ?? "",
+  });
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0].message, at: Date.now() };
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("create_sale", {
-    p_reference: base.data.reference,
-    p_sold_at: soldAt.toISOString(),
-    p_channel: base.data.channel,
-    p_customer_ref: base.data.customer_ref,
-    p_notes: base.data.notes,
-    p_items: items,
+  const { error } = await supabase.rpc("pos_checkout", {
+    p_codes: parsed.data.codes,
+    p_channel: parsed.data.channel,
+    p_customer_ref: parsed.data.customer_ref,
+    p_notes: parsed.data.notes,
   });
-  if (error) back("/panel/ventas", "error", dbMessage(error));
+  if (error) return { ok: false, message: dbMessage(error), at: Date.now() };
   revalidatePath("/panel/ventas");
-  back("/panel/ventas", "ok", "Venta registrada. Contará para tus misiones cuando Gallo Negro la verifique.");
+  revalidatePath("/panel");
+  const n = parsed.data.codes.length;
+  return { ok: true, message: `Venta registrada: ${n} ${n === 1 ? "prenda salió" : "prendas salieron"} de tu stock.`, at: Date.now() };
 }
 
 export async function cancelOwnSale(formData: FormData) {
@@ -60,8 +66,9 @@ export async function cancelOwnSale(formData: FormData) {
   const id = z.string().uuid().safeParse(formData.get("sale_id"));
   if (!id.success) back("/panel/ventas", "error", "Venta no válida");
   const supabase = await createClient();
-  const { error } = await supabase.rpc("cancel_sale", { p_sale_id: id.data, p_reason: "Anulada por el licenciado" });
+  const { error } = await supabase.rpc("cancel_sale", { p_sale_id: id.data, p_reason: "Anulada por el licenciado (error de caja)" });
   if (error) back("/panel/ventas", "error", dbMessage(error));
   revalidatePath("/panel/ventas");
-  back("/panel/ventas", "ok", "Venta anulada");
+  revalidatePath("/panel");
+  back("/panel/ventas", "ok", "Venta anulada. Las prendas volvieron a tu stock.");
 }

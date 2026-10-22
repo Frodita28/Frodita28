@@ -44,14 +44,14 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
       <Flash ok={sp.ok} error={sp.error} />
       <PageTitle eyebrow="Tu Tienda" title={storeName}>
         {user.storeName ? (
-          "Así va tu tienda Gallo Negro. Las cifras solo cuentan ventas verificadas por la marca."
+          "Así va tu tienda Gallo Negro. Las cifras salen de las ventas registradas con QR en tu punto de venta."
         ) : (
           <>Ponle nombre a tu tienda en <a href="#datos-tienda" className="text-bronze underline">Datos de tu tienda</a>.</>
         )}
       </PageTitle>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-        <Stat label="Total generado con la licencia" value={money(s.revenue)} hint="Ventas verificadas" />
+        <Stat label="Total generado con la licencia" value={money(s.revenue)} hint="Ventas registradas" />
         <Stat label="Inversión acumulada" value={money(s.investment)} hint={s.investment === 0 ? "Sin inversiones registradas" : "Registrada por Gallo Negro"} />
         <Stat label="Prendas vendidas" value={s.unitsSold} hint={units(s.unitsSold)} />
         <Stat
@@ -98,7 +98,7 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
       <section className="card mt-4">
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="eyebrow">Gráfica de ventas</h2>
-          <p className="text-xs text-parchment">Últimos 6 meses · ventas verificadas</p>
+          <p className="text-xs text-parchment">Últimos 6 meses · ventas registradas</p>
         </div>
         <SalesChart months={s.monthly} />
       </section>
@@ -118,9 +118,6 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
             <p className="text-sm text-linen">
               Tu tienda todavía no tiene una licencia activa. Gallo Negro revisa cada solicitud y activa la licencia
               después de formalizar el contrato y el pago.
-              {user.role === "applicant" && (
-                <Link href="/panel/solicitud" className="btn-bronze mt-4 flex w-full sm:inline-flex sm:w-auto">Ver o enviar mi solicitud</Link>
-              )}
             </p>
           )}
         </section>

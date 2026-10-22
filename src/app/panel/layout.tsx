@@ -7,7 +7,6 @@ export default async function PanelLayout({ children }: LayoutProps<"/panel">) {
   const user = await requireUser();
   const items = [
     { href: "/panel", label: "Tu Tienda" },
-    ...(user.role !== "admin" ? [{ href: "/panel/solicitud", label: "Mi solicitud" }] : []),
     { href: "/panel/misiones", label: "Misiones" },
     { href: "/panel/ventas", label: "Ventas" },
     { href: "/nueva-clave", label: "Contraseña" },
