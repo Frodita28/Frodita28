@@ -12,6 +12,7 @@ export default async function PanelLayout({ children }: LayoutProps<"/panel">) {
     { href: "/panel/recompensas", label: "Recompensas", icon: "gift" },
     { href: "/panel/misiones", label: "Misiones", icon: "flag" },
     { href: "/panel/ventas", label: "Ventas", icon: "qr" },
+    { href: "/panel/licencia", label: "Licencia", icon: "document" },
     { href: "/nueva-clave", label: "Contraseña", icon: "key" },
     ...(user.role === "admin" ? [{ href: "/admin", label: "Administración", icon: "gear" } as const] : []),
   ];
