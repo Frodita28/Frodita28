@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.2 — 2026-10-22
+
+- **Licencia, versión 1.0:** Gallo Negro confirmó las cifras de `/panel/licencia`. `esBorrador` pasa a `false` (se
+  quita la etiqueta "Versión borrador"), `version` "1.0" y `vigenteDesde` "22 de octubre de 2026". Se mantienen el
+  aviso de que el contrato firmado prevalece y el descargo del simulador.
+
 ## 0.6.1 — 2026-10-22
 
 - **Licencia** (`/panel/licencia`), pestaña nueva después de *Ventas*: explica la licencia, el selector de plan
