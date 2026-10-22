@@ -21,7 +21,7 @@ import { submitEvidence } from "./actions";
 
 export const metadata = { title: "Misiones" };
 
-type Row = ParticipationRow & { missions: MissionRow };
+type Row = ParticipationRow & { missions: MissionRow; mission_evidences: EvidenceRow[] };
 
 const TABS = [
   { key: "daily", label: "Diarias" },
@@ -47,22 +47,18 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
   const [{ data: rowsData }, { data: ledgerData }, { data: balance }, { data: license }] = await Promise.all([
     supabase
       .from("mission_participations")
-      .select("*, missions(*)")
+      .select("*, missions(*), mission_evidences(*)")
       .eq("user_id", user.id)
       .gte("period_end", since)
-      .order("period_start", { ascending: false }),
+      .order("period_start", { ascending: false })
+      .order("submitted_at", { referencedTable: "mission_evidences", ascending: false }),
     supabase.from("xp_ledger").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(100),
     supabase.from("user_xp_balances").select("total_xp").eq("user_id", user.id).maybeSingle(),
     supabase.from("licenses").select("id").eq("user_id", user.id).eq("status", "active").maybeSingle(),
   ]);
+  // Las evidencias llegan en la misma consulta que las participaciones.
   const rows = (rowsData ?? []) as Row[];
   const ledger = (ledgerData ?? []) as LedgerRow[];
-
-  const ids = rows.map((r) => r.id);
-  const { data: evData } = ids.length
-    ? await supabase.from("mission_evidences").select("*").in("participation_id", ids).order("submitted_at", { ascending: false })
-    : { data: [] };
-  const evidences = (evData ?? []) as EvidenceRow[];
 
   const tz = rows[0]?.missions.timezone ?? "America/Caracas";
   const today = todayIn(tz);
@@ -130,7 +126,7 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {byTab[tab].map((r) => (
-            <MissionCard key={r.id} row={r} evidences={evidences.filter((e) => e.participation_id === r.id)} returnTo={`/panel/misiones?tab=${tab}`} />
+            <MissionCard key={r.id} row={r} evidences={r.mission_evidences} returnTo={`/panel/misiones?tab=${tab}`} />
           ))}
         </div>
       )}

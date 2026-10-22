@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.1 — 2026-10-22
+
+- **Más velocidad.** Las funciones de Vercel corren en Oregón (`pdx1`, en `vercel.json`), la misma zona que la base de
+  datos de Supabase (`us-west-2`); antes corrían en Washington (`iad1`, valor por defecto) y cada consulta cruzaba el país.
+- El proxy verifica la sesión con `getClaims()` (firma del token comprobada con las claves públicas, sin llamar a
+  Supabase Auth en cada petición). Las páginas siguen validando con `getUser()`, ahora en paralelo con la lectura del perfil.
+- Misiones: las evidencias llegan en la misma consulta que las participaciones (un viaje menos a la base de datos).
+- Pantalla de carga (`loading.tsx`) en el panel y en Administración: al tocar una sección se ve al instante.
+
 ## 0.5.0 — 2026-10-22
 
 - **Ventas por punto de venta con QR.** La sección *Ventas* se rehízo: la tienda escanea con la cámara del móvil (o

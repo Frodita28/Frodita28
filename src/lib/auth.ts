@@ -18,15 +18,21 @@ export type CurrentUser = {
 /** Usuario actual con su perfil, o null. El rol se lee de la base de datos, nunca del cliente. */
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, full_name, public_alias, store_name")
-    .eq("id", user.id)
-    .single();
+  // El id sale del token (verificado localmente) para pedir el perfil a la vez que
+  // getUser() valida la sesión contra Supabase Auth: un viaje de ida y vuelta en lugar de dos.
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const userId = claimsData?.claims.sub;
+  if (!userId) return null;
+  const [
+    {
+      data: { user },
+    },
+    { data: profile },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase.from("profiles").select("role, full_name, public_alias, store_name").eq("id", userId).maybeSingle(),
+  ]);
+  if (!user || user.id !== userId) return null;
   if (!profile) return null;
   return {
     id: user.id,
