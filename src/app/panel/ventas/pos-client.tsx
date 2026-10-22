@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cartTotal, normalizeGarmentCode, SALE_CHANNELS, type PosItem } from "@/lib/pos";
+import { Alert } from "@/components/ui";
+import { Icon } from "@/components/icons";
 import { checkoutSale, lookupGarment } from "./actions";
 import { QrScanner } from "./scanner";
 
@@ -76,25 +78,23 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
 
   if (disabled) {
     return (
-      <section className="slab mb-6 border-l-4 border-l-warn text-sm text-warn">
-        Necesitas una licencia activa para vender desde el punto de venta.
-      </section>
+      <Alert>Necesitas una licencia activa para vender desde el punto de venta.</Alert>
     );
   }
 
   return (
-    <section className="slab mb-6 border-l-4 border-l-gold" aria-labelledby="pos-title">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 id="pos-title" className="slab-title">Punto de venta</h2>
-        <span className="text-xs text-parchment">{cart.length} {cart.length === 1 ? "prenda" : "prendas"}</span>
+    <section className="ui-card" aria-labelledby="pos-title">
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <h2 id="pos-title" className="ui-title-section">Punto de venta</h2>
+        <span className="ui-num text-[13px] font-medium text-fg-2">{cart.length} {cart.length === 1 ? "prenda" : "prendas"}</span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="space-y-3">
+        <div className="space-y-4">
           {scanning ? (
             <QrScanner onCode={add} onClose={() => setScanning(false)} />
           ) : (
-            <button type="button" className="btn-gold w-full py-4 text-xl" onClick={() => { setNotice(null); setScanning(true); }}>
+            <button type="button" className="ui-btn-primary min-h-14 w-full text-xl" onClick={() => { setNotice(null); setScanning(true); }}>
               Escanear QR de la prenda
             </button>
           )}
@@ -109,7 +109,7 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
             <label htmlFor="manual-code" className="sr-only">Código de la etiqueta</label>
             <input
               id="manual-code"
-              className="input font-mono uppercase"
+              className="ui-input font-mono uppercase"
               value={manual}
               onChange={(e) => setManual(e.target.value)}
               placeholder="GN-XXXXXXXX"
@@ -117,34 +117,35 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
               autoCapitalize="characters"
               spellCheck={false}
             />
-            <button className="btn-slab whitespace-nowrap" disabled={looking || !manual.trim()}>Agregar</button>
+            <button className="ui-btn-secondary whitespace-nowrap" disabled={looking || !manual.trim()}>Agregar</button>
           </form>
           {(notice || looking) && (
-            <p role="status" className={`text-sm ${looking ? "text-parchment" : notice?.tone === "ok" ? "text-ok" : "text-bad"}`}>
+            <p role="status" className={`flex items-start gap-2 ${looking || notice?.tone === "ok" ? "text-fg-2" : "text-fg"}`}>
+              {!looking && <Icon name={notice?.tone === "ok" ? "check" : "alert"} className={`mt-0.5 h-5 w-5 shrink-0 ${notice?.tone === "ok" ? "text-fg-2" : "text-brand-red"}`} />}
               {looking ? "Buscando prenda…" : notice?.text}
             </p>
           )}
         </div>
 
-        <form action={close} className="space-y-3">
+        <form action={close} className="space-y-4">
           <input type="hidden" name="codes" value={JSON.stringify(cart.map((i) => i.code))} />
           {cart.length === 0 ? (
-            <p className="border border-dashed border-smoke p-4 text-sm text-parchment">
+            <p className="rounded-ui border border-dashed border-line p-4 text-fg-2">
               Escanea la etiqueta QR de cada prenda que sale. El precio lo fija Gallo Negro en la etiqueta.
             </p>
           ) : (
-            <ul className="divide-y divide-ash border border-ash bg-pit">
+            <ul className="divide-y divide-line rounded-ui border border-line bg-surface-2">
               {cart.map((i) => (
-                <li key={i.code} className="flex items-center justify-between gap-3 p-3 text-sm">
+                <li key={i.code} className="flex items-center justify-between gap-4 p-4">
                   <div className="min-w-0">
-                    <p className="truncate font-medium text-ivory">{i.name}</p>
-                    <p className="font-mono text-xs text-parchment">{i.code} · {i.category}</p>
+                    <p className="truncate font-medium">{i.name}</p>
+                    <p className="mt-1 font-mono text-[13px] text-fg-2">{i.code} · {i.category}</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="whitespace-nowrap">{money(i.unitPrice)}</span>
+                    <span className="ui-num whitespace-nowrap">{money(i.unitPrice)}</span>
                     <button
                       type="button"
-                      className="text-xs text-parchment underline hover:text-bad"
+                      className="ui-btn-sm"
                       onClick={() => setCart((c) => c.filter((x) => x.code !== i.code))}
                       aria-label={`Quitar ${i.code}`}
                     >
@@ -153,30 +154,30 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
                   </div>
                 </li>
               ))}
-              <li className="flex items-center justify-between p-3">
-                <span className="label mb-0">Total</span>
-                <span className="font-display text-xl text-gold">{money(total)}</span>
+              <li className="flex items-center justify-between p-4">
+                <span className="ui-label">Total</span>
+                <span className="ui-num text-2xl">{money(total)}</span>
               </li>
             </ul>
           )}
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="label" htmlFor="channel">Canal</label>
-              <select className="input" id="channel" name="channel" defaultValue="presencial">
+              <label className="ui-field-label" htmlFor="channel">Canal</label>
+              <select className="ui-input" id="channel" name="channel" defaultValue="presencial">
                 {SALE_CHANNELS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
             <div>
-              <label className="label" htmlFor="customer_ref">Cliente (opcional)</label>
-              <input className="input" id="customer_ref" name="customer_ref" maxLength={120} placeholder="@usuario o nombre" />
+              <label className="ui-field-label" htmlFor="customer_ref">Cliente (opcional)</label>
+              <input className="ui-input" id="customer_ref" name="customer_ref" maxLength={120} placeholder="@usuario o nombre" />
             </div>
           </div>
-          <input className="input" name="notes" maxLength={1000} placeholder="Nota (opcional)" aria-label="Nota" />
-          <p className="text-xs text-parchment">
+          <input className="ui-input" name="notes" maxLength={1000} placeholder="Nota (opcional)" aria-label="Nota" />
+          <p className="text-[13px] text-fg-2">
             El cliente solo lo ven tú y Gallo Negro; sirve para las misiones de clientes que regresan.
           </p>
-          <button className="btn-gold w-full py-3" disabled={cart.length === 0 || closing || looking}>
+          <button className="ui-btn-primary w-full" disabled={cart.length === 0 || closing || looking}>
             {closing ? "Registrando…" : cart.length === 0 ? "Cerrar venta" : `Cerrar venta · ${money(total)}`}
           </button>
         </form>

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.0 — 2026-10-22
+
+- **Sistema de diseño del panel de licenciatarios** (`docs/DESIGN_SYSTEM.md`): tokens únicos en `globals.css`
+  (fondo, superficies, borde, tres niveles de texto, amarillo, rojo de marca, verde, radio de 4 px), fuentes
+  Barlow Condensed e Inter con `next/font` solo en el panel, y componentes compartidos en `src/components/ui.tsx`
+  (banner de página, tarjeta de cifra, barra de progreso, badge, acordeón, alerta, ranking).
+- Aplicado a todas las pestañas: Tu Tienda, Clasificación, Recompensas, Misiones, Ventas, Licencia y Contraseña,
+  que ahora se muestra dentro del panel con sus pestañas. También a Mi solicitud y a la pantalla de carga.
+- Accesibilidad: foco amarillo visible, botones de 44 px en móvil, `prefers-reduced-motion`, contraste ≥ 4.5:1
+  revisado a 390 px y 1440 px. Bebas Neue deja de cargarse. Sin cambios de lógica, datos, rutas ni base de datos.
+
 ## 0.6.2 — 2026-10-22
 
 - **Licencia, versión 1.0:** Gallo Negro confirmó las cifras de `/panel/licencia`. `esBorrador` pasa a `false` (se

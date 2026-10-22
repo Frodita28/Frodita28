@@ -87,14 +87,14 @@ export function QrScanner({ onCode, onClose }: { onCode: (text: string) => void;
   return (
     <div className="space-y-2">
       {error ? (
-        <p className="rounded-lg border border-warn/40 bg-warn/10 p-3 text-sm text-warn">{error}</p>
+        <p role="alert" className="rounded-ui border border-line border-l-4 border-l-brand-red bg-surface-2 p-4">{error}</p>
       ) : (
-        <div className="relative overflow-hidden rounded-xl border border-ash bg-black">
+        <div className="relative overflow-hidden rounded-ui border border-line bg-bg">
           <video ref={videoRef} className="aspect-[4/3] w-full object-cover" muted playsInline />
-          <div className="pointer-events-none absolute inset-[18%] rounded-lg border-2 border-bronze/80" aria-hidden />
+          <div className="pointer-events-none absolute inset-[18%] rounded-ui border-2 border-accent" aria-hidden />
         </div>
       )}
-      <button type="button" onClick={onClose} className="btn-ghost w-full text-sm">Cerrar cámara</button>
+      <button type="button" onClick={onClose} className="ui-btn-secondary w-full">Cerrar cámara</button>
     </div>
   );
 }
