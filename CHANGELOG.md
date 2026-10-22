@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.1 — 2026-10-22
+
+- **Licencia** (`/panel/licencia`), pestaña nueva después de *Ventas*: explica la licencia, el selector de plan
+  (Socio Fundador / Emprendedor Comercial, con escalones), "Tu inversión en números", un simulador de recuperación,
+  los 8 beneficios, las reglas del programa de reconocimiento, 5 cláusulas de confianza y la salida y renovación.
+- Todo el texto y las cifras viven en `src/content/licencia.ts` (`version`, `vigenteDesde`, `esBorrador`). Las cifras
+  son **BORRADOR** y la página lo indica con la etiqueta "Versión borrador". El porcentaje de recuperación se calcula
+  en `src/lib/licencia.ts` (inversión / PVP), con pruebas unitarias. Sin cambios de base de datos ni dependencias.
+
 ## 0.6.0 — 2026-10-22
 
 - **Nuevo diseño del panel de la tienda ("Club de licenciatarios")**, inspirado en la referencia que compartió

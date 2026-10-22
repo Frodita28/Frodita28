@@ -14,6 +14,13 @@ const PATHS = {
   check: "M5 12l5 5L20 7",
   search: "M11 18a7 7 0 100-14 7 7 0 000 14zM20 20l-4-4",
   clock: "M12 21a9 9 0 100-18 9 9 0 000 18zM12 7v5l3 2",
+  document: "M14 3H6v18h12V7zM14 3v4h4M9 12h6M9 16h6M9 8h2",
+  swap: "M4 8h13l-3-3M20 16H7l3 3",
+  recycle: "M4 12a8 8 0 0113.7-5.7L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 01-13.7 5.7L4 15.5M4 20v-4.5h4.5",
+  percent: "M19 5L5 19M7 9a2 2 0 100-4 2 2 0 000 4zM17 19a2 2 0 100-4 2 2 0 000 4z",
+  bolt: "M13 3L5 14h6l-1 7 8-11h-6z",
+  box: "M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10",
+  arrowUp: "M12 20V5M6 11l6-6 6 6",
 } as const;
 
 export type IconName = keyof typeof PATHS;
