@@ -30,8 +30,8 @@ p_register_delivery, p_note)` y `return_garment_unit(p_code, p_note)` (solo admi
 `refresh_my_missions`, `submit_mission_evidence`, `review_mission_evidence`, `admin_adjust_xp`,
 `duplicate_mission`, `resolve_fraud_flag`, `submit_license_application`, `update_license_application`,
 `withdraw_license_application`, `review_license_application` (start_review, request_info, approve, reject, note) y
-`activate_application_license`, `update_my_store`, `record_stock_movement`, `record_store_investment` y
-`store_summary`. Internas (sin permiso de ejecución para usuarios):
+`activate_application_license`, `update_my_store`, `record_stock_movement`, `record_store_investment`,
+`store_summary` y `store_leaderboard`. Internas (sin permiso de ejecución para usuarios):
 `ensure_participations`, `compute_mission_progress`, `recompute_participation`, `recompute_user_missions`,
 `expire_participations`, `run_mission_maintenance`, `log_application_event`, `application_from_payload`,
 `new_garment_code`, `untagged_stock` y `create_sale` (registro manual retirado de la API el 2026-10-22; se conserva
@@ -64,3 +64,7 @@ Resumen de Tu Tienda (`store_summary(p_user, p_months)`, propio o admin): XP (su
 `active` con mayor `minimum_xp` alcanzado y el siguiente), prendas vendidas y total generado (solo ventas
 `verified`), existencias = suma de `store_stock_movements` (incluye entregas con QR y devoluciones) − prendas de ventas verificadas (puede ser negativo si
 faltan entregas por registrar), inversión = suma de `store_investments`, y serie mensual en la zona horaria del perfil.
+
+Tabla de clasificación (`store_leaderboard(p_limit)`, cualquier usuario autenticado): tiendas `licensee` con licencia
+`active` ordenadas por XP con `rank()` (empates comparten puesto). Devuelve solo `place`, `alias` (`public_alias`, o
+«Tienda Gallo Negro» si no tiene), `total_xp` e `is_me`; incluye siempre la fila propia aunque quede fuera del límite.

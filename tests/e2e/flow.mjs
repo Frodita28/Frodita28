@@ -112,6 +112,7 @@ try {
 
   // Evidencia por enlace (D02) y por captura (D03).
   const d02 = lp.locator("article", { hasText: "El primer Reel" });
+  await d02.locator("summary").click(); // el formulario de evidencia se despliega desde el botón
   await d02.locator("input[name=url]").fill(`https://www.instagram.com/reel/E2E${stamp}/?igsh=abc`);
   await d02.locator("button:has-text('Enviar evidencia')").click();
   await lp.waitForURL(/ok=/);
@@ -120,6 +121,7 @@ try {
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
     "base64",
   );
+  await d03.locator("summary").click();
   await d03.locator("input[name=file]").setInputFiles({ name: "historia.png", mimeType: "image/png", buffer: png });
   await d03.locator("button:has-text('Enviar evidencia')").click();
   await lp.waitForURL(/ok=/);

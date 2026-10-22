@@ -42,4 +42,6 @@
 - **Tu Tienda:** inventario e inversión sin escritura directa y de solo inserción; solo el admin los registra
   (auditado) y solo para cuentas licenciadas; cada licenciado lee únicamente los suyos (RLS); `store_summary`
   rechaza consultar otra tienda salvo al admin; el nombre de la tienda se cambia solo con `update_my_store`.
-- **Pruebas de autorización:** `tests/db/accounts.test.ts`, `tests/db/stores.test.ts`, `tests/db/applications.test.ts`, `tests/db/security.test.ts`, `sales.test.ts` y el paso 10 de `tests/e2e/flow.mjs`.
+- **Clasificación:** `store_leaderboard` (security definer, sin acceso anónimo) solo expone el nombre visible
+  (`public_alias`) y los XP de cada tienda; nunca el nombre de la tienda, ventas, ingresos, stock ni datos personales.
+- **Pruebas de autorización:** `tests/db/accounts.test.ts`, `tests/db/stores.test.ts`, `tests/db/applications.test.ts`, `tests/db/security.test.ts`, `tests/db/leaderboard.test.ts`, `sales.test.ts` y el paso 10 de `tests/e2e/flow.mjs`.

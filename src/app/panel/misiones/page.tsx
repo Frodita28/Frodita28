@@ -1,7 +1,7 @@
 import Link from "next/link";
+import { Banner, Bar, ComingSoon, StatSlab, type Accent } from "@/components/club";
 import { Flash } from "@/components/flash";
-import { PageTitle } from "@/components/nav";
-import { ProgressBar } from "@/components/progress";
+import { Icon } from "@/components/icons";
 import { Pill, StatusBadge } from "@/components/status-badge";
 import { requireUser } from "@/lib/auth";
 import {
@@ -81,50 +81,59 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
   return (
     <>
       <Flash ok={sp.ok} error={sp.error ?? (refreshError ? "No se pudieron actualizar tus misiones" : undefined)} />
-      <PageTitle eyebrow="Gamificación" title="Misiones">
+      <Banner
+        title="Misiones y desafíos"
+        accent="blood"
+        aside={
+          <div className="border border-ash bg-pit px-4 py-2 text-center">
+            <p className="kicker">XP ganados este mes</p>
+            <p className="font-display text-xl text-gold">{formatXp(monthXp)}</p>
+          </div>
+        }
+      >
         Completa misiones con las ventas de tu punto de venta y contenido real para sumar XP. Los XP no representan dinero ni
         garantizan beneficios económicos.
-      </PageTitle>
+      </Banner>
 
       {!license && (
-        <div className="card mb-4 border-warn/40 text-sm text-warn">
+        <div className="slab mb-4 border-l-4 border-l-warn text-sm text-warn">
           Necesitas una licencia activa para participar en las misiones.
         </div>
       )}
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="XP acumulados" value={formatXp(total)} />
-        <Stat label="XP este mes" value={formatXp(monthXp)} />
-        <Stat label="En progreso" value={String(inProgress)} />
-        <Stat label="En revisión" value={String(byTab.review.length)} />
+      <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <StatSlab label="XP acumulados" value={formatXp(total)} />
+        <StatSlab label="XP este mes" value={formatXp(monthXp)} />
+        <StatSlab label="En progreso" value={String(inProgress)} />
+        <StatSlab label="En revisión" value={String(byTab.review.length)} />
       </div>
 
-      <div className="mb-6 grid gap-3 md:grid-cols-3">
-        <ComingSoon title="Nivel" text="Los ocho niveles (Aspirante → Leyenda Gallo Negro) se activan en la Fase 2, cuando Gallo Negro configure sus umbrales de XP." />
-        <ComingSoon title="Insignias y ranking" text="Insignias permanentes y rankings diario, semanal y mensual llegan en la Fase 2. Tus XP actuales ya contarán." />
-        <ComingSoon title="Recompensas" text="Ninguna recompensa está aprobada todavía. Se publicarán solo cuando Gallo Negro las confirme (Fase 3)." />
+      <div className="mb-5">
+        <ComingSoon title="Insignias">
+          Insignias permanentes por logros llegan en la Fase 2. Tus XP actuales ya cuentan para la{" "}
+          <Link href="/panel/clasificacion" className="text-gold">clasificación</Link>.
+        </ComingSoon>
       </div>
 
-      <nav className="mb-4 flex gap-1 overflow-x-auto border-b border-ash" aria-label="Filtros de misiones">
-        {TABS.map((t) => (
-          <Link
-            key={t.key}
-            href={`/panel/misiones?tab=${t.key}`}
-            className={`whitespace-nowrap border-b-2 px-3 py-2 text-sm ${tab === t.key ? "border-bronze text-ivory" : "border-transparent text-parchment hover:text-ivory"}`}
-            aria-current={tab === t.key ? "page" : undefined}
-          >
-            {t.label}
-            {t.key !== "xp" && <span className="ml-1 text-xs text-parchment">({byTab[t.key].length})</span>}
-          </Link>
-        ))}
+      <nav className="-mx-4 mb-4 overflow-x-auto px-4" aria-label="Filtros de misiones">
+        <ul className="flex gap-2">
+          {TABS.map((t) => (
+            <li key={t.key}>
+              <Link href={`/panel/misiones?tab=${t.key}`} className="chip" aria-current={tab === t.key ? "page" : undefined}>
+                {t.label}
+                {t.key !== "xp" && <span className="ml-1 opacity-70">({byTab[t.key].length})</span>}
+              </Link>
+            </li>
+          ))}
+        </ul>
       </nav>
 
       {tab === "xp" ? (
         <XpHistory ledger={ledger} tz={tz} />
       ) : byTab[tab].length === 0 ? (
-        <p className="card text-sm text-parchment">No hay misiones en esta sección.</p>
+        <p className="slab text-sm text-parchment">No hay misiones en esta sección.</p>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-4">
           {byTab[tab].map((r) => (
             <MissionCard key={r.id} row={r} evidences={r.mission_evidences} returnTo={`/panel/misiones?tab=${tab}`} />
           ))}
@@ -134,25 +143,22 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="card">
-      <p className="label">{label}</p>
-      <p className="font-display text-xl">{value}</p>
-    </div>
-  );
-}
+const ACCENT_BORDER: Record<Accent, string> = {
+  gold: "border-l-gold",
+  blood: "border-l-blood",
+  violet: "border-l-violet",
+  ok: "border-l-ok",
+  ash: "border-l-smoke",
+};
 
-function ComingSoon({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="rounded-xl border border-dashed border-smoke p-4">
-      <p className="mb-1 flex items-center gap-2 text-sm font-semibold">
-        {title} <Pill>Próximamente</Pill>
-      </p>
-      <p className="text-xs text-parchment">{text}</p>
-    </div>
-  );
-}
+const STATUS_ACCENT: Record<ParticipationStatus, Accent> = {
+  available: "ash",
+  in_progress: "gold",
+  pending_review: "violet",
+  completed: "ok",
+  rejected: "blood",
+  expired: "ash",
+};
 
 function MissionCard({ row, evidences, returnTo }: { row: Row; evidences: EvidenceRow[]; returnTo: string }) {
   const m = row.missions;
@@ -165,35 +171,36 @@ function MissionCard({ row, evidences, returnTo }: { row: Row; evidences: Eviden
   const canAddMore = pendingOrApproved < needed;
 
   return (
-    <article className="card flex flex-col gap-3">
-      <header className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs text-parchment">
-            {m.code} · {m.category} · {FREQUENCY_LABEL[m.frequency as Frequency]}
+    <article className={`slab flex flex-col gap-3 border-l-4 ${ACCENT_BORDER[STATUS_ACCENT[row.status as ParticipationStatus]]}`}>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="flex flex-wrap items-center gap-2">
+            <span className="tag border border-smoke bg-pit text-gold">{m.category}</span>
+            <span className="text-xs font-extrabold text-blood">+{row.xp_reward} XP</span>
+            <span className="text-[11px] text-parchment">{m.code} · {FREQUENCY_LABEL[m.frequency as Frequency]}</span>
           </p>
-          <h3 className="text-base font-semibold">{m.title}</h3>
+          <h3 className="mt-2 font-display text-base uppercase leading-snug tracking-wide sm:text-lg">{m.title}</h3>
         </div>
-        <div className="text-right">
-          <p className="font-display text-lg text-bronze">+{row.xp_reward}</p>
-          <p className="text-[10px] uppercase tracking-wider text-parchment">XP</p>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {row.status === "completed" && <Icon name="check" className="h-4 w-4 text-ok" />}
+          <StatusBadge status={row.status as ParticipationStatus} />
         </div>
       </header>
       <p className="text-sm text-linen">{m.description}</p>
 
-      <div>
-        <div className="mb-1 flex justify-between text-xs text-parchment">
+      <div className="max-w-2xl">
+        <Bar value={progress} target={target} accent={row.status === "completed" ? "ok" : "gold"} label={`Progreso de ${m.title}`} />
+        <div className="mt-1 flex flex-wrap justify-between gap-2 text-[11px] text-parchment">
           <span>
             {m.metric === "net_sales_growth_pct" && progress === null
               ? "Sin datos comparables del período anterior"
-              : `${progress ?? 0} / ${target} ${m.target_unit}`}
+              : `Progreso: ${progress ?? 0} / ${target} ${m.target_unit}`}
           </span>
           <span>Fecha límite: {formatDay(row.period_end)}</span>
         </div>
-        <ProgressBar value={progress} target={target} />
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <StatusBadge status={row.status as ParticipationStatus} />
         <Pill tone={m.validation_method === "auto" ? "bronze" : "neutral"}>
           {m.validation_method === "auto" ? "Validación automática" : "Revisión manual"}
         </Pill>
@@ -225,7 +232,12 @@ function MissionCard({ row, evidences, returnTo }: { row: Row; evidences: Eviden
       )}
 
       {showForm && canAddMore && (
-        <form action={submitEvidence} className="space-y-2 border-t border-ash pt-3">
+        <details className="group border-t border-ash pt-3" open={row.status === "rejected"}>
+          <summary className="btn-gold w-fit cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+            <span className="group-open:hidden">Enviar evidencia</span>
+            <span className="hidden group-open:inline">Ocultar formulario</span>
+          </summary>
+        <form action={submitEvidence} className="mt-3 max-w-2xl space-y-2">
           <input type="hidden" name="participation_id" value={row.id} />
           <input type="hidden" name="return_to" value={returnTo} />
           <label className="label" htmlFor={`url-${row.id}`}>Enlace de la publicación</label>
@@ -234,18 +246,19 @@ function MissionCard({ row, evidences, returnTo }: { row: Row; evidences: Eviden
           <input className="block w-full text-xs text-parchment file:mr-3 file:rounded-md file:border-0 file:bg-ash file:px-3 file:py-1.5 file:text-ivory" id={`file-${row.id}`} name="file" type="file" accept="image/png,image/jpeg,image/webp" />
           <input className="input" name="note" maxLength={1000} placeholder="Nota opcional para el revisor" />
           <p className="text-[11px] text-parchment">Nunca te pediremos contraseñas de tus redes sociales.</p>
-          <button className="btn-bronze">Enviar evidencia</button>
+          <button className="btn-gold">Enviar evidencia</button>
         </form>
+        </details>
       )}
     </article>
   );
 }
 
 function XpHistory({ ledger, tz }: { ledger: LedgerRow[]; tz: string }) {
-  if (ledger.length === 0) return <p className="card text-sm text-parchment">Todavía no tienes movimientos de XP.</p>;
+  if (ledger.length === 0) return <p className="slab text-sm text-parchment">Todavía no tienes movimientos de XP.</p>;
   const TYPE = { mission_reward: "Misión", admin_adjustment: "Ajuste", reversal: "Reversión" } as const;
   return (
-    <div className="table-wrap">
+    <div className="table-wrap rounded-none">
       <table className="table">
         <thead>
           <tr><th>Fecha</th><th>Tipo</th><th>Detalle</th><th className="text-right">XP</th></tr>

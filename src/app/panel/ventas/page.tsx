@@ -1,5 +1,5 @@
+import { Banner, StatSlab } from "@/components/club";
 import { Flash } from "@/components/flash";
-import { PageTitle } from "@/components/nav";
 import { SaleSource, SaleStatus, saleTotal, saleUnits, type SaleWithItems } from "@/components/sale-status";
 import { requireUser } from "@/lib/auth";
 import { canUndoPosSale, normalizeGarmentCode, SALE_CHANNELS } from "@/lib/pos";
@@ -47,22 +47,22 @@ export default async function SalesPage({ searchParams }: PageProps<"/panel/vent
   return (
     <>
       <Flash ok={sp.ok} error={sp.error} />
-      <PageTitle eyebrow="Punto de venta" title="Ventas de tu tienda">
+      <Banner title="Ventas de tu tienda">
         Cada prenda que sale se registra escaneando su QR. La venta queda registrada al instante, la prenda sale de tu stock
         y cuenta para Tu Tienda y tus misiones.
-      </PageTitle>
+      </Banner>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <div className="card"><p className="label">Ventas de hoy</p><p className="font-display text-xl">{todays.length}</p></div>
-        <div className="card"><p className="label">Prendas vendidas hoy</p><p className="font-display text-xl">{todays.reduce((s, v) => s + saleUnits(v), 0)}</p></div>
-        <div className="card"><p className="label">Total de hoy</p><p className="font-display text-xl">{money(todays.reduce((s, v) => s + saleTotal(v), 0))}</p></div>
-        <div className="card"><p className="label">Prendas con QR en tienda</p><p className="font-display text-xl">{units.length}</p></div>
+      <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <StatSlab label="Ventas de hoy" value={todays.length} />
+        <StatSlab label="Prendas vendidas hoy" value={todays.reduce((s, v) => s + saleUnits(v), 0)} />
+        <StatSlab label="Total de hoy" value={money(todays.reduce((s, v) => s + saleTotal(v), 0))} />
+        <StatSlab label="Prendas con QR en tienda" value={units.length} />
       </div>
 
       <PointOfSale userId={user.id} initialCode={code} disabled={!license} />
 
       {stock.size > 0 && (
-        <details className="card mb-6">
+        <details className="slab mb-6">
           <summary className="cursor-pointer text-sm font-semibold">Prendas disponibles para vender ({units.length})</summary>
           <ul className="mt-3 divide-y divide-ash text-sm">
             {[...stock.values()].sort((a, b) => a.name.localeCompare(b.name)).map((r) => (
@@ -75,8 +75,8 @@ export default async function SalesPage({ searchParams }: PageProps<"/panel/vent
         </details>
       )}
 
-      <h2 className="eyebrow mb-3">Registro de ventas</h2>
-      <div className="table-wrap">
+      <h2 className="slab-title mb-3">Registro de ventas</h2>
+      <div className="table-wrap rounded-none shadow-[4px_4px_0_0_#000]">
         <table className="table">
           <thead>
             <tr><th>Fecha</th><th>Venta</th><th>Prendas</th><th className="text-right">Total</th><th>Estado</th><th></th></tr>

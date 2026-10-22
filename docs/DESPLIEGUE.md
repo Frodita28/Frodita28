@@ -145,6 +145,13 @@ el precio de venta → **Generar etiquetas** → **Imprimir etiquetas**. Como ti
 prenda** (el navegador pide permiso para la cámara) o escribe el código → **Cerrar venta**. La cámara del navegador
 necesita `https://` (Vercel ya lo da).
 
+## 6.6 Actualización de la tabla de clasificación (2026-10-22)
+
+Si la base de datos se instaló antes de esta versión, en **SQL Editor → New query** pega el contenido de
+`actualizar-clasificacion.sql` (es la migración `supabase/migrations/20261022000009_leaderboard.sql`) y pulsa **Run**.
+Sin ella, la pestaña **Clasificación** sale vacía y Tu Tienda muestra «—» en el ranking. En un proyecto nuevo no hace
+falta: ya viene dentro de `instalar.sql`.
+
 ## 7. Opcional: tarea diaria de misiones
 
 **Integrations → Cron** → activa *pg_cron* → **Create job**: nombre `misiones-diarias`, horario `5 4 * * *`
