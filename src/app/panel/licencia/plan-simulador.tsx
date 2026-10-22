@@ -1,12 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Bar, StatSlab } from "@/components/club";
+import { Figure, ProgressBar, SectionHeader, StatCard } from "@/components/ui";
 import { licencia, type PlanId } from "@/content/licencia";
 import { costoMercancia, formatPct, formatUsd, recuperacion, simular } from "@/lib/licencia";
-
-/** Mismo estado activo (amarillo) que las pestañas del panel. */
-const ACTIVO = "border-gold! bg-gold! text-obsidian!";
 
 /** Selector de plan, "Tu inversión en números" y simulador de recuperación (cálculo en el cliente). */
 export function PlanSimulador({ planInicial }: { planInicial: PlanId }) {
@@ -27,81 +24,80 @@ export function PlanSimulador({ planInicial }: { planInicial: PlanId }) {
 
   return (
     <>
-      <section className="mb-5" aria-label={selectorPlan.titulo}>
-        <p className="kicker mb-2">{selectorPlan.titulo}</p>
-        <div className="grid grid-cols-2 gap-2 sm:inline-grid" role="radiogroup" aria-label={selectorPlan.titulo}>
-          {planes.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              role="radio"
-              aria-checked={p.id === plan.id}
-              onClick={() => elegirPlan(p.id)}
-              className={`tab justify-center text-center whitespace-normal ${p.id === plan.id ? ACTIVO : ""}`}
-            >
-              {p.nombre}
-            </button>
-          ))}
-        </div>
-        {plan.escalones.length > 1 && (
-          <div className="mt-3">
-            <p className="kicker mb-2">{selectorPlan.escalonTitulo}</p>
-            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={selectorPlan.escalonTitulo}>
-              {plan.escalones.map((e) => (
+      <section className="flex flex-col gap-6" aria-labelledby="numeros-titulo">
+        <div className="space-y-4">
+          <div>
+            <p className="ui-label mb-2" id="plan-titulo">{selectorPlan.titulo}</p>
+            <div className="grid grid-cols-1 gap-2 sm:inline-flex sm:flex-wrap" role="group" aria-labelledby="plan-titulo">
+              {planes.map((p) => (
                 <button
-                  key={e.id}
+                  key={p.id}
                   type="button"
-                  role="radio"
-                  aria-checked={e.id === escalon.id}
-                  onClick={() => setEscalonId(e.id)}
-                  className={`chip ${e.id === escalon.id ? ACTIVO : ""}`}
+                  aria-pressed={p.id === plan.id}
+                  onClick={() => elegirPlan(p.id)}
+                  className="ui-tab justify-center border border-line text-center whitespace-normal aria-pressed:border-accent"
                 >
-                  {e.etiqueta}
+                  {p.nombre}
                 </button>
               ))}
             </div>
           </div>
-        )}
-      </section>
+          {plan.escalones.length > 1 && (
+            <div>
+              <p className="ui-label mb-2" id="escalon-titulo">{selectorPlan.escalonTitulo}</p>
+              <div className="flex flex-wrap gap-2" role="group" aria-labelledby="escalon-titulo">
+                {plan.escalones.map((e) => (
+                  <button
+                    key={e.id}
+                    type="button"
+                    aria-pressed={e.id === escalon.id}
+                    onClick={() => setEscalonId(e.id)}
+                    className="ui-chip"
+                  >
+                    {e.etiqueta}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
-      <section className="mb-6">
-        <h2 className="slab-title mb-3">{n.titulo}</h2>
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatSlab
-            label={n.inversion}
-            value={<span className="text-gold">{formatUsd(escalon.inversionUsd)}</span>}
-            hint={plan.escalones.length > 1 ? plan.inversionResumen : plan.inversionSufijo}
-          />
-          <StatSlab label={n.margen} value={formatPct(escalon.margenMinimo)} />
-          <StatSlab
-            label={n.pvp}
-            value={formatUsd(escalon.pvpUsd)}
-            hint={`${n.costo}: ${formatUsd(costoMercancia(escalon))} (${n.costoNota})`}
-          />
-          <StatSlab
-            label={n.recuperacion}
-            value={<span className="text-gold">{formatPct(recuperacion(escalon))}</span>}
-            hint={n.recuperacionSufijo}
-          />
-          <StatSlab label={n.exclusividad} value={plan.exclusividad} />
-          <StatSlab label={n.vigencia} value={plan.vigencia} />
-          <StatSlab
-            label={n.recompra}
-            value={plan.recompraAnualMinimaUsd === null ? n.noAplica : formatUsd(plan.recompraAnualMinimaUsd)}
-          />
+        <div>
+          <SectionHeader title={n.titulo} id="numeros-titulo" />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard
+              label={n.inversion}
+              size="lg"
+              value={formatUsd(escalon.inversionUsd)}
+              hint={plan.escalones.length > 1 ? plan.inversionResumen : plan.inversionSufijo}
+            />
+            <StatCard label={n.margen} size="lg" value={formatPct(escalon.margenMinimo)} />
+            <StatCard
+              label={n.pvp}
+              size="lg"
+              value={formatUsd(escalon.pvpUsd)}
+              hint={`${n.costo}: ${formatUsd(costoMercancia(escalon))} (${n.costoNota})`}
+            />
+            <StatCard label={n.recuperacion} size="lg" value={formatPct(recuperacion(escalon))} hint={n.recuperacionSufijo} />
+            <StatCard label={n.exclusividad} value={<span className="font-title font-bold tracking-[0.02em] uppercase">{plan.exclusividad}</span>} />
+            <StatCard label={n.vigencia} value={<span className="font-title font-bold tracking-[0.02em] uppercase">{plan.vigencia}</span>} />
+            <StatCard
+              label={n.recompra}
+              value={plan.recompraAnualMinimaUsd === null ? <span className="font-title font-bold tracking-[0.02em] uppercase">{n.noAplica}</span> : formatUsd(plan.recompraAnualMinimaUsd)}
+            />
+          </div>
         </div>
       </section>
 
-      <section className="slab mb-6 border-l-4 border-l-gold">
-        <h2 className="slab-title">{t.titulo}</h2>
-        <p className="mt-1 text-xs text-parchment">
+      <section className="ui-card" aria-labelledby="simulador-titulo">
+        <SectionHeader title={t.titulo} id="simulador-titulo">
           {plan.nombre}
           {plan.escalones.length > 1 && ` · ${escalon.etiqueta}`}
-        </p>
-        <label className="mt-4 block">
-          <span className="flex items-end justify-between gap-3 text-sm font-bold">
-            <span>{t.pregunta}</span>
-            <span className="font-display text-3xl leading-none text-gold">{pct}%</span>
+        </SectionHeader>
+        <label className="block">
+          <span className="flex items-end justify-between gap-4">
+            <span className="font-medium">{t.pregunta}</span>
+            <span className="ui-num text-[40px] leading-none">{pct}%</span>
           </span>
           <input
             type="range"
@@ -109,37 +105,27 @@ export function PlanSimulador({ planInicial }: { planInicial: PlanId }) {
             max={100}
             step={1}
             value={pct}
+            aria-valuetext={`${pct}%`}
             onChange={(e) => setPct(Number(e.target.value))}
-            className="mt-3 w-full accent-gold"
+            className="mt-4 h-11 w-full cursor-pointer accent-accent"
           />
         </label>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <div className="border border-ash bg-pit p-3">
-            <p className="kicker">{t.ventas}</p>
-            <p className="mt-1 font-display text-xl sm:text-2xl">{formatUsd(sim.ventasUsd)}</p>
-          </div>
-          <div className="border border-ash bg-pit p-3">
-            <p className="kicker">{t.margen}</p>
-            <p className="mt-1 font-display text-xl sm:text-2xl">{formatUsd(sim.margenUsd)}</p>
-          </div>
-          <div className="border border-ash bg-pit p-3">
-            <p className="kicker">{t.recuperado}</p>
-            <p className="mt-1 font-display text-xl sm:text-2xl">
-              {formatUsd(sim.recuperadoUsd)} <span className="text-sm text-parchment">/ {formatUsd(escalon.inversionUsd)}</span>
-            </p>
-          </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <Figure label={t.ventas} value={formatUsd(sim.ventasUsd)} />
+          <Figure label={t.margen} value={formatUsd(sim.margenUsd)} />
+          <Figure
+            label={t.recuperado}
+            value={<>{formatUsd(sim.recuperadoUsd)} <span className="text-[15px] font-normal text-fg-2">/ {formatUsd(escalon.inversionUsd)}</span></>}
+          />
         </div>
-        <div className="mt-4 space-y-2">
-          <p className="flex justify-between text-xs font-bold">
-            <span>{t.puntoRecuperacion}: {punto}%</span>
-            <span className={sim.recuperado ? "text-ok" : "text-gold"}>{Math.round(sim.avance)}%</span>
-          </p>
-          <Bar value={sim.avance} target={100} accent={sim.recuperado ? "ok" : "gold"} label={t.barra} />
-          <p className={`text-sm ${sim.recuperado ? "font-bold text-ok" : "text-linen"}`} aria-live="polite">
+        <div className="mt-6 space-y-2">
+          <p className="ui-label">{t.puntoRecuperacion}: <span className="ui-num">{punto}%</span></p>
+          <ProgressBar value={sim.avance} target={100} done={sim.recuperado} label={t.barra} />
+          <p className={sim.recuperado ? "font-medium text-success" : "text-fg-2"} aria-live="polite">
             {sim.recuperado ? t.mensajeRecuperado : `${t.faltaPrefijo} ${sim.faltaPct}% ${t.faltaSufijo}`}
           </p>
         </div>
-        <p className="mt-4 border-t border-ash pt-3 text-xs text-parchment">{t.descargo}</p>
+        <p className="mt-6 border-t border-line pt-4 text-[13px] text-fg-2">{t.descargo}</p>
       </section>
     </>
   );

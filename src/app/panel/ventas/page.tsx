@@ -1,6 +1,6 @@
-import { Banner, StatSlab } from "@/components/club";
+import { Accordion, Badge, PageBanner, SectionHeader, StatCard, type BadgeTone } from "@/components/ui";
 import { Flash } from "@/components/flash";
-import { SaleSource, SaleStatus, saleTotal, saleUnits, type SaleWithItems } from "@/components/sale-status";
+import { SALE_STATUS, saleTotal, saleUnits, type SaleWithItems } from "@/components/sale-status";
 import { requireUser } from "@/lib/auth";
 import { canUndoPosSale, normalizeGarmentCode, SALE_CHANNELS } from "@/lib/pos";
 import { money } from "@/lib/store";
@@ -12,6 +12,9 @@ import { PointOfSale } from "./pos";
 export const metadata = { title: "Ventas" };
 
 const CHANNEL_LABEL: Record<string, string> = Object.fromEntries(SALE_CHANNELS);
+
+/** Estado de la venta con los tonos del panel (rojo solo para rechazos). */
+const SALE_TONE: Record<SaleWithItems["status"], BadgeTone> = { pending: "accent", verified: "neutral", rejected: "alert", cancelled: "neutral" };
 
 type Unit = { product_id: string; unit_price: number; products: { name: string; sku: string } | null };
 
@@ -46,81 +49,93 @@ export default async function SalesPage({ searchParams }: PageProps<"/panel/vent
 
   return (
     <>
-      <Flash ok={sp.ok} error={sp.error} />
-      <Banner title="Ventas de tu tienda">
-        Cada prenda que sale se registra escaneando su QR. La venta queda registrada al instante, la prenda sale de tu stock
-        y cuenta para Tu Tienda y tus misiones.
-      </Banner>
-
-      <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatSlab label="Ventas de hoy" value={todays.length} />
-        <StatSlab label="Prendas vendidas hoy" value={todays.reduce((s, v) => s + saleUnits(v), 0)} />
-        <StatSlab label="Total de hoy" value={money(todays.reduce((s, v) => s + saleTotal(v), 0))} />
-        <StatSlab label="Prendas con QR en tienda" value={units.length} />
+      <div className="flex flex-col gap-4">
+        <Flash ok={sp.ok} error={sp.error} variant="panel" />
+        <PageBanner title="Ventas de tu tienda">
+          Cada prenda que sale se registra escaneando su QR. La venta queda registrada al instante, la prenda sale de tu stock
+          y cuenta para Tu Tienda y tus misiones.
+        </PageBanner>
       </div>
 
-      <PointOfSale userId={user.id} initialCode={code} disabled={!license} />
+      <section className="flex flex-col gap-4" aria-label="Punto de venta">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard label="Ventas de hoy" value={todays.length} />
+          <StatCard label="Prendas vendidas hoy" value={todays.reduce((s, v) => s + saleUnits(v), 0)} />
+          <StatCard label="Total de hoy" value={money(todays.reduce((s, v) => s + saleTotal(v), 0))} />
+          <StatCard label="Prendas con QR en tienda" value={units.length} />
+        </div>
 
-      {stock.size > 0 && (
-        <details className="slab mb-6">
-          <summary className="cursor-pointer text-sm font-semibold">Prendas disponibles para vender ({units.length})</summary>
-          <ul className="mt-3 divide-y divide-ash text-sm">
-            {[...stock.values()].sort((a, b) => a.name.localeCompare(b.name)).map((r) => (
-              <li key={r.sku} className="flex justify-between gap-3 py-2">
-                <span>{r.name} <span className="text-xs text-parchment">· {r.sku}</span></span>
-                <span className="whitespace-nowrap text-parchment">{r.count} × {[...r.prices].map(money).join(" / ")}</span>
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
+        <PointOfSale userId={user.id} initialCode={code} disabled={!license} />
 
-      <h2 className="slab-title mb-3">Registro de ventas</h2>
-      <div className="table-wrap rounded-none shadow-[4px_4px_0_0_#000]">
-        <table className="table">
-          <thead>
-            <tr><th>Fecha</th><th>Venta</th><th>Prendas</th><th className="text-right">Total</th><th>Estado</th><th></th></tr>
-          </thead>
-          <tbody>
-            {sales.length === 0 && (
-              <tr><td colSpan={6} className="text-parchment">Todavía no hay ventas. Escanea una prenda para registrar la primera.</td></tr>
-            )}
-            {sales.map((s) => (
-              <tr key={s.id}>
-                <td className="whitespace-nowrap text-parchment">{formatDateTime(s.sold_at)}</td>
-                <td>
-                  <div className="flex items-center gap-2">{s.reference} <SaleSource source={s.source} /></div>
-                  <div className="text-xs text-parchment">{CHANNEL_LABEL[s.channel] ?? s.channel}{s.customer_ref ? ` · ${s.customer_ref}` : ""}</div>
-                </td>
-                <td className="text-xs">
-                  {s.sale_items.map((i, k) => (
-                    <div key={k}>
-                      {i.quantity} × {i.products?.name}
-                      {i.garment_units?.code && <span className="ml-1 font-mono text-parchment">{i.garment_units.code}</span>}
-                    </div>
-                  ))}
-                </td>
-                <td className="text-right">{money(saleTotal(s))}</td>
-                <td>
-                  <SaleStatus status={s.status} />
-                  {(s.rejection_reason || s.cancel_reason) && <div className="mt-1 text-xs text-parchment">{s.rejection_reason ?? s.cancel_reason}</div>}
-                </td>
-                <td>
-                  {s.source === "pos" && s.status === "verified" && canUndoPosSale(s.created_at) && (
-                    <form action={cancelOwnSale}>
-                      <input type="hidden" name="sale_id" value={s.id} />
-                      <button className="text-xs text-parchment underline hover:text-bad">Anular</button>
-                    </form>
-                  )}
-                </td>
+        {stock.size > 0 && (
+          <Accordion title={`Prendas disponibles para vender (${units.length})`}>
+            <ul className="divide-y divide-line">
+              {[...stock.values()].sort((a, b) => a.name.localeCompare(b.name)).map((r) => (
+                <li key={r.sku} className="flex justify-between gap-4 py-3">
+                  <span>{r.name} <span className="text-[13px] text-fg-2">· {r.sku}</span></span>
+                  <span className="ui-num text-right whitespace-nowrap text-fg-2">{r.count} × {[...r.prices].map(money).join(" / ")}</span>
+                </li>
+              ))}
+            </ul>
+          </Accordion>
+        )}
+      </section>
+
+      <section>
+        <SectionHeader title="Registro de ventas" />
+        <div className="ui-table-wrap">
+          <table className="ui-table">
+            <thead>
+              <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Venta</th>
+                <th scope="col">Prendas</th>
+                <th scope="col" className="text-right">Total</th>
+                <th scope="col">Estado</th>
+                <th scope="col"><span className="sr-only">Acciones</span></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p className="mt-2 text-xs text-parchment">
-        Puedes anular una venta en sus primeros 15 minutos si fue un error de caja; después, pídeselo a Gallo Negro.
-      </p>
+            </thead>
+            <tbody>
+              {sales.length === 0 && (
+                <tr><td colSpan={6} className="text-fg-2">Todavía no hay ventas. Escanea una prenda para registrar la primera.</td></tr>
+              )}
+              {sales.map((s) => (
+                <tr key={s.id}>
+                  <td className="whitespace-nowrap text-fg-2">{formatDateTime(s.sold_at)}</td>
+                  <td>
+                    <div className="flex items-center gap-2 whitespace-nowrap">{s.reference} <Badge>{s.source === "pos" ? "QR" : "Manual"}</Badge></div>
+                    <div className="mt-1 text-[13px] text-fg-2">{CHANNEL_LABEL[s.channel] ?? s.channel}{s.customer_ref ? ` · ${s.customer_ref}` : ""}</div>
+                  </td>
+                  <td className="text-[13px]">
+                    {s.sale_items.map((i, k) => (
+                      <div key={k}>
+                        {i.quantity} × {i.products?.name}
+                        {i.garment_units?.code && <span className="ml-1 font-mono text-fg-2">{i.garment_units.code}</span>}
+                      </div>
+                    ))}
+                  </td>
+                  <td className="ui-num text-right whitespace-nowrap">{money(saleTotal(s))}</td>
+                  <td>
+                    <Badge tone={SALE_TONE[s.status]}>{SALE_STATUS[s.status].label}</Badge>
+                    {(s.rejection_reason || s.cancel_reason) && <div className="mt-1 text-[13px] text-fg-2">{s.rejection_reason ?? s.cancel_reason}</div>}
+                  </td>
+                  <td>
+                    {s.source === "pos" && s.status === "verified" && canUndoPosSale(s.created_at) && (
+                      <form action={cancelOwnSale}>
+                        <input type="hidden" name="sale_id" value={s.id} />
+                        <button className="ui-btn-sm">Anular</button>
+                      </form>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-2 text-[13px] text-fg-2">
+          Puedes anular una venta en sus primeros 15 minutos si fue un error de caja; después, pídeselo a Gallo Negro.
+        </p>
+      </section>
     </>
   );
 }

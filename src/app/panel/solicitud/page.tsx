@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ApplicationStatusPill, ApplicationTimeline, type ApplicationEvent } from "@/components/application-status";
 import { Flash } from "@/components/flash";
-import { PageTitle } from "@/components/nav";
+import { PageBanner } from "@/components/ui";
 import { APPLICATION_STATUS, OPEN_STATUSES, channelLabel, type ApplicationStatus } from "@/lib/applications";
 import { requireUser } from "@/lib/auth";
 import { formatDateTime } from "@/lib/time";
@@ -53,43 +53,45 @@ export default async function MyApplication({ searchParams }: PageProps<"/panel/
 
   return (
     <>
-      <Flash ok={sp.ok} error={sp.error} />
-      <PageTitle eyebrow="Licencias" title="Mi solicitud">
-        Aquí envías tu solicitud para ser licenciado y sigues su estado. Una solicitud no es una licencia: si se aprueba,
-        Gallo Negro formaliza contigo el contrato y el pago, y después activa tu licencia.
-      </PageTitle>
+      <div className="flex flex-col gap-4">
+        <Flash ok={sp.ok} error={sp.error} variant="panel" />
+        <PageBanner title="Mi solicitud">
+          Aquí envías tu solicitud para ser licenciado y sigues su estado. Una solicitud no es una licencia: si se aprueba,
+          Gallo Negro formaliza contigo el contrato y el pago, y después activa tu licencia.
+        </PageBanner>
+      </div>
 
       {user.role === "admin" && (
-        <p className="card text-sm text-linen">
+        <p className="ui-card text-fg-2">
           Las cuentas de administrador no envían solicitudes. Revisa las recibidas en{" "}
-          <Link href="/admin/solicitudes" className="text-bronze underline">Administración · Solicitudes</Link>.
+          <Link href="/admin/solicitudes" className="ui-link">Administración · Solicitudes</Link>.
         </p>
       )}
 
       {current && <CurrentApplication app={current} plans={plans ?? []} />}
 
       {canApply && (
-        <section className="card max-w-3xl">
-          <h2 className="eyebrow mb-4">{past.length ? "Nueva solicitud" : "Solicitar licencia"}</h2>
+        <section className="ui-card max-w-3xl">
+          <h2 className="ui-title-section mb-4">{past.length ? "Nueva solicitud" : "Solicitar licencia"}</h2>
           <ApplicationForm action={submitApplication} plans={plans ?? []} defaults={{ full_name: user.fullName }} submitLabel="Enviar solicitud" />
         </section>
       )}
 
       {user.role === "licensee" && !current && (
-        <p className="card text-sm text-linen">Tu cuenta ya tiene una licencia. Consulta sus datos en <Link href="/panel" className="text-bronze underline">Inicio</Link>.</p>
+        <p className="ui-card text-fg-2">Tu cuenta ya tiene una licencia. Consulta sus datos en <Link href="/panel" className="ui-link">Inicio</Link>.</p>
       )}
 
       {past.length > 0 && (
-        <section className="mt-6 max-w-3xl">
-          <h2 className="eyebrow mb-2">Solicitudes anteriores</h2>
+        <section className="max-w-3xl">
+          <h2 className="ui-title-section mb-4">Solicitudes anteriores</h2>
           <ul className="space-y-2">
             {past.map((a) => (
-              <li key={a.id} className="card flex flex-wrap items-center justify-between gap-2 text-sm">
+              <li key={a.id} className="ui-card flex flex-wrap items-center justify-between gap-2">
                 <span>Enviada el {formatDateTime(a.submitted_at)}</span>
                 <span className="flex items-center gap-2">
                   <ApplicationStatusPill status={a.status} />
                 </span>
-                {a.admin_message && <p className="w-full text-xs text-parchment">{a.admin_message}</p>}
+                {a.admin_message && <p className="w-full text-[13px] text-fg-2">{a.admin_message}</p>}
               </li>
             ))}
           </ul>
@@ -104,25 +106,25 @@ function CurrentApplication({ app, plans }: { app: Application; plans: { id: str
   const info = APPLICATION_STATUS[app.status];
   return (
     <div className="grid gap-4 lg:grid-cols-3">
-      <section className="card lg:col-span-2">
+      <section className="ui-card lg:col-span-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="eyebrow">Estado</h2>
+          <h2 className="ui-title-section">Estado</h2>
           <ApplicationStatusPill status={app.status} />
         </div>
-        <p className="mt-3 text-sm text-linen">{app.license_id ? "Tu licencia está activa. Ya puedes abrir y gestionar tu tienda." : info.help}</p>
+        <p className="mt-3 text-fg-2">{app.license_id ? "Tu licencia está activa. Ya puedes abrir y gestionar tu tienda." : info.help}</p>
         {app.admin_message && (
-          <div className={`mt-4 rounded-lg border p-3 text-sm ${app.status === "needs_info" ? "border-warn/60" : "border-ash"}`}>
-            <p className="label">Mensaje de Gallo Negro</p>
+          <div className={`mt-4 rounded-ui border p-4 ${app.status === "needs_info" ? "border-l-4 border-line border-l-brand-red" : "border-line"}`}>
+            <p className="ui-label mb-2">Mensaje de Gallo Negro</p>
             <p className="whitespace-pre-line">{app.admin_message}</p>
           </div>
         )}
         {app.status === "approved" && app.assigned && (
-          <p className="mt-3 text-sm">Plan asignado: <strong>{app.assigned.name}</strong></p>
+          <p className="mt-3">Plan asignado: <strong>{app.assigned.name}</strong></p>
         )}
 
         {editable ? (
-          <div className="mt-6 border-t border-ash pt-4">
-            <h3 className="eyebrow mb-4">{app.status === "needs_info" ? "Corrige y vuelve a enviar" : "Editar mi solicitud"}</h3>
+          <div className="mt-6 border-t border-line pt-4">
+            <h3 className="ui-title-card mb-4">{app.status === "needs_info" ? "Corrige y vuelve a enviar" : "Editar mi solicitud"}</h3>
             <ApplicationForm
               action={updateApplication}
               plans={plans}
@@ -131,27 +133,27 @@ function CurrentApplication({ app, plans }: { app: Application; plans: { id: str
             />
           </div>
         ) : (
-          <dl className="mt-6 grid gap-3 border-t border-ash pt-4 text-sm sm:grid-cols-2">
-            <div><dt className="label">Nombre</dt><dd>{app.full_name}</dd></div>
-            <div><dt className="label">Ubicación</dt><dd>{app.city}, {app.country}</dd></div>
-            <div><dt className="label">Canales</dt><dd>{app.sales_channels.map(channelLabel).join(", ")}</dd></div>
-            <div><dt className="label">Plan de interés</dt><dd>{app.preferred?.name ?? "Sin preferencia"}</dd></div>
+          <dl className="mt-6 grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
+            <div><dt className="ui-label mb-1">Nombre</dt><dd>{app.full_name}</dd></div>
+            <div><dt className="ui-label mb-1">Ubicación</dt><dd>{app.city}, {app.country}</dd></div>
+            <div><dt className="ui-label mb-1">Canales</dt><dd>{app.sales_channels.map(channelLabel).join(", ")}</dd></div>
+            <div><dt className="ui-label mb-1">Plan de interés</dt><dd>{app.preferred?.name ?? "Sin preferencia"}</dd></div>
           </dl>
         )}
       </section>
 
       <aside className="space-y-4">
-        <section className="card">
-          <h2 className="eyebrow mb-3">Historial</h2>
+        <section className="ui-card">
+          <h2 className="ui-title-section mb-4">Historial</h2>
           <ApplicationTimeline events={app.application_events} />
         </section>
         {!app.license_id && (
-          <section className="card">
-            <h2 className="eyebrow mb-2">Retirar solicitud</h2>
+          <section className="ui-card">
+            <h2 className="ui-title-section mb-4">Retirar solicitud</h2>
             <form action={withdrawApplication} className="space-y-2">
               <input type="hidden" name="id" value={app.id} />
-              <input className="input" name="reason" maxLength={500} placeholder="Motivo (opcional)" aria-label="Motivo" />
-              <button className="btn-danger w-full">Retirar</button>
+              <input className="ui-input" name="reason" maxLength={500} placeholder="Motivo (opcional)" aria-label="Motivo" />
+              <button className="ui-btn-secondary w-full">Retirar</button>
             </form>
           </section>
         )}

@@ -1,4 +1,4 @@
-/** Iconos de trazo simple para el panel de las tiendas (SVG en línea, sin dependencias). */
+/** Iconos lineales del panel de las tiendas (SVG en línea, sin dependencias; trazo de 1.75 px). */
 const PATHS = {
   store: "M3 9l1.5-5h15L21 9M3 9h18M3 9v1a3 3 0 006 0 3 3 0 006 0 3 3 0 006 0V9M5 13v7h14v-7M10 20v-4h4v4",
   podium: "M9 21V9h6v12M3 21v-7h6M15 21v-9h6v9M2 21h20M12 3l.9 1.8 2 .3-1.4 1.4.3 2-1.8-.9-1.8.9.3-2-1.4-1.4 2-.3z",
@@ -21,13 +21,15 @@ const PATHS = {
   bolt: "M13 3L5 14h6l-1 7 8-11h-6z",
   box: "M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10",
   arrowUp: "M12 20V5M6 11l6-6 6 6",
+  chevronDown: "M6 9l6 6 6-6",
+  alert: "M12 3l10 18H2zM12 10v4M12 17.5h.01",
 } as const;
 
 export type IconName = keyof typeof PATHS;
 
 export function Icon({ name, className = "h-5 w-5" }: { name: IconName; className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d={PATHS[name]} />
     </svg>
   );

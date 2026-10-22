@@ -14,16 +14,8 @@
   --color-ok: #7fb685;
   --color-warn: #d9a441;
   --color-bad: #d9725f;
-  /* Club de licenciatarios (panel de las tiendas): dorado vivo, rojo y violeta de acento. */
-  --color-gold: #e2b23c;
-  --color-gold-soft: #f2c957;
-  --color-blood: #e5484d;
-  --color-violet: #9b6bff;
-  --color-pit: #121214;
-  --color-slab: #1b1b1e;
-  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-display-face), var(--font-body), ui-sans-serif, sans-serif;
-  --font-condensed: var(--font-condensed-face), var(--font-display-face), ui-sans-serif, sans-serif;
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-face), var(--font-archivo), ui-sans-serif, sans-serif;
 }
 
 html {
@@ -90,42 +82,193 @@ body {
   }
 }
 
-/* ---------- Club de licenciatarios: bloques con borde marcado y sombra dura ---------- */
+/* =====================================================================
+   Sistema de diseño del panel de licenciatarios.
+   Fuente única de los tokens: aquí se definen colores, radio y fuentes;
+   el resto del panel solo usa estas variables o las utilidades de abajo.
+   Las fuentes reales (Barlow Condensed e Inter) las inyecta next/font en
+   src/app/panel/fonts.ts sobre --font-heading y --font-body.
+   ===================================================================== */
 
-@utility slab {
-  @apply border border-ash bg-slab p-4 shadow-[4px_4px_0_0_#000] sm:p-5;
+:root {
+  --bg: #0b0b0c;
+  --surface: #141416;
+  --surface-2: #1c1c1f;
+  --border: #2a2a2e;
+  --text: #f5f5f4;
+  --text-2: #a1a1a6;
+  --text-3: #6b6b72;
+  --accent: #e9b824;
+  --brand-red: #e5484d;
+  --success: #3fb950;
+  --radius: 4px;
+  --font-heading: "Barlow Condensed", "Oswald", sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
 }
 
-@utility slab-title {
-  @apply font-display text-lg uppercase leading-tight tracking-wide sm:text-xl;
+/* Alias de Tailwind para los tokens: bg-surface, text-fg-2, border-line, font-title… */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-fg: var(--text);
+  --color-fg-2: var(--text-2);
+  --color-fg-3: var(--text-3);
+  --color-accent: var(--accent);
+  --color-brand-red: var(--brand-red);
+  --color-success: var(--success);
+  --radius-ui: var(--radius);
+  --font-title: var(--font-heading);
+  --font-text: var(--font-body);
 }
 
-@utility kicker {
-  @apply text-[11px] font-bold uppercase tracking-[0.12em] text-parchment;
-}
+/* Raíz del panel: fondo, tipografía base (15 px), foco amarillo y apertura suave de acordeones. */
+.gn-panel {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  interpolate-size: allow-keywords;
 
-@utility tab {
-  @apply inline-flex items-center gap-2 border border-ash bg-pit px-3 py-2 font-condensed text-lg uppercase leading-none tracking-wide whitespace-nowrap text-linen transition-colors hover:border-gold/60 hover:text-ivory sm:px-4 sm:py-2.5 sm:text-xl;
-  &[aria-current="page"] {
-    @apply border-gold bg-gold text-obsidian;
+  & :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  & ::placeholder {
+    color: var(--text-3);
+  }
+
+  & details::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition:
+      block-size 200ms ease,
+      content-visibility 200ms allow-discrete;
+  }
+
+  & details[open]::details-content {
+    block-size: auto;
   }
 }
 
-@utility chip {
-  @apply inline-flex items-center border border-ash px-3 py-1.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap text-parchment hover:text-ivory;
-  &[aria-current="page"] {
-    @apply border-gold bg-gold text-obsidian;
+@media (prefers-reduced-motion: reduce) {
+  .gn-panel *,
+  .gn-panel *::before,
+  .gn-panel *::after,
+  .gn-panel ::details-content {
+    transition-duration: 0s !important;
+    animation: none !important;
   }
 }
 
-@utility btn-gold {
-  @apply btn rounded-none bg-gold font-condensed text-lg tracking-wide text-obsidian uppercase shadow-[3px_3px_0_0_#000] hover:bg-gold-soft;
+/* ---------- Tipografía ---------- */
+
+@utility ui-title-page {
+  @apply font-title text-[36px] leading-none font-bold tracking-[0.02em] uppercase sm:text-[44px];
 }
 
-@utility btn-slab {
-  @apply btn rounded-none border border-smoke bg-pit font-condensed text-lg tracking-wide text-ivory uppercase hover:border-gold;
+@utility ui-title-section {
+  @apply font-title text-2xl leading-tight font-bold tracking-[0.02em] uppercase;
 }
 
-@utility tag {
-  @apply inline-flex items-center px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider;
+@utility ui-title-card {
+  @apply font-title text-xl leading-tight font-bold tracking-[0.02em] uppercase;
+}
+
+@utility ui-label {
+  @apply text-xs leading-tight font-medium tracking-[0.06em] text-fg-2 uppercase;
+}
+
+@utility ui-num {
+  @apply font-text font-semibold tabular-nums;
+}
+
+@utility ui-link {
+  @apply text-fg underline decoration-fg-3 underline-offset-4 transition-colors duration-150 hover:decoration-accent;
+}
+
+/* ---------- Superficies ---------- */
+
+@utility ui-card {
+  @apply rounded-ui border border-line bg-surface p-4 sm:p-6;
+}
+
+@utility ui-card-inset {
+  @apply rounded-ui border border-line bg-surface-2 p-4;
+}
+
+/* ---------- Botones (mínimo 44 px de alto) ---------- */
+
+@utility ui-btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-ui px-4 font-title text-lg leading-none font-bold tracking-[0.02em] uppercase transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility ui-btn-primary {
+  @apply ui-btn bg-accent text-bg hover:bg-accent/90;
+}
+
+@utility ui-btn-secondary {
+  @apply ui-btn border border-line bg-transparent text-fg hover:border-fg-2 hover:bg-surface-2;
+}
+
+/* Acción secundaria pequeña dentro de listas y tablas (44 px en móvil, 36 px en escritorio). */
+@utility ui-btn-sm {
+  @apply ui-btn-secondary px-3 font-text text-[13px] font-medium tracking-normal normal-case sm:min-h-9;
+}
+
+/* ---------- Formularios ---------- */
+
+@utility ui-input {
+  @apply min-h-11 w-full rounded-ui border border-line bg-bg px-3 py-2 text-[15px] text-fg transition-colors duration-150 focus:border-accent focus:outline-none;
+}
+
+@utility ui-field-label {
+  @apply mb-2 block text-[13px] font-medium text-fg-2;
+}
+
+/* ---------- Navegación ---------- */
+
+@utility ui-tab {
+  @apply inline-flex min-h-11 items-center gap-2 rounded-ui px-3 font-title text-lg leading-none font-bold tracking-[0.02em] whitespace-nowrap text-fg-2 uppercase transition-colors duration-150 hover:bg-surface-2 hover:text-fg sm:px-4;
+  &[aria-current="page"],
+  &[aria-pressed="true"],
+  &[aria-current="page"]:hover,
+  &[aria-pressed="true"]:hover {
+    background-color: var(--accent);
+    color: var(--bg);
+  }
+}
+
+/* Filtro secundario dentro de una página (misiones, escalones…). */
+@utility ui-chip {
+  @apply inline-flex min-h-11 items-center gap-1 rounded-ui border border-line px-3 text-[13px] font-medium tracking-[0.04em] whitespace-nowrap text-fg-2 uppercase transition-colors duration-150 hover:border-fg-2 hover:text-fg sm:min-h-9;
+  &[aria-current="page"],
+  &[aria-pressed="true"],
+  &[aria-current="page"]:hover,
+  &[aria-pressed="true"]:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+}
+
+/* ---------- Tabla ---------- */
+
+@utility ui-table-wrap {
+  @apply relative overflow-x-auto rounded-ui border border-line bg-surface;
+}
+
+@utility ui-table {
+  @apply w-full text-left text-[15px];
+  & th {
+    @apply border-b border-line px-4 py-3 text-xs font-medium tracking-[0.06em] whitespace-nowrap text-fg-2 uppercase;
+  }
+  & td {
+    @apply border-b border-line px-4 py-3 align-top;
+  }
+  & tbody tr:last-child td {
+    @apply border-b-0;
+  }
 }
