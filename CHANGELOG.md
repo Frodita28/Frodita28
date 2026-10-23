@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1 — 2026-10-23
+
+- **Rangos confirmados:** Gallo Negro confirmó los nombres y XP de los rangos (2.000 / 3.000 / 3.500 / 4.000 / 6.000,
+  acumulado máximo 18.500) y que lo de cada rango se libera al alcanzarlo. Se quitan las marcas BORRADOR de
+  `src/content/rangos.ts`. Las recompensas siguen sin publicar y las imágenes de rango siguen pendientes.
+
 ## 0.8.0 — 2026-10-23
 
 - **Rangos y XP en Tu tienda:** cinco rangos (Umbral, Vigía, Centurión, Soberano, AYAM CEMANI) calculados solo
