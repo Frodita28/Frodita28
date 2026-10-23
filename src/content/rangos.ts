@@ -23,7 +23,8 @@ export type Rango = {
   cosmetico: string;
 };
 
-// BORRADOR: nombres de rango y XP para completar cada uno, pendientes de confirmar por Gallo Negro.
+// Nombres de rango y XP para completar cada uno: confirmados por Gallo Negro el 23 oct 2026.
+// Lo de cada rango se libera al ALCANZARLO (p. ej. Centurión con 5.000 XP).
 export const RANGOS: Rango[] = [
   {
     nivel: 1,
@@ -31,7 +32,7 @@ export const RANGOS: Rango[] = [
     nombre: "Umbral",
     xpParaCompletar: 2000,
     concepto: "Puerta o arco entreabierto con luz amarilla entrando",
-    imagen: null, // BORRADOR: /rangos/umbral.webp cuando exista
+    imagen: null, // Pendiente: /rangos/umbral.webp cuando exista
     cosmetico: "Marco simple en el avatar",
   },
   {
@@ -40,7 +41,7 @@ export const RANGOS: Rango[] = [
     nombre: "Vigía",
     xpParaCompletar: 3000,
     concepto: "Torre de vigilancia con farol, u ojo atento dentro de un escudo",
-    imagen: null, // BORRADOR: /rangos/vigia.webp cuando exista
+    imagen: null, // Pendiente: /rangos/vigia.webp cuando exista
     cosmetico: "Marco amarillo",
   },
   {
@@ -49,7 +50,7 @@ export const RANGOS: Rango[] = [
     nombre: "Centurión",
     xpParaCompletar: 3500,
     concepto: "Casco de centurión con cresta roja transversal",
-    imagen: null, // BORRADOR: /rangos/centurion.webp cuando exista
+    imagen: null, // Pendiente: /rangos/centurion.webp cuando exista
     cosmetico: "Marco doble con detalle rojo",
   },
   {
@@ -58,7 +59,7 @@ export const RANGOS: Rango[] = [
     nombre: "Soberano",
     xpParaCompletar: 4000,
     concepto: "Corona cuyas puntas imitan una cresta de gallo",
-    imagen: null, // BORRADOR: /rangos/soberano.webp cuando exista
+    imagen: null, // Pendiente: /rangos/soberano.webp cuando exista
     cosmetico: "Marco con brasas animadas",
   },
   {
@@ -67,7 +68,7 @@ export const RANGOS: Rango[] = [
     nombre: "AYAM CEMANI",
     xpParaCompletar: 6000,
     concepto: "Gallo Ayam Cemani completamente negro con aureola dorada",
-    imagen: null, // BORRADOR: /rangos/ayam-cemani.webp cuando exista
+    imagen: null, // Pendiente: /rangos/ayam-cemani.webp cuando exista
     cosmetico: "Marco máximo e insignia de rango máximo junto al nombre",
   },
 ];
@@ -83,7 +84,7 @@ export type RecompensaNivel = {
   publicada: boolean;
 };
 
-// BORRADOR: recompensas reales por rango. El catálogo de /panel/recompensas está vacío;
+// Recompensas por rango: aún no definidas por Gallo Negro. El catálogo de /panel/recompensas está vacío;
 // ninguna está publicada y por eso no se describe ningún premio concreto.
 export const recompensasPorNivel: RecompensaNivel[] = [
   { nivel: 1, titulo: "Recompensa de Umbral", descripcion: "Gallo Negro la anunciará en Recompensas.", publicada: false },
