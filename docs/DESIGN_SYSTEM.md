@@ -1,6 +1,6 @@
 # Sistema de diseño del panel de licenciatarios
 
-Alcance: todo lo que se ve dentro del panel (`/panel/*` y la pestaña Contraseña, `/nueva-clave`). El panel de
+Alcance: todo lo que se ve dentro del panel (`/panel/*` y el cambio de contraseña, `/nueva-clave`, enlazado desde la cabecera). El panel de
 administración (`/admin`), el acceso y la página pública conservan su estilo anterior (tokens `obsidian`, `ivory`,
 `bronze`… en `globals.css`) y no se tocaron.
 
@@ -45,12 +45,21 @@ iconos (sobre surface-2 daría 4.3:1, por eso nunca como color de texto).
 
 ## Componentes
 
-- `src/components/club.tsx`: `StoreShell` (cabecera + pestañas + contenido a 1152 px, secciones a 48 px),
-  `panelTabs(role)`, `ROLE_LABEL`.
+- `src/components/club.tsx`: `StoreShell` (cabecera con avatar enmarcado según el rango y botón «Cambiar
+  contraseña» junto a «Salir» + pestañas + contenido a 1152 px, secciones a 48 px), `panelTabs(role)`, `ROLE_LABEL`.
 - `src/components/club-tabs.tsx`: pestañas con `aria-current`, scroll horizontal en móvil.
 - `src/components/ui.tsx`: `PageBanner`, `SectionHeader`, `StatCard`, `Figure`, `ProgressBar` (8 px, % a la
   derecha, verde al llegar a la meta), `Badge` (neutral, accent, success, alert), `Accordion`, `Alert`,
-  `ComingSoon`, `EmptyState`, `Ranking` (top 3 con borde amarillo, resto en lista).
+  `ComingSoon`, `EmptyState`.
+- Rangos (contenido y cifras en `src/content/rangos.ts`, cálculo en `src/lib/rangos.ts`):
+  `src/components/rangos.tsx` (`RankEmblem`, `RankAvatar` con el marco de cada rango, `RankBadge`,
+  `MaxRankInsignia`, `Embers`), `rank-hero.tsx` (anillo radial, «+N XP» y subida de rango), `rank-route.tsx`
+  (ruta de rangos), `rank-unlocks.tsx` («Liberado en tu rango» y «Cómo ganar XP»).
+- `src/components/license-card.tsx`: credencial de la licencia en Tu tienda (textos en `src/content/licencia-tienda.ts`).
+- Clasificación: podio, lista con movimientos y nombre visible en `src/app/panel/clasificacion/`.
+- Animaciones `gn-*` en `globals.css`; con `prefers-reduced-motion` no se anima nada y se ocultan las brasas y el
+  brillo (`gn-motion-only`). El brillo rotatorio (`gn-halo`, conic-gradient) es la única excepción a «sin
+  degradados» y solo aparece en el rango 5.
 - `Flash` acepta `variant="panel"`.
 - Iconos: `src/components/icons.tsx` (SVG lineal propio, trazo 1.75 px, sin emojis).
 

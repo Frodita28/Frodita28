@@ -272,3 +272,138 @@ body {
     @apply border-b-0;
   }
 }
+
+/* ---------- Rangos y clasificación ----------
+   Animaciones de la experiencia de rangos. Con prefers-reduced-motion la regla de
+   .gn-panel de arriba las desactiva todas; las brasas y el brillo además se ocultan. */
+
+@keyframes gn-sweep {
+  from {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  to {
+    stroke-dashoffset: var(--gn-sweep-to);
+    opacity: 0;
+  }
+}
+
+@keyframes gn-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.72;
+  }
+}
+
+@keyframes gn-pop {
+  from {
+    transform: scale(0.86);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes gn-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+@keyframes gn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gn-ember {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-64px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes gn-float-up {
+  0% {
+    transform: translate(-50%, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -48px);
+    opacity: 0;
+  }
+}
+
+@keyframes gn-rise {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes gn-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@utility gn-anim-pulse {
+  animation: gn-pulse 3.2s ease-in-out infinite;
+}
+
+@utility gn-anim-pop {
+  animation: gn-pop 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@utility gn-anim-breathe {
+  animation: gn-breathe 4.5s ease-in-out infinite;
+}
+
+@utility gn-anim-spin {
+  animation: gn-spin 9s linear infinite;
+}
+
+@utility gn-anim-rise {
+  animation: gn-rise 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@utility gn-anim-fade {
+  animation: gn-fade 200ms ease-out both;
+}
+
+/* Brillo rotatorio del rango máximo: la única excepción a «sin degradados». */
+@utility gn-halo {
+  background: conic-gradient(from 0deg, transparent 0deg, var(--accent) 60deg, transparent 120deg, transparent 360deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gn-panel .gn-motion-only {
+    display: none !important;
+  }
+}

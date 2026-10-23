@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { licencia } from "../content/licencia";
-import { costoMercancia, formatPct, formatUsd, recuperacion, simular } from "./licencia";
+import { costoMercancia, formatPct, formatUsd, recuperacion, simular, vigencia } from "./licencia";
 
 const plan = (id: string) => licencia.planes.find((p) => p.id === id)!;
 
@@ -44,4 +44,15 @@ describe("simular", () => {
 
 describe("formatUsd", () => {
   it("usa el formato del contrato", () => assert.equal(formatUsd(1500), "$1,500 USD"));
+});
+
+describe("vigencia", () => {
+  it("sin fecha de cierre no hay barra", () => assert.equal(vigencia("2026-10-21", null, "2026-10-23"), null));
+  it("calcula días restantes y avance", () => {
+    assert.deepEqual(vigencia("2026-01-01", "2026-12-31", "2026-07-02"), { diasRestantes: 182, transcurrido: 182 / 364, porVencer: false });
+  });
+  it("avisa a 30 días o menos y no baja de 0", () => {
+    assert.equal(vigencia("2026-01-01", "2026-11-20", "2026-10-21")?.porVencer, true);
+    assert.equal(vigencia("2026-01-01", "2026-10-01", "2026-10-21")?.diasRestantes, 0);
+  });
 });

@@ -1,69 +1,185 @@
 import Link from "next/link";
-import { Alert, EmptyState, PageBanner, Ranking } from "@/components/ui";
+import { Alert, EmptyState, PageBanner } from "@/components/ui";
+import { Flash } from "@/components/flash";
 import { Icon } from "@/components/icons";
+import { TEXTOS_CLASIFICACION as T, TEXTOS_RANGOS } from "@/content/rangos";
 import { requireUser } from "@/lib/auth";
-import { parseBoard } from "@/lib/leaderboard";
+import { parseBoard, rivalidad } from "@/lib/leaderboard";
+import { estadoRango, todosLosRangos } from "@/lib/rangos";
 import { createClient } from "@/lib/supabase/server";
+import { LeaderboardBoard, type BoardEntry } from "./board";
+import { NameEditor } from "./name-editor";
 
 export const metadata = { title: "Clasificación" };
+
+const fmt = (n: number) => new Intl.NumberFormat("es-VE").format(n);
 
 export default async function LeaderboardPage({ searchParams }: PageProps<"/panel/clasificacion">) {
   const sp = await searchParams;
   const q = (typeof sp.q === "string" ? sp.q : "").trim().slice(0, 40);
-  await requireUser("/panel/clasificacion");
+  const liga = typeof sp.liga === "string" && todosLosRangos().some((r) => r.slug === sp.liga) ? sp.liga : "";
+  const requested = Number(typeof sp.top === "string" ? sp.top : T.topInicial);
+  const limit = Math.min(Math.max(Number.isFinite(requested) ? requested : T.topInicial, T.topInicial), T.topMaximo);
+  const user = await requireUser("/panel/clasificacion");
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("store_leaderboard", { p_limit: 100 });
+  // Top N + la posición de la tienda; el orden y el desempate los decide la base (rank() por XP).
+  const { data, error } = await supabase.rpc("store_leaderboard", { p_limit: limit });
   const board = parseBoard(data);
-  const rows = q ? board.filter((r) => r.alias.toLocaleLowerCase("es").includes(q.toLocaleLowerCase("es"))) : board;
   const me = board.find((r) => r.isMe);
+  const rival = rivalidad(board);
+  // La base devuelve como mucho `limit` tiendas más la propia: si llegan tantas, puede haber más.
+  const truncated = board.filter((r) => r.place <= limit).length >= limit;
+  const canShowMore = truncated && limit < T.topMaximo;
+
+  const entries: BoardEntry[] = board.map((r) => {
+    const e = estadoRango(r.totalXp);
+    return {
+      place: r.place,
+      alias: r.alias || T.nombrePorDefecto,
+      totalXp: r.totalXp,
+      isMe: r.isMe,
+      nivel: e.rango.nivel,
+      slug: e.rango.slug,
+      rangoNombre: e.rango.nombre,
+      progreso: e.progreso,
+      siguiente: e.siguiente?.nombre ?? null,
+      maximoCompletado: e.maximoCompletado,
+    };
+  });
+  const filtered = Boolean(q || liga);
+  const rows = entries.filter(
+    (r) => (!q || r.alias.toLocaleLowerCase("es").includes(q.toLocaleLowerCase("es"))) && (!liga || r.slug === liga),
+  );
+
+  const href = (params: { q?: string; liga?: string; top?: number }) => {
+    const u = new URLSearchParams();
+    const nq = params.q ?? q;
+    const nl = params.liga ?? liga;
+    const nt = params.top ?? (limit !== T.topInicial ? limit : undefined);
+    if (nq) u.set("q", nq);
+    if (nl) u.set("liga", nl);
+    if (nt) u.set("top", String(nt));
+    const s = u.toString();
+    return `/panel/clasificacion${s ? `?${s}` : ""}`;
+  };
 
   return (
     <>
-      <PageBanner
-        title="Tabla de clasificación"
-        aside={
-          me && (
-            <div className="ui-card-inset min-w-32 text-center">
+      <div className="flex flex-col gap-4">
+        <Flash ok={sp.ok} error={sp.error} variant="panel" />
+        <PageBanner
+          title={T.titulo}
+          aside={
+            <div className={`ui-card-inset min-w-36 text-center ${me ? "border-accent!" : ""}`}>
               <p className="ui-label">Tu posición</p>
-              <p className="ui-num mt-2 text-[40px] leading-none text-accent">#{me.place}</p>
+              <p className="ui-num mt-2 text-[48px] leading-none text-accent">{me ? `#${me.place}` : "—"}</p>
+              <p className="mt-2 text-[13px] text-fg-2">{!me ? "Sin licencia activa" : truncated ? `Top ${fmt(limit)} a la vista` : `de ${fmt(board.length)} ${board.length === 1 ? "tienda" : "tiendas"}`}</p>
             </div>
-          )
-        }
-      >
-        Tiendas con licencia activa ordenadas por XP. Solo se muestra el nombre visible de cada tienda y sus XP: las
-        ventas y los datos de cada tienda son privados.
-      </PageBanner>
+          }
+        >
+          {T.subtitulo} {T.privacidad}
+        </PageBanner>
+      </div>
 
       <section className="flex flex-col gap-4" aria-label="Clasificación">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="ui-label">Vista:</span>
-            <span className="ui-chip" aria-current="page">Individual</span>
-            <span className="ui-chip cursor-not-allowed opacity-60" title="Los equipos aún no están definidos">
-              Por squads · próximamente
-            </span>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+            <div className="flex items-center gap-2 pb-1">
+              <span className="ui-label shrink-0">Vista:</span>
+              <span className="ui-chip" aria-current="page">Individual</span>
+              <span className="ui-chip cursor-not-allowed opacity-60" aria-disabled="true" title="Los equipos aún no están definidos">
+                Por squads · próximamente
+              </span>
+              <span className="mx-1 h-6 w-px shrink-0 bg-line" aria-hidden />
+              <span className="ui-label shrink-0">Período:</span>
+              <span className="ui-chip" aria-current="page">Total</span>
+              <span className="ui-chip cursor-not-allowed opacity-60" aria-disabled="true" title="La clasificación por mes aún no está disponible">
+                Este mes · próximamente
+              </span>
+            </div>
           </div>
-          <form className="relative w-full sm:w-72" role="search">
+          <form className="relative w-full lg:w-72" role="search">
             <Icon name="search" className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-fg-2" />
             <label htmlFor="q" className="sr-only">Buscar tienda</label>
             <input id="q" name="q" defaultValue={q} className="ui-input pl-9" placeholder="Buscar tienda…" />
+            {liga && <input type="hidden" name="liga" value={liga} />}
+            {limit !== T.topInicial && <input type="hidden" name="top" value={limit} />}
           </form>
+        </div>
+
+        <nav className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label="Ligas por rango">
+          <ul className="flex gap-2 pb-1">
+            <li>
+              <Link href={href({ liga: "" })} className="ui-chip" aria-current={!liga ? "page" : undefined}>Todos</Link>
+            </li>
+            {todosLosRangos().map((r) => (
+              <li key={r.slug}>
+                <Link href={href({ liga: r.slug })} className="ui-chip" aria-current={liga === r.slug ? "page" : undefined}>
+                  {r.nombre}
+                  <span className="ui-num font-medium">({entries.filter((e) => e.slug === r.slug).length})</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
+          {me && rival && (
+            <div className="ui-card flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-accent!">
+              <div className="min-w-0">
+                <p className="ui-label">{rival.tipo === "rival" ? T.rivalTitulo : T.liderTitulo}</p>
+                <p className="mt-2 text-[17px]">
+                  {rival.tipo === "rival" ? (
+                    <>
+                      Estás a <span className="ui-num text-accent">{fmt(rival.gap)} XP</span> de superar a{" "}
+                      <span className="font-semibold">{rival.alias}</span>.
+                    </>
+                  ) : rival.tipo === "lider" ? (
+                    <>
+                      Lideras la tabla por <span className="ui-num text-accent">{fmt(rival.ventaja)} XP</span>.
+                    </>
+                  ) : (
+                    T.primeraTienda
+                  )}
+                </p>
+              </div>
+              <Link href="/panel/misiones" className="ui-btn-secondary shrink-0">
+                <Icon name="flag" className="h-4 w-4" /> Sumar XP
+              </Link>
+            </div>
+          )}
+          <Link
+            href="/panel/recompensas"
+            className={`ui-card flex items-center gap-3 transition-colors duration-150 hover:bg-surface-2 ${me && rival ? "" : "md:col-span-2"}`}
+          >
+            <Icon name="gift" className="h-5 w-5 shrink-0 text-fg-2" />
+            <span className="min-w-0 flex-1 text-[15px]">{T.reconocimientos}</span>
+            <Icon name="chevronDown" className="h-4 w-4 shrink-0 -rotate-90 text-fg-2" />
+          </Link>
         </div>
 
         {error ? (
           <Alert>No se pudo cargar la clasificación.</Alert>
         ) : board.length === 0 ? (
-          <EmptyState>Todavía no hay tiendas con licencia activa en la clasificación.</EmptyState>
-        ) : rows.length === 0 ? (
-          <EmptyState>Ninguna tienda coincide con «{q}».</EmptyState>
+          <EmptyState>Todavía no hay tiendas con licencia activa en la clasificación. Cuando se activen, aparecerán aquí por XP.</EmptyState>
+        ) : filtered && rows.length === 0 ? (
+          <EmptyState>
+            {q ? `Ninguna tienda coincide con «${q}»` : "Ninguna tienda está en esta liga todavía"}
+            {q && liga ? " en esta liga" : ""}. <Link href={href({ q: "", liga: "" })} className="ui-link">Ver todas</Link>
+          </EmptyState>
         ) : (
-          <Ranking rows={rows} />
+          <LeaderboardBoard entries={filtered ? rows : entries} filtered={filtered} />
         )}
 
-        <p className="text-[13px] text-fg-2">
-          Tu nombre visible se cambia en <Link href="/panel#datos-tienda" className="ui-link">Datos de tu tienda</Link>; sin él
-          apareces como «Tienda Gallo Negro». Los XP no representan dinero ni garantizan beneficios económicos.
-        </p>
+        {canShowMore && (
+          <Link href={href({ top: Math.min(limit * 2, T.topMaximo) })} className="ui-btn-secondary self-center" scroll={false}>
+            Ver más
+          </Link>
+        )}
+
+        <NameEditor alias={user.publicAlias} />
+
+        <p className="text-[13px] text-fg-2">{TEXTOS_RANGOS.avisoXp}</p>
       </section>
     </>
   );

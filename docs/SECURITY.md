@@ -19,7 +19,7 @@
   (revocada a `anon` y `authenticated`) que asigna usuario, rol y licencia y lo audita (`account.provisioned`, con el
   admin que actúa). Asignar contraseña también queda auditado (`account.password_set`).
 - **Contraseñas:** las asignadas por el admin tienen un mínimo de 6 (el de Supabase) y son **temporales**: la persona
-  debe cambiarla en *Contraseña* (`/nueva-clave`, mínimo 10). La contraseña de prueba `123456` de la cuenta
+  debe cambiarla con el botón *Cambiar contraseña* de la cabecera del panel (`/nueva-clave`, mínimo 10). La contraseña de prueba `123456` de la cuenta
   `tiendita` es solo para el entorno de prueba y debe cambiarse antes de cualquier uso real. Ninguna contraseña está
   escrita en migraciones, semillas ni código: el script `crear-usuario` la pide por teclado.
 - **Sesión:** validada con `auth.getUser()` en el servidor; redirecciones internas saneadas; el login responde
