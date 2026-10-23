@@ -1,0 +1,134 @@
+/*
+ * Rangos de experiencia del panel de licenciatarios: nombres, cifras, textos e imágenes.
+ * Las cifras de XP son las que hay que confirmar; los acumulados se calculan en
+ * src/lib/rangos.ts, nunca a mano.
+ */
+
+export type RangoSlug = "umbral" | "vigia" | "centurion" | "soberano" | "ayam-cemani";
+
+export type Rango = {
+  nivel: number;
+  slug: RangoSlug;
+  nombre: string;
+  /** XP necesarios para COMPLETAR este rango (no el acumulado). */
+  xpParaCompletar: number;
+  /** Idea de la imagen, para quien la diseñe. */
+  concepto: string;
+  /**
+   * Ruta de la imagen en /public (512×512, fondo transparente). null mientras no exista:
+   * se muestra un marcador SVG alusivo al nombre.
+   */
+  imagen: string | null;
+  /** Cosmético que se libera al llegar a este rango (marco del avatar). */
+  cosmetico: string;
+};
+
+// BORRADOR: nombres de rango y XP para completar cada uno, pendientes de confirmar por Gallo Negro.
+export const RANGOS: Rango[] = [
+  {
+    nivel: 1,
+    slug: "umbral",
+    nombre: "Umbral",
+    xpParaCompletar: 2000,
+    concepto: "Puerta o arco entreabierto con luz amarilla entrando",
+    imagen: null, // BORRADOR: /rangos/umbral.webp cuando exista
+    cosmetico: "Marco simple en el avatar",
+  },
+  {
+    nivel: 2,
+    slug: "vigia",
+    nombre: "Vigía",
+    xpParaCompletar: 3000,
+    concepto: "Torre de vigilancia con farol, u ojo atento dentro de un escudo",
+    imagen: null, // BORRADOR: /rangos/vigia.webp cuando exista
+    cosmetico: "Marco amarillo",
+  },
+  {
+    nivel: 3,
+    slug: "centurion",
+    nombre: "Centurión",
+    xpParaCompletar: 3500,
+    concepto: "Casco de centurión con cresta roja transversal",
+    imagen: null, // BORRADOR: /rangos/centurion.webp cuando exista
+    cosmetico: "Marco doble con detalle rojo",
+  },
+  {
+    nivel: 4,
+    slug: "soberano",
+    nombre: "Soberano",
+    xpParaCompletar: 4000,
+    concepto: "Corona cuyas puntas imitan una cresta de gallo",
+    imagen: null, // BORRADOR: /rangos/soberano.webp cuando exista
+    cosmetico: "Marco con brasas animadas",
+  },
+  {
+    nivel: 5,
+    slug: "ayam-cemani",
+    nombre: "AYAM CEMANI",
+    xpParaCompletar: 6000,
+    concepto: "Gallo Ayam Cemani completamente negro con aureola dorada",
+    imagen: null, // BORRADOR: /rangos/ayam-cemani.webp cuando exista
+    cosmetico: "Marco máximo e insignia de rango máximo junto al nombre",
+  },
+];
+
+export type RecompensaNivel = {
+  nivel: number;
+  titulo: string;
+  descripcion: string;
+  /**
+   * false mientras Gallo Negro no la publique en /panel/recompensas: se muestra como
+   * «Próximamente» sin prometer nada concreto.
+   */
+  publicada: boolean;
+};
+
+// BORRADOR: recompensas reales por rango. El catálogo de /panel/recompensas está vacío;
+// ninguna está publicada y por eso no se describe ningún premio concreto.
+export const recompensasPorNivel: RecompensaNivel[] = [
+  { nivel: 1, titulo: "Recompensa de Umbral", descripcion: "Gallo Negro la anunciará en Recompensas.", publicada: false },
+  { nivel: 2, titulo: "Recompensa de Vigía", descripcion: "Gallo Negro la anunciará en Recompensas.", publicada: false },
+  { nivel: 3, titulo: "Recompensa de Centurión", descripcion: "Gallo Negro la anunciará en Recompensas.", publicada: false },
+  { nivel: 4, titulo: "Recompensa de Soberano", descripcion: "Gallo Negro la anunciará en Recompensas.", publicada: false },
+  { nivel: 5, titulo: "Recompensa de AYAM CEMANI", descripcion: "Gallo Negro la anunciará en Recompensas.", publicada: false },
+];
+
+/** Textos fijos de la experiencia de rangos y de la clasificación. */
+export const TEXTOS_RANGOS = {
+  avisoXp: "Los XP no representan dinero ni garantizan beneficios económicos.",
+  rangoMaximo: "Rango máximo completado",
+  heroEtiqueta: "Tu rango",
+  rutaTitulo: "Ruta de rangos",
+  rutaAyuda: "Toca un rango para ver qué se libera.",
+  liberadoTitulo: "Liberado en tu rango",
+  comoGanarTitulo: "Cómo ganar XP",
+  comoGanarAyuda: "Misiones disponibles para tu tienda y los XP que suma cada una al completarla.",
+  sinMisiones: "No hay misiones disponibles para tu tienda en este momento.",
+  frecuencias: { daily: "Diarias · se repiten cada día", weekly: "Semanales · cada semana", monthly: "Mensuales · cada mes" },
+  subisteA: "Subiste a",
+  verRecompensas: "Ver recompensas",
+  cerrar: "Cerrar",
+  proximamente: "Próximamente",
+  insigniaMaxima: "Rango máximo",
+} as const;
+
+/** Textos de la página Clasificación. */
+export const TEXTOS_CLASIFICACION = {
+  titulo: "Tabla de clasificación",
+  subtitulo: "Las tiendas con licencia activa, ordenadas por XP. Suma XP con misiones y escala hasta la cima.",
+  privacidad: "Solo se muestran el nombre visible, los XP y el rango de cada tienda.",
+  nombrePorDefecto: "Tienda Gallo Negro",
+  puestoLibre: "Puesto libre",
+  puestoLibreAyuda: "Completa misiones para ocuparlo",
+  primeraTienda: "Eres la primera tienda de la tabla. Sube de rango y marca el ritmo para las que vienen.",
+  rivalTitulo: "Tu rival",
+  liderTitulo: "Vas en cabeza",
+  irAMiPosicion: "Ir a mi posición",
+  reconocimientos: "Mira los reconocimientos en Recompensas",
+  nombreTitulo: "Tu nombre en el ranking",
+  nombreAyuda: "Es el único dato que ven otros licenciatarios. Si lo dejas vacío apareces como «Tienda Gallo Negro».",
+  nombreMax: 40,
+  nombreMin: 2,
+  topInicial: 50,
+  topMaximo: 200,
+} as const;

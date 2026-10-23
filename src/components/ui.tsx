@@ -1,5 +1,4 @@
-import type { BoardRow } from "@/lib/leaderboard";
-import { formatXp, progressPercent } from "@/lib/missions";
+import { progressPercent } from "@/lib/missions";
 import { Icon, type IconName } from "./icons";
 
 /*
@@ -190,53 +189,4 @@ export function ComingSoon({ title, children }: { title: string; children: React
 /** Mensaje de lista vacía. */
 export function EmptyState({ children }: { children: React.ReactNode }) {
   return <p className="ui-card text-fg-2">{children}</p>;
-}
-
-/** Clasificación: los tres primeros puestos con borde amarillo y el resto en lista. */
-export function Ranking({ rows }: { rows: BoardRow[] }) {
-  const podium = rows.filter((r) => r.place <= 3);
-  const rest = rows.filter((r) => r.place > 3);
-  return (
-    <div className="space-y-4">
-      {podium.length > 0 && (
-        <ol className="grid gap-4 md:grid-cols-3">
-          {podium.map((r, i) => (
-            <li key={`${r.place}-${r.alias}-${i}`} className={`ui-card border-accent! ${r.isMe ? "bg-surface-2!" : ""}`}>
-              <div className="flex items-center justify-between gap-2">
-                <span className="ui-num text-[32px] leading-none text-accent">#{r.place}</span>
-                <Icon name="trophy" className="h-5 w-5 text-fg-2" />
-              </div>
-              <RankingName row={r} className="mt-4" />
-              <p className="ui-num mt-4 text-2xl">{formatXp(r.totalXp)}</p>
-            </li>
-          ))}
-        </ol>
-      )}
-      {rest.length > 0 && (
-        <ol className="divide-y divide-line rounded-ui border border-line bg-surface" start={rest[0].place}>
-          {rest.map((r, i) => (
-            <li key={`${r.place}-${r.alias}-${i}`} className={`flex items-center gap-4 px-4 py-3 sm:px-6 ${r.isMe ? "bg-surface-2" : ""}`}>
-              <span className="ui-num w-10 shrink-0 text-fg-2">#{r.place}</span>
-              <RankingName row={r} className="min-w-0 flex-1" />
-              <span className="ui-num shrink-0 text-right">{formatXp(r.totalXp)}</span>
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
-  );
-}
-
-function RankingName({ row, className = "" }: { row: BoardRow; className?: string }) {
-  return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-line bg-surface-2 text-[13px] font-semibold" aria-hidden>
-        {row.alias.slice(0, 1).toUpperCase()}
-      </span>
-      <div className="min-w-0">
-        <p className={`truncate ${row.isMe ? "font-semibold" : "font-medium"}`}>{row.alias}{row.isMe && " (Tú)"}</p>
-        <p className="ui-label mt-1">Licenciatario verificado</p>
-      </div>
-    </div>
-  );
 }

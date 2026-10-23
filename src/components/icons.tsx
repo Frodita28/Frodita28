@@ -23,6 +23,12 @@ const PATHS = {
   arrowUp: "M12 20V5M6 11l6-6 6 6",
   chevronDown: "M6 9l6 6 6-6",
   alert: "M12 3l10 18H2zM12 10v4M12 17.5h.01",
+  lock: "M6 11h12v10H6zM8 11V8a4 4 0 018 0v3M12 15v2",
+  map: "M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14",
+  calendar: "M4 6h16v15H4zM4 10h16M8 3v4M16 3v4",
+  crown: "M4 18h16M5 18L3 7l5 4 4-7 4 7 5-4-2 11",
+  arrowDown: "M12 4v15M6 13l6 6 6-6",
+  target: "M12 21a9 9 0 100-18 9 9 0 000 18zM12 16a4 4 0 100-8 4 4 0 000 8zM12 12h.01",
 } as const;
 
 export type IconName = keyof typeof PATHS;

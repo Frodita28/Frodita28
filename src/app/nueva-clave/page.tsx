@@ -2,16 +2,25 @@ import { ROLE_LABEL, StoreShell, panelTabs } from "@/components/club";
 import { Flash } from "@/components/flash";
 import { PageBanner } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
+import { getMyTotalXp } from "@/lib/xp";
 import { updatePassword } from "../login/actions";
 
 export const metadata = { title: "Cambiar contraseña" };
 
-/** Pestaña "Contraseña" del panel: misma estructura y pestañas que el resto de secciones. */
+/**
+ * Cambio de contraseña, enlazado desde el botón «Cambiar contraseña» de la cabecera del panel
+ * (no es una pestaña). Misma estructura y pestañas que el resto de secciones.
+ */
 export default async function NewPasswordPage({ searchParams }: PageProps<"/nueva-clave">) {
   const user = await requireUser("/nueva-clave");
-  const sp = await searchParams;
+  const [sp, totalXp] = await Promise.all([searchParams, getMyTotalXp(user.id)]);
   return (
-    <StoreShell tabs={panelTabs(user.role)} storeName={user.storeName ?? user.publicAlias ?? user.fullName ?? "Tu Tienda"} roleLabel={ROLE_LABEL[user.role]}>
+    <StoreShell
+      tabs={panelTabs(user.role)}
+      storeName={user.storeName ?? user.publicAlias ?? user.fullName ?? "Tu Tienda"}
+      roleLabel={ROLE_LABEL[user.role]}
+      totalXp={totalXp}
+    >
       <div className="flex flex-col gap-4">
         <Flash ok={sp.ok} error={sp.error} variant="panel" />
         <PageBanner title="Cambiar contraseña">

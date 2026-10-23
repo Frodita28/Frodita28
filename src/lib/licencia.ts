@@ -49,3 +49,32 @@ export function formatUsd(n: number): string {
 export function formatPct(fraccion: number): string {
   return `${Math.round(fraccion * 100)}%`;
 }
+
+export type Vigencia = {
+  /** Días que faltan hasta la fecha de cierre (0 si ya pasó). */
+  diasRestantes: number;
+  /** Parte transcurrida de la vigencia, de 0 a 1. */
+  transcurrido: number;
+  /** Quedan 30 días o menos. */
+  porVencer: boolean;
+};
+
+const dayNumber = (iso: string) => {
+  const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
+  return Math.floor(Date.UTC(y, (m || 1) - 1, d || 1) / 86_400_000);
+};
+
+/** Avance de la vigencia de una licencia (fechas YYYY-MM-DD). null si no tiene fecha de cierre. */
+export function vigencia(inicio: string | null, cierre: string | null, hoy: string, avisoDias = 30): Vigencia | null {
+  if (!cierre) return null;
+  const fin = dayNumber(cierre);
+  const ahora = dayNumber(hoy);
+  const ini = inicio ? dayNumber(inicio) : ahora;
+  const total = Math.max(fin - ini, 1);
+  const diasRestantes = Math.max(fin - ahora, 0);
+  return {
+    diasRestantes,
+    transcurrido: Math.min(Math.max((ahora - ini) / total, 0), 1),
+    porVencer: diasRestantes <= avisoDias,
+  };
+}

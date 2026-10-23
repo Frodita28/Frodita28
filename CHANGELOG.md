@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.8.0 — 2026-10-23
+
+- **Rangos y XP en Tu tienda:** cinco rangos (Umbral, Vigía, Centurión, Soberano, AYAM CEMANI) calculados solo
+  con el XP total que ya existe (`src/lib/rangos.ts`, cifras BORRADOR en `src/content/rangos.ts`). Hero con anillo
+  radial, ruta de rangos, «Liberado en tu rango», «Cómo ganar XP» con las misiones reales, etiqueta «+N XP» y
+  superposición de subida de rango (último XP visto en `localStorage`). El avatar de la cabecera y de la
+  clasificación lleva el marco de su rango. Se quitan las tarjetas «Puntos de XP» y «Rango de licencia».
+- **Clasificación renovada:** podio 2-1-3, ligas por rango, lista con rango, barra de progreso y movimiento desde
+  la última visita, tarjeta «Tu rival», puestos libres, Top 50 con «Ver más» y bloque «Tu nombre en el ranking»
+  (único dato editable de la tienda; usa la misma función `update_my_store`).
+- **Licencia de tu tienda:** tarjeta tipo credencial de solo lectura (estado, territorio, vigencia con días
+  restantes, contrato y plan) con enlace a `/panel/licencia`.
+- **Navegación:** la pestaña Contraseña sale de la barra; `/nueva-clave` sigue igual y se abre con el botón «Cambiar
+  contraseña» de la cabecera. Se elimina el panel «Datos de tu tienda» (nombre y responsable dejan de editarse desde
+  el panel; los datos no se borran). Sin cambios de base de datos.
+
 ## 0.7.0 — 2026-10-22
 
 - **Sistema de diseño del panel de licenciatarios** (`docs/DESIGN_SYSTEM.md`): tokens únicos en `globals.css`
