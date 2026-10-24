@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { TEXTOS_RANGOS, recompensasPorNivel } from "@/content/rangos";
 import { estadoRango, rangosAlcanzados, type RangoConUmbral } from "@/lib/rangos";
+import { tomarVuelo } from "@/lib/xp-celebracion";
 import { Embers, RankEmblem } from "./rangos";
 
 const fmt = (n: number) => new Intl.NumberFormat("es-VE").format(Math.round(n));
@@ -52,6 +53,9 @@ export function RankHero({ totalXp, storageKey }: { totalXp: number; storageKey:
     const prev = readLastXp(storageKey);
     writeLastXp(storageKey, estado.totalXp);
     const reduce = reducedMotion();
+    // Si una misión recién completada vuela su "+N XP" hasta aquí, el anillo espera a que llegue
+    // y no se repite la etiqueta.
+    const vuelo = reduce ? 0 : tomarVuelo();
     const target = { progress: estado.progreso, xp: estado.totalXp };
     const gained = prev !== null && estado.totalXp > prev ? estado.totalXp - prev : 0;
     const subidas = prev !== null && gained ? rangosAlcanzados(prev, estado.totalXp) : [];
@@ -65,11 +69,11 @@ export function RankHero({ totalXp, storageKey }: { totalXp: number; storageKey:
     let start: number | null = null;
     const tick = (now: number) => {
       if (start === null) {
-        start = now;
-        if (gained && !reduce) setGain(gained);
+        start = now + vuelo;
+        if (gained && !reduce && !vuelo) setGain(gained);
       }
       // Con movimiento reducido se pinta directamente el estado final.
-      const t = reduce ? 1 : Math.min((now - start) / DURATION, 1);
+      const t = reduce ? 1 : Math.max(0, Math.min((now - start) / DURATION, 1));
       const e = easeOut(t);
       setShown({ progress: from.progress + (target.progress - from.progress) * e, xp: from.xp + (target.xp - from.xp) * e });
       if (t < 1) frame.current = requestAnimationFrame(tick);
@@ -85,9 +89,9 @@ export function RankHero({ totalXp, storageKey }: { totalXp: number; storageKey:
     : `${rango.nombre}, nivel ${rango.nivel}: ${fmt(xpEnRango)} de ${fmt(tramo)} XP del rango (${pct} %)`;
 
   return (
-    <section className="ui-card relative overflow-hidden" aria-labelledby="rango-titulo">
+    <section id="rango-hero" className="ui-card relative overflow-hidden" aria-labelledby="rango-titulo">
       <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-10">
-        <div className="relative shrink-0">
+        <div className="relative shrink-0" data-gn-xp-destino>
           <RankRing
             nivel={rango.nivel}
             progress={shown.progress}
@@ -108,7 +112,7 @@ export function RankHero({ totalXp, storageKey }: { totalXp: number; storageKey:
 
         <div className="flex w-full min-w-0 flex-col items-center text-center sm:items-start sm:text-left">
           <p className="ui-label">{TEXTOS_RANGOS.heroEtiqueta} · Nivel {rango.nivel}</p>
-          <h2 id="rango-titulo" className="mt-2 font-title text-[44px] leading-none font-bold tracking-[0.02em] uppercase sm:text-[56px]">
+          <h2 id="rango-titulo" className="mt-2 max-w-full font-title text-[clamp(2.25rem,11vw,3.5rem)] leading-none font-bold tracking-[0.02em] break-words uppercase">
             {rango.nombre}
           </h2>
 
@@ -159,7 +163,7 @@ export function RankRing({
   emblem,
   ariaNow,
   ariaText,
-  className = "h-60 w-60 sm:h-80 sm:w-80",
+  className = "h-[212px] w-[212px] sm:h-80 sm:w-80",
 }: {
   nivel: number;
   progress: number;
@@ -231,7 +235,7 @@ export function RankRing({
           />
         )}
       </svg>
-      {nivel >= 4 && <Embers count={12} spread={1.02} />}
+      {nivel >= 4 && <Embers count={12} mobileCount={6} spread={1.02} />}
       <div className={`absolute inset-[16%] ${nivel >= 3 ? "gn-anim-pop" : ""}`}>
         <div className={`h-full w-full ${nivel >= 5 ? "gn-anim-breathe" : ""}`}>{emblem}</div>
       </div>
@@ -266,7 +270,7 @@ function LevelUpOverlay({ rangos, onClose }: { rangos: RangoConUmbral[]; onClose
   ];
 
   return (
-    <div className="gn-anim-fade fixed inset-0 z-50 grid place-items-center bg-bg/85 p-4" onClick={onClose}>
+    <div className="gn-anim-fade fixed inset-0 z-[60] grid place-items-end bg-bg/85 p-4 pb-[calc(16px+env(safe-area-inset-bottom))] md:place-items-center" onClick={onClose}>
       <div
         role="dialog"
         aria-modal="true"

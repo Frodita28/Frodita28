@@ -17,7 +17,7 @@ import {
 import { daysAgoIso, formatDateTime } from "@/lib/time";
 import type { EvidenceRow, LedgerRow, MissionRow, ParticipationRow } from "@/lib/types";
 import { createClient } from "@/lib/supabase/server";
-import { submitEvidence } from "./actions";
+import { EvidenceForm } from "./evidence-form";
 
 export const metadata = { title: "Misiones" };
 
@@ -98,7 +98,7 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
       </div>
 
       <section className="flex flex-col gap-4" aria-label="Resumen de XP">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
           <StatCard label="XP acumulados" value={formatXp(total)} />
           <StatCard label="XP este mes" value={formatXp(monthXp)} />
           <StatCard label="En progreso" value={String(inProgress)} />
@@ -111,7 +111,7 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
       </section>
 
       <section className="flex flex-col gap-4">
-        <nav className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label="Filtros de misiones">
+        <nav className="gn-snap-x -mx-4 overflow-x-auto px-4 md:mx-0 md:px-0" aria-label="Filtros de misiones">
           <ul className="flex gap-2 pb-1">
             {TABS.map((t) => (
               <li key={t.key}>
@@ -162,7 +162,7 @@ function MissionCard({ row, evidences, returnTo }: { row: Row; evidences: Eviden
   const canAddMore = pendingOrApproved < needed;
 
   return (
-    <article className="ui-card flex flex-col gap-4">
+    <article id={`mision-${row.id}`} className="ui-card flex scroll-mt-24 flex-col gap-4">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2">
@@ -225,21 +225,9 @@ function MissionCard({ row, evidences, returnTo }: { row: Row; evidences: Eviden
             <span className="hidden group-open:inline">Ocultar formulario</span>
             <Icon name="chevronDown" className="h-4 w-4 transition-transform duration-200 group-open:rotate-180" />
           </summary>
-          <form action={submitEvidence} className="mt-4 max-w-2xl space-y-4">
-            <input type="hidden" name="participation_id" value={row.id} />
-            <input type="hidden" name="return_to" value={returnTo} />
-            <div>
-              <label className="ui-field-label" htmlFor={`url-${row.id}`}>Enlace de la publicación</label>
-              <input className="ui-input" id={`url-${row.id}`} name="url" type="url" placeholder="https://instagram.com/reel/…" />
-            </div>
-            <div>
-              <label className="ui-field-label" htmlFor={`file-${row.id}`}>…o captura (PNG, JPG, WEBP · máx. 5 MB)</label>
-              <input className="block w-full text-[13px] text-fg-2 file:mr-3 file:min-h-11 file:rounded-ui file:border file:border-line file:bg-surface-2 file:px-4 file:text-fg sm:file:min-h-9" id={`file-${row.id}`} name="file" type="file" accept="image/png,image/jpeg,image/webp" />
-            </div>
-            <input className="ui-input" name="note" maxLength={1000} placeholder="Nota opcional para el revisor" aria-label="Nota opcional para el revisor" />
-            <p className="text-[13px] text-fg-2">Nunca te pediremos contraseñas de tus redes sociales.</p>
-            <button className="ui-btn-primary">Enviar evidencia</button>
-          </form>
+          <div className="mt-4">
+            <EvidenceForm participationId={row.id} returnTo={returnTo} />
+          </div>
         </details>
       )}
     </article>
@@ -250,22 +238,36 @@ function XpHistory({ ledger, tz }: { ledger: LedgerRow[]; tz: string }) {
   if (ledger.length === 0) return <EmptyState>Todavía no tienes movimientos de XP.</EmptyState>;
   const TYPE = { mission_reward: "Misión", admin_adjustment: "Ajuste", reversal: "Reversión" } as const;
   return (
-    <div className="ui-table-wrap">
-      <table className="ui-table">
-        <thead>
-          <tr><th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Detalle</th><th scope="col" className="text-right">XP</th></tr>
-        </thead>
-        <tbody>
-          {ledger.map((l) => (
-            <tr key={l.id}>
-              <td className="whitespace-nowrap text-fg-2">{formatDateTime(l.created_at, tz)}</td>
-              <td>{TYPE[l.transaction_type]}</td>
-              <td>{l.description}</td>
-              <td className="ui-num text-right whitespace-nowrap">{l.amount > 0 ? `+${l.amount}` : l.amount}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <>
+      {/* Teléfono: lista de dos líneas. */}
+      <ul className="divide-y divide-line rounded-ui border border-line bg-surface md:hidden">
+        {ledger.map((l) => (
+          <li key={l.id} className="flex items-start justify-between gap-4 px-4 py-3">
+            <div className="min-w-0">
+              <p className="text-[15px] [overflow-wrap:anywhere]">{l.description}</p>
+              <p className="mt-1 text-[13px] text-fg-2">{TYPE[l.transaction_type]} · {formatDateTime(l.created_at, tz)}</p>
+            </div>
+            <span className={`ui-num shrink-0 ${l.amount > 0 ? "text-accent" : ""}`}>{l.amount > 0 ? `+${l.amount}` : l.amount}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="ui-table-wrap hidden md:block">
+        <table className="ui-table">
+          <thead>
+            <tr><th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Detalle</th><th scope="col" className="text-right">XP</th></tr>
+          </thead>
+          <tbody>
+            {ledger.map((l) => (
+              <tr key={l.id}>
+                <td className="whitespace-nowrap text-fg-2">{formatDateTime(l.created_at, tz)}</td>
+                <td>{TYPE[l.transaction_type]}</td>
+                <td>{l.description}</td>
+                <td className="ui-num text-right whitespace-nowrap">{l.amount > 0 ? `+${l.amount}` : l.amount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }

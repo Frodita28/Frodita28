@@ -29,6 +29,11 @@ const PATHS = {
   crown: "M4 18h16M5 18L3 7l5 4 4-7 4 7 5-4-2 11",
   arrowDown: "M12 4v15M6 13l6 6 6-6",
   target: "M12 21a9 9 0 100-18 9 9 0 000 18zM12 16a4 4 0 100-8 4 4 0 000 8zM12 12h.01",
+  close: "M6 6l12 12M18 6L6 18",
+  more: "M4 6h16M4 12h16M4 18h16",
+  logout: "M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10",
+  chevronRight: "M9 6l6 6-6 6",
+  upload: "M12 16V4M7 9l5-5 5 5M4 16v4h16v-4",
 } as const;
 
 export type IconName = keyof typeof PATHS;

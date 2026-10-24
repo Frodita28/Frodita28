@@ -1,24 +1,36 @@
+"use client";
+
+import { useState } from "react";
 import { money, monthLabel, niceMax, units, type StoreMonth } from "@/lib/store";
 
 /**
  * Gráfica de barras de ventas verificadas por mes (una sola serie).
- * Se dibuja con HTML/CSS para que los textos mantengan su tamaño en el móvil.
+ * Se dibuja con HTML/CSS para que los textos mantengan su tamaño en el móvil. Cada barra
+ * se puede tocar (o enfocar) para ver su dato, sin depender del cursor; la tabla sigue debajo.
  */
 export function SalesChart({ months }: { months: StoreMonth[] }) {
   const max = niceMax(Math.max(0, ...months.map((m) => m.revenue)));
   const empty = max === 0;
   const ticks = empty ? [] : [max, max / 2, 0];
+  const [sel, setSel] = useState<number | null>(null);
+  const label = (m: StoreMonth) => `${monthLabel(m.month, true)}: ${money(m.revenue)} · ${units(m.units)}`;
+  const elegido = sel !== null ? months[sel] : null;
 
   return (
     <figure>
-      <div className="flex gap-2" role="img" aria-label="Ventas registradas por mes">
+      {!empty && (
+        <p className="mb-2 min-h-6 text-[13px] text-fg-2 first-letter:uppercase" aria-live="polite">
+          {elegido ? label(elegido) : "Toca una barra para ver su dato."}
+        </p>
+      )}
+      <div className="flex gap-2" role="group" aria-label="Ventas registradas por mes">
         {!empty && (
-          <div className="ui-num flex h-44 flex-col justify-between text-right text-xs font-normal text-fg-2" aria-hidden>
+          <div className="ui-num flex h-32 flex-col justify-between text-right text-[11px] font-normal text-fg-2 sm:h-44 sm:text-xs" aria-hidden>
             {ticks.map((t) => <span key={t} className="-translate-y-1/2 first:translate-y-0 last:translate-y-0 leading-none">{money(t)}</span>)}
           </div>
         )}
-        <div className="flex-1">
-          <div className="relative h-44 border-b border-line">
+        <div className="min-w-0 flex-1">
+          <div className="relative h-32 border-b border-line sm:h-44">
             {!empty && <div className="absolute inset-x-0 top-0 border-t border-line/60" aria-hidden />}
             {!empty && <div className="absolute inset-x-0 top-1/2 border-t border-line/60" aria-hidden />}
             {empty && (
@@ -26,28 +38,34 @@ export function SalesChart({ months }: { months: StoreMonth[] }) {
                 Aún no hay ventas registradas en estos meses.
               </p>
             )}
-            <div className="relative flex h-full items-end">
-              {months.map((m) => {
-                const label = `${monthLabel(m.month, true)}: ${money(m.revenue)} · ${units(m.units)}`;
-                return (
-                  <div key={m.month} className="group relative flex h-full flex-1 items-end justify-center" title={label}>
+            {!empty && (
+              <div className="relative flex h-full items-end">
+                {months.map((m, i) => (
+                  <button
+                    key={m.month}
+                    type="button"
+                    onClick={() => setSel(sel === i ? null : i)}
+                    aria-pressed={sel === i}
+                    aria-label={label(m)}
+                    className="group relative flex h-full flex-1 items-end justify-center rounded-t-[2px] focus-visible:bg-surface-2"
+                  >
                     {m.revenue > 0 && (
-                      <div
-                        className="w-3/5 max-w-10 rounded-t-[2px] bg-accent transition-opacity duration-150 group-hover:opacity-80"
+                      <span
+                        className={`block w-3/5 max-w-10 rounded-t-[2px] bg-accent transition-opacity duration-150 group-hover:opacity-80 ${
+                          sel !== null && sel !== i ? "opacity-50" : ""
+                        }`}
                         style={{ height: `${(m.revenue / max) * 100}%` }}
                       />
                     )}
-                    {/* Detalle al pasar el cursor (y en lectores de pantalla). */}
-                    <span className="pointer-events-none absolute bottom-full z-10 mb-1 hidden rounded-ui border border-line bg-surface-2 px-2 py-1 text-[13px] whitespace-nowrap text-fg group-hover:block">
-                      {label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="mt-2 flex text-xs text-fg-2" aria-hidden>
-            {months.map((m) => <span key={m.month} className="flex-1 text-center capitalize">{monthLabel(m.month)}</span>)}
+          <div className="mt-2 flex text-[11px] text-fg-2 sm:text-xs" aria-hidden>
+            {months.map((m, i) => (
+              <span key={m.month} className={`flex-1 text-center capitalize ${sel === i ? "font-semibold text-fg" : ""}`}>{monthLabel(m.month)}</span>
+            ))}
           </div>
         </div>
       </div>

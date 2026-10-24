@@ -20,8 +20,9 @@ export default async function LicensePage() {
           <Icon name="document" className="mt-0.5 h-5 w-5 shrink-0 text-fg-2" />
           <p className="min-w-0 flex-1 text-fg-2">{licencia.aviso}</p>
           {licencia.esBorrador && (
-            <span title={licencia.avisoBorrador}>
+            <span className="flex flex-wrap items-center gap-2">
               <Badge tone="accent">{licencia.etiquetaBorrador}</Badge>
+              <span className="text-[13px] text-fg-2">{licencia.avisoBorrador}</span>
             </span>
           )}
         </div>
@@ -58,7 +59,7 @@ export default async function LicensePage() {
           </ul>
           <div className="mt-6 flex flex-wrap gap-2 border-t border-line pt-6">
             {reconocimiento.enlaces.map((l) => (
-              <Link key={l.href} href={l.href} className="ui-btn-secondary">
+              <Link key={l.href} href={l.href} className="ui-btn-secondary w-full sm:w-auto">
                 <Icon name={l.icono} className="h-4 w-4" />
                 {l.texto}
               </Link>

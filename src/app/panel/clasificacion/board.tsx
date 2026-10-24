@@ -120,7 +120,11 @@ export function LeaderboardBoard({ entries, filtered }: { entries: BoardEntry[];
       )}
 
       {hasMe && !meVisible && (
-        <button type="button" onClick={goToMe} className="ui-btn-primary fixed right-4 bottom-4 z-40 shadow-[0_0_0_4px_var(--bg)] sm:right-6 sm:bottom-6">
+        <button
+          type="button"
+          onClick={goToMe}
+          className="ui-btn-primary fixed right-4 bottom-[calc(88px+env(safe-area-inset-bottom))] z-30 shadow-[0_0_0_4px_var(--bg)] md:right-6 md:bottom-6"
+        >
           <Icon name="target" className="h-5 w-5" /> {T.irAMiPosicion}
         </button>
       )}
@@ -128,22 +132,23 @@ export function LeaderboardBoard({ entries, filtered }: { entries: BoardEntry[];
   );
 }
 
-const PODIUM_ORDER = ["sm:order-2", "sm:order-1", "sm:order-3"];
+// El podio se mantiene en 3 columnas (2-1-3) también en el teléfono, en versión compacta.
+const PODIUM_ORDER = ["order-2", "order-1", "order-3"];
 
 function Podium({ entries, meRef }: { entries: BoardEntry[]; meRef: React.RefObject<HTMLElement | null> }) {
   const slots = [0, 1, 2].map((i) => entries[i] ?? null);
   return (
-    <ol className="grid items-end gap-4 pt-4 sm:grid-cols-3" aria-label="Podio">
+    <ol className="grid grid-cols-3 items-end gap-2 pt-4 sm:gap-4" aria-label="Podio">
       {slots.map((e, i) =>
         e ? (
           <PodiumCard key={`${e.place}-${e.alias}`} entry={e} index={i} meRef={e.isMe ? meRef : undefined} />
         ) : (
           <li key={`libre-${i}`} className={`${PODIUM_ORDER[i]} gn-anim-rise`} style={{ animationDelay: `${i * 180}ms` }}>
-            <div className={`flex flex-col items-center justify-center gap-2 rounded-ui border border-dashed border-line p-6 text-center ${i === 0 ? "sm:min-h-80" : "sm:min-h-64"}`}>
-              <span className="ui-num text-[32px] leading-none text-fg-3">#{i + 1}</span>
-              <p className="font-title text-xl font-bold tracking-[0.02em] uppercase">{T.puestoLibre}</p>
-              <p className="text-[13px] text-fg-2">{T.puestoLibreAyuda}</p>
-              <Link href="/panel/misiones" className="ui-link text-[13px]">Ir a misiones</Link>
+            <div className={`flex flex-col items-center justify-center gap-2 rounded-ui border border-dashed border-line px-2 py-4 text-center sm:p-6 ${i === 0 ? "min-h-48 sm:min-h-80" : "min-h-40 sm:min-h-64"}`}>
+              <span className="ui-num text-2xl leading-none text-fg-3 sm:text-[32px]">#{i + 1}</span>
+              <p className="font-title text-base leading-tight font-bold tracking-[0.02em] uppercase sm:text-xl">{T.puestoLibre}</p>
+              <p className="hidden text-[13px] text-fg-2 sm:block">{T.puestoLibreAyuda}</p>
+              <Link href="/panel/misiones" className="ui-link inline-flex min-h-11 items-center text-[13px] sm:min-h-0">Ir a misiones</Link>
             </div>
           </li>
         ),
@@ -164,7 +169,7 @@ function PodiumCard({ entry: e, index, meRef }: { entry: BoardEntry; index: numb
       style={{ animationDelay: `${(first ? 0 : index) * 180}ms` }}
     >
       <article
-        className={`ui-card relative flex flex-col items-center text-center ${first ? "border-accent! sm:min-h-80 sm:pt-10" : "sm:min-h-64"} ${e.isMe ? "bg-surface-2!" : ""}`}
+        className={`ui-card relative flex flex-col items-center px-2! pb-4! text-center sm:px-6! sm:pb-6! ${first ? "border-accent! pt-6! sm:min-h-80 sm:pt-10!" : "pt-4! sm:min-h-64"} ${e.isMe ? "bg-surface-2!" : ""}`}
         aria-label={`Puesto ${e.place}: ${e.alias}${e.isMe ? " (tú)" : ""}, ${e.rangoNombre}, ${fmt(e.totalXp)} XP`}
       >
         {first && (
@@ -172,17 +177,18 @@ function PodiumCard({ entry: e, index, meRef }: { entry: BoardEntry; index: numb
             <Icon name="crown" className="h-4 w-4" />
           </span>
         )}
-        {e.isMe && <span className="absolute top-3 right-3 rounded-[2px] bg-accent px-2 py-0.5 text-xs font-semibold tracking-[0.04em] text-bg uppercase">Tú</span>}
-        <span className={`ui-num leading-none ${first ? "text-[44px] text-accent" : "text-[32px] text-fg-2"}`}>#{e.place}</span>
-        {rango && <RankEmblem rango={rango} className={`mt-4 ${first ? "h-28 w-28" : "h-20 w-20"}`} />}
-        <div className="mt-4 flex max-w-full items-center gap-2">
-          <RankAvatar nivel={e.nivel} label={initials(e.alias, 1)} size="sm" />
-          <p className="truncate font-medium">{e.alias}</p>
+        {e.isMe && <span className="absolute top-2 right-2 rounded-[2px] bg-accent px-1.5 py-0.5 text-[11px] font-semibold tracking-[0.04em] text-bg uppercase sm:top-3 sm:right-3 sm:px-2 sm:text-xs">Tú</span>}
+        <span className={`ui-num leading-none ${first ? "text-[32px] text-accent sm:text-[44px]" : "text-2xl text-fg-2 sm:text-[32px]"}`}>#{e.place}</span>
+        {/* Medallón L para el primer puesto y M para el segundo y el tercero. */}
+        {rango && <RankEmblem rango={rango} className={`mt-3 sm:mt-4 ${first ? "h-20 w-20 sm:h-28 sm:w-28" : "h-14 w-14 sm:h-20 sm:w-20"}`} />}
+        <div className="mt-3 flex max-w-full min-w-0 items-center gap-2 sm:mt-4">
+          <span className="hidden sm:inline-flex"><RankAvatar nivel={e.nivel} label={initials(e.alias, 1)} size="sm" /></span>
+          <p className="min-w-0 truncate text-[13px] font-medium sm:text-[15px]">{e.alias}</p>
           {e.nivel === 5 && <MaxRankInsignia />}
         </div>
-        <p className="mt-2 font-title text-lg leading-none font-bold tracking-[0.02em] text-fg-2 uppercase">{e.rangoNombre}</p>
-        <p className={`ui-num mt-3 ${first ? "text-[32px]" : "text-2xl"}`} aria-hidden>
-          {fmt(xp)} <span className="text-[15px] text-fg-2">XP</span>
+        <p className="mt-1 max-w-full truncate font-title text-sm leading-none font-bold tracking-[0.02em] text-fg-2 uppercase sm:mt-2 sm:text-lg">{e.rangoNombre}</p>
+        <p className={`ui-num mt-2 sm:mt-3 ${first ? "text-lg sm:text-[32px]" : "text-base sm:text-2xl"}`} aria-hidden>
+          {fmt(xp)} <span className="text-xs text-fg-2 sm:text-[15px]">XP</span>
         </p>
       </article>
     </li>

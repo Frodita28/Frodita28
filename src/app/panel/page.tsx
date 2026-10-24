@@ -1,27 +1,56 @@
 import Link from "next/link";
 import { Badge, PageBanner, SectionHeader, StatCard } from "@/components/ui";
+import { AccionesRapidas } from "@/components/acciones-rapidas";
 import { Flash } from "@/components/flash";
 import { Icon } from "@/components/icons";
 import { LicenseCard, type LicenseCardData } from "@/components/license-card";
 import { RankHero } from "@/components/rank-hero";
+import { RankMiniBar } from "@/components/rank-mini-bar";
 import { RankRoute } from "@/components/rank-route";
-import { HowToEarnXp, RankUnlocks, type MissionXp } from "@/components/rank-unlocks";
+import { RankUnlocks } from "@/components/rank-unlocks";
 import { SalesChart } from "@/components/sales-chart";
+import { TiendaJuego, type DiaRacha } from "@/components/tienda-juego";
 import { requireUser } from "@/lib/auth";
 import { parseBoard, xpToNextPlace } from "@/lib/leaderboard";
-import { formatXp, todayIn } from "@/lib/missions";
+import { canSubmitEvidence, formatXp, isPeriodOpen, todayIn, type Frequency, type ParticipationStatus } from "@/lib/missions";
+import { ultimos7Dias, type MisionHoy } from "@/lib/misiones-hoy";
 import { estadoRango } from "@/lib/rangos";
 import { money, parseStoreSummary, units } from "@/lib/store";
 import { createClient } from "@/lib/supabase/server";
+import { daysAgoIso } from "@/lib/time";
 import { getMyTotalXp } from "@/lib/xp";
 
 export const metadata = { title: "Tu Tienda" };
+
+type MissionInfo = {
+  code: string;
+  title: string;
+  frequency: Frequency;
+  validation_method: "auto" | "manual";
+  metric: string;
+  target_unit: string;
+  timezone: string;
+  status: string;
+  evidence_instructions: string;
+};
+
+type PartRow = {
+  id: string;
+  status: ParticipationStatus;
+  current_progress: number | null;
+  target_value: number;
+  xp_reward: number;
+  period_start: string;
+  period_end: string;
+  missions: MissionInfo;
+  mission_evidences: { status: string }[];
+};
 
 export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
   const sp = await searchParams;
   const user = await requireUser();
   const supabase = await createClient();
-  const [{ data: license }, { data: rawSummary }, { data: rawBoard }, { data: missionsData }, totalXp] = await Promise.all([
+  const [{ data: license }, { data: rawSummary }, { data: rawBoard }, { data: missionsData }, totalXp, { error: refreshError }] = await Promise.all([
     supabase
       .from("licenses")
       .select("status, territory, starts_at, ends_at, contract_ref, license_plans(name, status, is_demo)")
@@ -32,15 +61,89 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
     supabase.rpc("store_summary", { p_user: user.id, p_months: 6 }),
     supabase.rpc("store_leaderboard", { p_limit: 200 }),
     // La política de la tabla solo entrega las misiones activas que aplican a la tienda.
-    supabase.from("missions").select("code, title, frequency, xp_reward").eq("status", "active").order("code"),
+    supabase
+      .from("missions")
+      .select("code, title, frequency, xp_reward, validation_method, metric, target_unit, evidence_instructions")
+      .eq("status", "active")
+      .order("code"),
     getMyTotalXp(user.id),
+    // Abre los períodos actuales y actualiza estados (lo mismo que hace /panel/misiones al cargar).
+    supabase.rpc("refresh_my_missions"),
   ]);
+  // Participaciones del período actual y de las últimas semanas (para la racha), con sus evidencias.
+  const { data: partData } = await supabase
+    .from("mission_participations")
+    .select(
+      "id, status, current_progress, target_value, xp_reward, period_start, period_end, missions(code, title, frequency, validation_method, metric, target_unit, timezone, status, evidence_instructions), mission_evidences(status)",
+    )
+    .eq("user_id", user.id)
+    .gte("period_end", daysAgoIso(62))
+    .order("period_start", { ascending: false });
+  const parts = (partData ?? []) as unknown as PartRow[];
+
   const s = parseStoreSummary(rawSummary);
   const board = parseBoard(rawBoard);
   const me = board.find((r) => r.isMe);
   const next = xpToNextPlace(board);
   const storeName = user.storeName ?? "Tu Tienda";
   const { rango } = estadoRango(totalXp);
+  const activeLicense = license?.status === "active";
+  const tz = parts[0]?.missions.timezone ?? "America/Caracas";
+  const hoy = todayIn(tz);
+
+  // Misiones del período en curso, con el mismo criterio de /panel/misiones.
+  const current = parts.filter((p) => {
+    const t = todayIn(p.missions.timezone);
+    return p.missions.status === "active" && p.period_start <= t && t <= p.period_end;
+  });
+  const misiones: MisionHoy[] =
+    current.length > 0
+      ? current.map((p) => {
+          const m = p.missions;
+          const target = Number(p.target_value);
+          const enCurso = p.mission_evidences.filter((e) => e.status !== "rejected").length;
+          const needed = m.metric === "manual_approval" ? 1 : target;
+          return {
+            id: p.id,
+            code: m.code,
+            title: m.title,
+            frequency: m.frequency,
+            xp: p.xp_reward,
+            status: p.status,
+            progress: p.current_progress === null ? null : Number(p.current_progress),
+            target,
+            unit: m.target_unit,
+            validation: m.validation_method,
+            metric: m.metric,
+            instructions: m.evidence_instructions,
+            canSend: canSubmitEvidence(p.status, m.validation_method, isPeriodOpen(p.period_end, todayIn(m.timezone))) && enCurso < needed,
+          };
+        })
+      : // Sin participaciones (sin licencia activa): las misiones se ven como no disponibles.
+        ((missionsData ?? []) as (Omit<MissionInfo, "timezone" | "status"> & { xp_reward: number })[]).map((m) => ({
+          id: m.code,
+          code: m.code,
+          title: m.title,
+          frequency: m.frequency,
+          xp: m.xp_reward,
+          status: null,
+          progress: null,
+          target: 0,
+          unit: m.target_unit,
+          validation: m.validation_method,
+          metric: m.metric,
+          instructions: m.evidence_instructions,
+          canSend: false,
+        }));
+
+  // Racha: días (period_start de la diaria) con al menos una misión diaria completada.
+  const diarias = parts.filter((p) => p.missions.frequency === "daily" && p.status === "completed");
+  const diasConDiaria = [...new Set(diarias.map((p) => p.period_start))];
+  const semana: DiaRacha[] = ultimos7Dias(hoy).map((dia) => ({
+    dia,
+    misiones: diarias.filter((p) => p.period_start === dia).map((p) => ({ titulo: p.missions.title, xp: p.xp_reward })),
+  }));
+
   const licenseData: LicenseCardData | null = license
     ? {
         status: license.status,
@@ -55,7 +158,7 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
   return (
     <>
       <div className="flex flex-col gap-4">
-        <Flash ok={sp.ok} error={sp.error} variant="panel" />
+        <Flash ok={sp.ok} error={sp.error ?? (refreshError ? "No se pudieron actualizar tus misiones" : undefined)} variant="panel" />
         <PageBanner title={storeName}>
           {user.storeName
             ? "Así va tu tienda Gallo Negro. Las cifras salen de las ventas registradas con QR en tu punto de venta."
@@ -64,11 +167,21 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
       </div>
 
       <RankHero totalXp={totalXp} storageKey={`gn:ultimo-xp:${user.id}`} />
+      <RankMiniBar totalXp={totalXp} />
 
-      <RankRoute nivelActual={rango.nivel} />
+      <TiendaJuego
+        misiones={misiones}
+        diasConDiaria={diasConDiaria}
+        semana={semana}
+        hoy={hoy}
+        totalXp={totalXp}
+        tieneLicencia={activeLicense || current.length > 0}
+        userId={user.id}
+        acciones={<AccionesRapidas puesto={me?.place ?? null} tiendas={board.length} />}
+      />
 
-      <section className="flex flex-col gap-4" aria-label="Resumen">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <section aria-label="Resumen">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3">
           <StatCard
             label="Ranking actual"
             icon="trophy"
@@ -85,7 +198,7 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
                         ? `Primer puesto de ${board.length} ${board.length === 1 ? "tienda" : "tiendas"}`
                         : `Puesto ${me.place} de ${board.length}`}
                 </span>
-                <Link href="/panel/clasificacion" className="ui-link self-start">Ver clasificación</Link>
+                <Link href="/panel/clasificacion" className="ui-link inline-flex min-h-11 items-center self-start sm:min-h-0">Ver clasificación</Link>
               </span>
             }
           />
@@ -119,15 +232,11 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
             }
           />
         </div>
-
-        <Link href="/panel/ventas" className="ui-btn-primary w-full sm:w-auto sm:self-start">
-          <Icon name="qr" /> Abrir punto de venta
-        </Link>
       </section>
 
-      <div className="grid gap-12 lg:grid-cols-2 lg:items-start lg:gap-6">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start lg:gap-6">
+        <RankRoute nivelActual={rango.nivel} />
         <RankUnlocks nivelActual={rango.nivel} />
-        <HowToEarnXp missions={(missionsData ?? []) as MissionXp[]} />
       </div>
 
       <section className="ui-card">
