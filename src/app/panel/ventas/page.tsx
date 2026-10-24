@@ -58,7 +58,7 @@ export default async function SalesPage({ searchParams }: PageProps<"/panel/vent
       </div>
 
       <section className="flex flex-col gap-4" aria-label="Punto de venta">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
           <StatCard label="Ventas de hoy" value={todays.length} />
           <StatCard label="Prendas vendidas hoy" value={todays.reduce((s, v) => s + saleUnits(v), 0)} />
           <StatCard label="Total de hoy" value={money(todays.reduce((s, v) => s + saleTotal(v), 0))} />
@@ -72,7 +72,7 @@ export default async function SalesPage({ searchParams }: PageProps<"/panel/vent
             <ul className="divide-y divide-line">
               {[...stock.values()].sort((a, b) => a.name.localeCompare(b.name)).map((r) => (
                 <li key={r.sku} className="flex justify-between gap-4 py-3">
-                  <span>{r.name} <span className="text-[13px] text-fg-2">· {r.sku}</span></span>
+                  <span className="min-w-0 [overflow-wrap:anywhere]">{r.name} <span className="text-[13px] text-fg-2">· {r.sku}</span></span>
                   <span className="ui-num text-right whitespace-nowrap text-fg-2">{r.count} × {[...r.prices].map(money).join(" / ")}</span>
                 </li>
               ))}
@@ -83,7 +83,47 @@ export default async function SalesPage({ searchParams }: PageProps<"/panel/vent
 
       <section>
         <SectionHeader title="Registro de ventas" />
-        <div className="ui-table-wrap">
+        {/* Teléfono: cada venta es una tarjeta de dos líneas. */}
+        <ul className="divide-y divide-line rounded-ui border border-line bg-surface md:hidden">
+          {sales.length === 0 && <li className="p-4 text-fg-2">Todavía no hay ventas. Escanea una prenda para registrar la primera.</li>}
+          {sales.map((s) => (
+            <li key={s.id} className="flex flex-col gap-2 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="flex flex-wrap items-center gap-2 font-medium">
+                    {s.reference} <Badge>{s.source === "pos" ? "QR" : "Manual"}</Badge>
+                  </p>
+                  <p className="mt-1 text-[13px] text-fg-2">
+                    {formatDateTime(s.sold_at)} · {CHANNEL_LABEL[s.channel] ?? s.channel}
+                    {s.customer_ref ? ` · ${s.customer_ref}` : ""}
+                  </p>
+                </div>
+                <span className="ui-num shrink-0 text-right">{money(saleTotal(s))}</span>
+              </div>
+              <ul className="text-[13px] text-fg-2">
+                {s.sale_items.map((i, k) => (
+                  <li key={k} className="[overflow-wrap:anywhere]">
+                    {i.quantity} × {i.products?.name}
+                    {i.garment_units?.code && <span className="ml-1 font-mono">{i.garment_units.code}</span>}
+                  </li>
+                ))}
+              </ul>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <Badge tone={SALE_TONE[s.status]}>{SALE_STATUS[s.status].label}</Badge>
+                  {(s.rejection_reason || s.cancel_reason) && <p className="mt-1 text-[13px] text-fg-2">{s.rejection_reason ?? s.cancel_reason}</p>}
+                </div>
+                {s.source === "pos" && s.status === "verified" && canUndoPosSale(s.created_at) && (
+                  <form action={cancelOwnSale}>
+                    <input type="hidden" name="sale_id" value={s.id} />
+                    <button className="ui-btn-sm">Anular</button>
+                  </form>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className="ui-table-wrap hidden md:block">
           <table className="ui-table">
             <thead>
               <tr>

@@ -125,6 +125,7 @@ body {
 
 /* Raíz del panel: fondo, tipografía base (15 px), foco amarillo y apertura suave de acordeones. */
 .gn-panel {
+  -webkit-tap-highlight-color: rgb(233 184 36 / 0.12);
   background-color: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
@@ -167,7 +168,7 @@ body {
 /* ---------- Tipografía ---------- */
 
 @utility ui-title-page {
-  @apply font-title text-[36px] leading-none font-bold tracking-[0.02em] uppercase sm:text-[44px];
+  @apply font-title text-[clamp(2rem,9vw,2.75rem)] leading-none font-bold tracking-[0.02em] uppercase;
 }
 
 @utility ui-title-section {
@@ -222,7 +223,7 @@ body {
 /* ---------- Formularios ---------- */
 
 @utility ui-input {
-  @apply min-h-11 w-full rounded-ui border border-line bg-bg px-3 py-2 text-[15px] text-fg transition-colors duration-150 focus:border-accent focus:outline-none;
+  @apply min-h-11 w-full rounded-ui border border-line bg-bg px-3 py-2 text-base text-fg transition-colors duration-150 focus:border-accent focus:outline-none;
 }
 
 @utility ui-field-label {
@@ -400,6 +401,40 @@ body {
 /* Brillo rotatorio del rango máximo: la única excepción a «sin degradados». */
 @utility gn-halo {
   background: conic-gradient(from 0deg, transparent 0deg, var(--accent) 60deg, transparent 120deg, transparent 360deg);
+}
+
+/* Paneles inferiores (BottomSheet): suben desde abajo en el teléfono y aparecen en escritorio. */
+@keyframes gn-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.gn-sheet {
+  max-height: none;
+  &[open] > div {
+    animation: gn-sheet-up 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  &[open]::backdrop {
+    animation: gn-fade 200ms ease-out both;
+  }
+  @media (min-width: 768px) {
+    &[open] > div {
+      animation: gn-pop 200ms ease-out both;
+    }
+  }
+}
+
+/* Listas horizontales: se detienen en cada elemento y dejan ver el siguiente. */
+@utility gn-snap-x {
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 16px;
+  & li {
+    scroll-snap-align: start;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

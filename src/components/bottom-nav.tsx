@@ -1,0 +1,126 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { signOut } from "@/app/login/actions";
+import { TEXTOS_NAV as T } from "@/content/rangos";
+import { BottomSheet } from "./bottom-sheet";
+import { Icon, type IconName } from "./icons";
+
+type Item = { href: string; label: string; icon: IconName };
+
+const PRINCIPALES: Item[] = [
+  { href: "/panel", label: T.tienda, icon: "store" },
+  { href: "/panel/misiones", label: T.misiones, icon: "flag" },
+  { href: "/panel/ventas", label: T.ventas, icon: "qr" },
+  { href: "/panel/clasificacion", label: T.clasificacion, icon: "podium" },
+];
+
+/** Sección activa: la ruta más específica que coincide. */
+function activa(pathname: string, hrefs: string[]) {
+  return hrefs.filter((h) => pathname === h || pathname.startsWith(`${h}/`)).sort((a, b) => b.length - a.length)[0];
+}
+
+/**
+ * Barra inferior fija del teléfono (< 768 px): Tienda · Misiones · Ventas (central, amarilla) ·
+ * Clasificación · Más. «Más» abre un panel inferior con el resto de secciones y la sesión.
+ */
+export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes: boolean; isAdmin: boolean }) {
+  const pathname = usePathname();
+  const [mas, setMas] = useState(false);
+  const extras: Item[] = [
+    { href: "/panel/recompensas", label: T.recompensas, icon: "gift" },
+    { href: "/panel/licencia", label: T.licencia, icon: "document" },
+    { href: "/nueva-clave", label: T.contrasena, icon: "key" },
+    ...(isAdmin ? [{ href: "/admin", label: T.administracion, icon: "gear" } as const] : []),
+  ];
+  const current = activa(pathname, [...PRINCIPALES, ...extras].map((i) => i.href));
+  const enMas = extras.some((i) => i.href === current);
+
+  return (
+    <>
+      <nav
+        aria-label="Secciones"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)] md:hidden print:hidden"
+      >
+        <ul className="mx-auto grid max-w-lg grid-cols-[1fr_1fr_68px_1fr_1fr]">
+          {PRINCIPALES.slice(0, 2).map((i) => (
+            <NavItem key={i.href} item={i} active={current === i.href} dot={i.href === "/panel/misiones" && misionesPendientes} />
+          ))}
+          <li className="flex justify-center">
+            <Link
+              href="/panel/ventas"
+              aria-current={current === "/panel/ventas" ? "page" : undefined}
+              className={`-mt-4 flex min-h-[60px] w-16 flex-col items-center justify-center gap-0.5 rounded-ui border-4 border-bg bg-accent text-bg ${
+                current === "/panel/ventas" ? "ring-2 ring-accent" : ""
+              }`}
+            >
+              <Icon name="qr" className="h-6 w-6" />
+              <span className="text-xs leading-none font-semibold">{T.ventas}</span>
+            </Link>
+          </li>
+          <NavItem item={PRINCIPALES[3]} active={current === "/panel/clasificacion"} />
+          <li>
+            <button
+              type="button"
+              onClick={() => setMas(true)}
+              aria-haspopup="dialog"
+              aria-expanded={mas}
+              className={`flex min-h-14 w-full flex-col items-center justify-center gap-1 ${enMas ? "text-accent" : "text-fg-2"}`}
+            >
+              <Icon name="more" className="h-6 w-6" />
+              <span className="text-xs leading-none font-medium">{T.mas}</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <BottomSheet open={mas} onClose={() => setMas(false)} title={T.masTitulo}>
+        <ul className="-mx-2 flex flex-col">
+          {extras.map((i) => (
+            <li key={i.href}>
+              <Link
+                href={i.href}
+                onClick={() => setMas(false)}
+                aria-current={current === i.href ? "page" : undefined}
+                className="flex min-h-12 items-center gap-3 rounded-ui px-2 text-[16px] hover:bg-surface-2 aria-[current=page]:text-accent"
+              >
+                <Icon name={i.icon} className="h-5 w-5 shrink-0" />
+                <span className="flex-1">{i.label}</span>
+                <Icon name="chevronRight" className="h-4 w-4 text-fg-3" />
+              </Link>
+            </li>
+          ))}
+          <li className="mt-2 border-t border-line pt-2">
+            <form action={signOut}>
+              <button className="flex min-h-12 w-full items-center gap-3 rounded-ui px-2 text-left text-[16px] hover:bg-surface-2">
+                <Icon name="logout" className="h-5 w-5 shrink-0" />
+                {T.salir}
+              </button>
+            </form>
+          </li>
+        </ul>
+      </BottomSheet>
+    </>
+  );
+}
+
+function NavItem({ item, active, dot }: { item: Item; active: boolean; dot?: boolean }) {
+  return (
+    <li>
+      <Link
+        href={item.href}
+        aria-current={active ? "page" : undefined}
+        className={`flex min-h-14 flex-col items-center justify-center gap-1 ${active ? "text-accent" : "text-fg-2"}`}
+      >
+        <span className="relative">
+          <Icon name={item.icon} className="h-6 w-6" />
+          {dot && <span className="absolute -top-0.5 -right-1 h-2 w-2 rounded-full bg-accent" aria-hidden />}
+        </span>
+        <span className="max-w-full truncate px-0.5 text-xs leading-none font-medium tracking-tight">{item.label}</span>
+        {dot && <span className="sr-only">{T.misionesPendientes}</span>}
+      </Link>
+    </li>
+  );
+}

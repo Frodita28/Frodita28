@@ -9,6 +9,7 @@ import { estadoRango, todosLosRangos } from "@/lib/rangos";
 import { createClient } from "@/lib/supabase/server";
 import { LeaderboardBoard, type BoardEntry } from "./board";
 import { NameEditor } from "./name-editor";
+import { SearchToggle } from "./search-toggle";
 
 export const metadata = { title: "Clasificación" };
 
@@ -82,32 +83,22 @@ export default async function LeaderboardPage({ searchParams }: PageProps<"/pane
       </div>
 
       <section className="flex flex-col gap-4" aria-label="Clasificación">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-            <div className="flex items-center gap-2 pb-1">
-              <span className="ui-label shrink-0">Vista:</span>
-              <span className="ui-chip" aria-current="page">Individual</span>
-              <span className="ui-chip cursor-not-allowed opacity-60" aria-disabled="true" title="Los equipos aún no están definidos">
-                Por squads · próximamente
-              </span>
-              <span className="mx-1 h-6 w-px shrink-0 bg-line" aria-hidden />
-              <span className="ui-label shrink-0">Período:</span>
-              <span className="ui-chip" aria-current="page">Total</span>
-              <span className="ui-chip cursor-not-allowed opacity-60" aria-disabled="true" title="La clasificación por mes aún no está disponible">
-                Este mes · próximamente
-              </span>
-            </div>
+        <div className="flex flex-wrap items-center gap-2 md:flex-nowrap md:gap-4 lg:justify-between">
+          <div className="gn-snap-x -ml-4 min-w-0 flex-1 overflow-x-auto pl-4 md:mx-0 md:px-0">
+            <ul className="flex items-center gap-2 pb-1">
+              <li className="ui-label shrink-0">Vista:</li>
+              <li><span className="ui-chip" aria-current="page">Individual</span></li>
+              <li><span className="ui-chip cursor-not-allowed opacity-60" aria-disabled="true">Por squads · próximamente</span></li>
+              <li className="mx-1 h-6 w-px shrink-0 bg-line" aria-hidden />
+              <li className="ui-label shrink-0">Período:</li>
+              <li><span className="ui-chip" aria-current="page">Total</span></li>
+              <li className="pr-4 md:pr-0"><span className="ui-chip cursor-not-allowed opacity-60" aria-disabled="true">Este mes · próximamente</span></li>
+            </ul>
           </div>
-          <form className="relative w-full lg:w-72" role="search">
-            <Icon name="search" className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-fg-2" />
-            <label htmlFor="q" className="sr-only">Buscar tienda</label>
-            <input id="q" name="q" defaultValue={q} className="ui-input pl-9" placeholder="Buscar tienda…" />
-            {liga && <input type="hidden" name="liga" value={liga} />}
-            {limit !== T.topInicial && <input type="hidden" name="top" value={limit} />}
-          </form>
+          <SearchToggle q={q} liga={liga} top={limit !== T.topInicial ? limit : null} />
         </div>
 
-        <nav className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label="Ligas por rango">
+        <nav className="gn-snap-x -mx-4 overflow-x-auto px-4 md:mx-0 md:px-0" aria-label="Ligas por rango">
           <ul className="flex gap-2 pb-1">
             <li>
               <Link href={href({ liga: "" })} className="ui-chip" aria-current={!liga ? "page" : undefined}>Todos</Link>

@@ -115,6 +115,8 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
               placeholder="GN-XXXXXXXX"
               autoComplete="off"
               autoCapitalize="characters"
+              inputMode="text"
+              enterKeyHint="done"
               spellCheck={false}
             />
             <button className="ui-btn-secondary whitespace-nowrap" disabled={looking || !manual.trim()}>Agregar</button>
@@ -170,7 +172,7 @@ export default function PointOfSaleClient({ userId, initialCode, disabled }: { u
             </div>
             <div>
               <label className="ui-field-label" htmlFor="customer_ref">Cliente (opcional)</label>
-              <input className="ui-input" id="customer_ref" name="customer_ref" maxLength={120} placeholder="@usuario o nombre" />
+              <input className="ui-input" id="customer_ref" name="customer_ref" maxLength={120} placeholder="@usuario o nombre" autoComplete="off" autoCapitalize="none" enterKeyHint="next" />
             </div>
           </div>
           <input className="ui-input" name="notes" maxLength={1000} placeholder="Nota (opcional)" aria-label="Nota" />

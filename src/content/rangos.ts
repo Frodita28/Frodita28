@@ -102,10 +102,6 @@ export const TEXTOS_RANGOS = {
   rutaTitulo: "Ruta de rangos",
   rutaAyuda: "Toca un rango para ver qué se libera.",
   liberadoTitulo: "Liberado en tu rango",
-  comoGanarTitulo: "Cómo ganar XP",
-  comoGanarAyuda: "Misiones disponibles para tu tienda y los XP que suma cada una al completarla.",
-  sinMisiones: "No hay misiones disponibles para tu tienda en este momento.",
-  frecuencias: { daily: "Diarias · se repiten cada día", weekly: "Semanales · cada semana", monthly: "Mensuales · cada mes" },
   subisteA: "Subiste a",
   verRecompensas: "Ver recompensas",
   cerrar: "Cerrar",
@@ -132,4 +128,63 @@ export const TEXTOS_CLASIFICACION = {
   nombreMin: 2,
   topInicial: 50,
   topMaximo: 200,
+} as const;
+
+/**
+ * Textos de la parte interactiva de Tu tienda (misiones de hoy, racha, siguiente jugada,
+ * acciones rápidas) y de la navegación móvil del panel.
+ */
+export const TEXTOS_TIENDA = {
+  misionesTitulo: "Misiones de hoy",
+  pestanas: { daily: "Diarias", weekly: "Semanales", monthly: "Mensuales" },
+  periodo: { daily: "hoy", weekly: "esta semana", monthly: "este mes" },
+  estados: { pendiente: "Pendiente", revision: "En revisión", completada: "Completada", no_disponible: "No disponible" },
+  enviar: "Enviar",
+  reenviar: "Reenviar",
+  enviando: "Enviando…",
+  verMision: "Ver misión",
+  verTodas: "Ver todas",
+  verMenos: "Ver menos",
+  /** Filas pendientes visibles en móvil antes de «Ver todas». */
+  visiblesMovil: 4,
+  sinMisionesPeriodo: "No hay misiones en esta sección para tu tienda.",
+  sinLicencia: "Necesitas una licencia activa para participar en las misiones.",
+  todoCompletado: "Completaste todas las misiones de esta sección.",
+  enviadaOk: "Evidencia enviada. Gallo Negro la revisará pronto.",
+  errorEnvio: "No se pudo enviar la evidencia. Revisa los datos e inténtalo otra vez.",
+  rechazada: "Rechazada: puedes enviar una evidencia nueva.",
+  misionCompletada: "Misión completada",
+  rachaTitulo: "Racha",
+  // BORRADOR: confirma el tono del texto cuando aún no hay racha.
+  rachaVacia: "Completa una misión diaria para empezar tu racha.",
+  rachaAyuda: "Toca un día para ver qué completaste.",
+  sinCompletadasDia: "Ese día no completaste misiones diarias.",
+  dias: ["D", "L", "M", "X", "J", "V", "S"],
+  siguienteTitulo: "Tu siguiente jugada",
+  empezar: "Empezar",
+  verMisiones: "Ver misiones",
+  todoListo: "Ya completaste lo pendiente de hoy. Mañana hay misiones nuevas.",
+  accionesTitulo: "Acciones rápidas",
+  accionPos: "Abrir punto de venta",
+  accionMisiones: "Mis misiones",
+  accionClasificacion: "Clasificación",
+  accionRecompensas: "Recompensas",
+  sinPosicion: "Sin posición aún",
+} as const;
+
+/** Navegación inferior del panel en el teléfono. */
+export const TEXTOS_NAV = {
+  tienda: "Tienda",
+  misiones: "Misiones",
+  ventas: "Ventas",
+  clasificacion: "Clasificación",
+  mas: "Más",
+  masTitulo: "Más opciones",
+  recompensas: "Recompensas",
+  licencia: "Licencia",
+  contrasena: "Cambiar contraseña",
+  administracion: "Administración",
+  salir: "Salir",
+  cerrar: "Cerrar",
+  misionesPendientes: "Tienes misiones diarias pendientes",
 } as const;

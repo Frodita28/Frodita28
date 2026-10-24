@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.9.0 — 2026-10-24
+
+- **Tu tienda interactiva:** «Cómo ganar XP» pasa a «Misiones de hoy» (pestañas Diarias · Semanales · Mensuales,
+  resumen y barra del período, filas con «+N XP», estado y acción; en móvil 4 filas y «Ver todas»). Las misiones
+  de evidencia se envían desde un panel inferior con el mismo formulario y la misma función
+  `submit_mission_evidence` de `/panel/misiones` (estado optimista «En revisión», error claro si falla); las
+  automáticas muestran su progreso. Celebración al completar una misión desde la última visita: «+N XP» vuela
+  hasta el anillo, vibración corta, aviso para lectores de pantalla y superposición de subida de rango.
+  Nuevas tarjetas «Racha» (últimos 7 días con misiones diarias completadas), «Tu siguiente jugada» y «Acciones
+  rápidas» (sustituye al botón suelto del punto de venta). Nuevo orden de la página. Sin cambios de base de
+  datos ni de cómo se ganan los XP.
+- **Panel móvil primero:** barra inferior fija con «Más» en panel inferior, cabecera compacta, mini barra de
+  rango al desplazarse, podio 2-1-3 compacto, buscador plegable, «Ir a mi posición» sobre la barra, tablas
+  como listas en móvil, gráfica de ventas tocable y más baja, campos de 16 px, esqueletos de carga del hero,
+  las misiones y la clasificación, brasas reducidas a 6 en móvil.
+- **App:** `viewport-fit=cover`, `theme-color` #0B0B0C, `color-scheme` dark y manifest web («Gallo Negro
+  Licencias», iconos 192/512 y maskable en `public/iconos/`). Sin service worker.
+
 ## 0.8.1 — 2026-10-23
 
 - **Rangos confirmados:** Gallo Negro confirmó los nombres y XP de los rangos (2.000 / 3.000 / 3.500 / 4.000 / 6.000,

@@ -12,7 +12,7 @@ export function PageBanner({ title, aside, children }: { title: string; aside?: 
   return (
     <div className="flex flex-wrap items-end justify-between gap-6 border-l-4 border-brand-red py-1 pl-4 sm:pl-6">
       <div className="min-w-0 max-w-3xl">
-        <h1 className="ui-title-page">{title}</h1>
+        <h1 className="ui-title-page [overflow-wrap:anywhere]">{title}</h1>
         {children && <div className="mt-3 text-base text-fg-2">{children}</div>}
       </div>
       {aside}
@@ -65,7 +65,11 @@ export function StatCard({
         <p className="ui-label">{label}</p>
         {icon && <Icon name={icon} className="h-5 w-5 shrink-0 text-fg-2" />}
       </div>
-      <div className={`ui-num mt-2 leading-none break-words ${size === "lg" ? "text-[40px] sm:text-5xl" : "text-[32px]"}`}>{value}</div>
+      <div
+        className={`ui-num mt-2 leading-none [overflow-wrap:anywhere] ${size === "lg" ? "text-[clamp(1.75rem,9vw,3rem)]" : "text-[clamp(1.375rem,6.5vw,2rem)]"}`}
+      >
+        {value}
+      </div>
       {hint && <div className="mt-3 text-[13px] text-fg-2">{hint}</div>}
     </div>
   );

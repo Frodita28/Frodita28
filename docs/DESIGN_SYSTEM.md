@@ -33,28 +33,38 @@ iconos (sobre surface-2 daría 4.3:1, por eso nunca como color de texto).
 
 ## Utilidades (`@utility` en `globals.css`)
 
-- Tipografía: `ui-title-page` (36/44 px), `ui-title-section` (24 px), `ui-title-card` (20 px), `ui-label`
+- Tipografía: `ui-title-page` (`clamp()` de 32 a 44 px), `ui-title-section` (24 px), `ui-title-card` (20 px), `ui-label`
   (12 px mayúsculas), `ui-num` (Inter 600, `tabular-nums`), `ui-link`.
 - Superficies: `ui-card`, `ui-card-inset`.
 - Botones (mín. 44 px): `ui-btn-primary`, `ui-btn-secondary`, `ui-btn-sm`.
-- Formularios: `ui-input`, `ui-field-label`.
+- Formularios: `ui-input` (16 px para que iOS no haga zoom), `ui-field-label`.
 - Navegación: `ui-tab` (pestañas del panel y selector de plan), `ui-chip` (filtros dentro de una página).
 - Tabla: `ui-table-wrap` + `ui-table` (cabecera pequeña en mayúsculas, filas con línea fina).
-- Raíz `.gn-panel`: texto base de 15 px, foco amarillo de 2 px, placeholders y apertura suave de `<details>`;
+- Listas horizontales: `gn-snap-x` (scroll-snap por elemento, deja ver el siguiente).
+- Raíz `.gn-panel`: resaltado táctil sutil, texto base de 15 px, foco amarillo de 2 px, placeholders y apertura suave de `<details>`;
   respeta `prefers-reduced-motion`.
 
 ## Componentes
 
 - `src/components/club.tsx`: `StoreShell` (cabecera con avatar enmarcado según el rango y botón «Cambiar
   contraseña» junto a «Salir» + pestañas + contenido a 1152 px, secciones a 48 px), `panelTabs(role)`, `ROLE_LABEL`.
-- `src/components/club-tabs.tsx`: pestañas con `aria-current`, scroll horizontal en móvil.
+- `src/components/club-tabs.tsx`: pestañas con `aria-current` (solo desde 768 px).
+- Móvil primero (< 768 px): cabecera compacta (logo, tienda truncada y avatar), `bottom-nav.tsx` (barra
+  inferior Tienda · Misiones · Ventas · Clasificación · Más, con punto amarillo si hay diarias pendientes,
+  `src/lib/panel-nav.ts`), `bottom-sheet.tsx` (panel inferior en móvil y ventana en escritorio sobre `<dialog>`,
+  cierre visible y al tocar fuera), `rank-mini-bar.tsx` (mini barra fija de rango al desplazarse en Tu tienda).
+  `main` deja sitio al final para la barra (`env(safe-area-inset-bottom)`). Las tablas pasan a listas de dos
+  líneas en móvil (ventas, historial de XP).
+- Tu tienda: `tienda-juego.tsx` («Misiones de hoy», racha, «Tu siguiente jugada» y panel de evidencia; cálculos
+  en `src/lib/misiones-hoy.ts`, coordinación del vuelo «+N XP» con el hero en `src/lib/xp-celebracion.ts`) y
+  `acciones-rapidas.tsx`. Textos en `TEXTOS_TIENDA` y `TEXTOS_NAV` de `src/content/rangos.ts`.
 - `src/components/ui.tsx`: `PageBanner`, `SectionHeader`, `StatCard`, `Figure`, `ProgressBar` (8 px, % a la
   derecha, verde al llegar a la meta), `Badge` (neutral, accent, success, alert), `Accordion`, `Alert`,
   `ComingSoon`, `EmptyState`.
 - Rangos (contenido y cifras en `src/content/rangos.ts`, cálculo en `src/lib/rangos.ts`):
   `src/components/rangos.tsx` (`RankEmblem`, `RankAvatar` con el marco de cada rango, `RankBadge`,
   `MaxRankInsignia`, `Embers`), `rank-hero.tsx` (anillo radial, «+N XP» y subida de rango), `rank-route.tsx`
-  (ruta de rangos), `rank-unlocks.tsx` («Liberado en tu rango» y «Cómo ganar XP»).
+  (ruta de rangos), `rank-unlocks.tsx` («Liberado en tu rango»).
 - `src/components/license-card.tsx`: credencial de la licencia en Tu tienda (textos en `src/content/licencia-tienda.ts`).
 - Clasificación: podio, lista con movimientos y nombre visible en `src/app/panel/clasificacion/`.
 - Animaciones `gn-*` en `globals.css`; con `prefers-reduced-motion` no se anima nada y se ocultan las brasas y el

@@ -8,9 +8,19 @@ const display = Archivo_Black({ variable: "--font-display-face", subsets: ["lati
 export const metadata: Metadata = {
   title: { default: "Gallo Negro Licencias", template: "%s · Gallo Negro Licencias" },
   description: "Ropa exclusiva con identidad propia. Plataforma de licenciados de Gallo Negro.",
+  applicationName: "Gallo Negro Licencias",
+  appleWebApp: { capable: true, title: "Gallo Negro", statusBarStyle: "black-translucent" },
+  icons: { apple: "/iconos/gn-180.png" },
 };
 
-export const viewport: Viewport = { themeColor: "#0b0b0c" };
+// viewport-fit=cover deja usar env(safe-area-inset-*) en teléfonos con muesca o barra de gestos.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0B0B0C",
+  colorScheme: "dark",
+};
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

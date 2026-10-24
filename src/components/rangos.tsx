@@ -136,8 +136,8 @@ export function MaxRankInsignia() {
   );
 }
 
-/** Brasas pequeñas que suben despacio (máximo 12). Se ocultan con movimiento reducido. */
-export function Embers({ count = 12, spread = 1, small }: { count?: number; spread?: number; small?: boolean }) {
+/** Brasas pequeñas que suben despacio (máximo 12; `mobileCount` en el teléfono). Se ocultan con movimiento reducido. */
+export function Embers({ count = 12, mobileCount, spread = 1, small }: { count?: number; mobileCount?: number; spread?: number; small?: boolean }) {
   const n = Math.min(Math.max(count, 0), 12);
   return (
     <span className="gn-motion-only pointer-events-none absolute inset-0" aria-hidden>
@@ -149,7 +149,7 @@ export function Embers({ count = 12, spread = 1, small }: { count?: number; spre
         return (
           <span
             key={i}
-            className={`absolute rounded-full ${small ? "h-1 w-1" : "h-1.5 w-1.5"} ${i % 3 === 0 ? "bg-brand-red" : "bg-accent"}`}
+            className={`absolute rounded-full ${small ? "h-1 w-1" : "h-1.5 w-1.5"} ${i % 3 === 0 ? "bg-brand-red" : "bg-accent"} ${mobileCount !== undefined && i % Math.ceil(n / Math.max(mobileCount, 1)) !== 0 ? "max-md:hidden" : ""}`}
             style={{
               left: `${x}%`,
               top: `${y}%`,

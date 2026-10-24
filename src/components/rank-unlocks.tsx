@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { TEXTOS_RANGOS, recompensasPorNivel } from "@/content/rangos";
-import { formatXp, type Frequency } from "@/lib/missions";
 import { todosLosRangos } from "@/lib/rangos";
 import { Icon } from "./icons";
 import { RankAvatar } from "./rangos";
@@ -48,45 +47,6 @@ export function RankUnlocks({ nivelActual }: { nivelActual: number }) {
           );
         })}
       </ul>
-    </section>
-  );
-}
-
-export type MissionXp = { code: string; title: string; frequency: Frequency; xp_reward: number };
-
-/** «Cómo ganar XP»: misiones disponibles para la tienda y los XP de cada una. */
-export function HowToEarnXp({ missions }: { missions: MissionXp[] }) {
-  const groups = (["daily", "weekly", "monthly"] as const)
-    .map((f) => ({ f, items: missions.filter((m) => m.frequency === f) }))
-    .filter((g) => g.items.length > 0);
-  return (
-    <section className="ui-card" aria-labelledby="ganar-xp-titulo">
-      <SectionHeader
-        title={TEXTOS_RANGOS.comoGanarTitulo}
-        id="ganar-xp-titulo"
-        aside={<Link href="/panel/misiones" className="ui-link text-[13px]">Ir a misiones</Link>}
-      >
-        {TEXTOS_RANGOS.comoGanarAyuda}
-      </SectionHeader>
-      {groups.length === 0 ? (
-        <p className="text-fg-2">{TEXTOS_RANGOS.sinMisiones}</p>
-      ) : (
-        <div className="space-y-4">
-          {groups.map((g) => (
-            <div key={g.f}>
-              <p className="ui-label mb-2">{TEXTOS_RANGOS.frecuencias[g.f]}</p>
-              <ul className="divide-y divide-line rounded-ui border border-line">
-                {g.items.map((m) => (
-                  <li key={m.code} className="flex items-center justify-between gap-4 px-4 py-2.5">
-                    <span className="min-w-0 truncate text-[15px]">{m.title}</span>
-                    <span className="ui-num shrink-0 text-accent">+{formatXp(m.xp_reward)}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
     </section>
   );
 }

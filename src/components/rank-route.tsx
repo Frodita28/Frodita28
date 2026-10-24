@@ -23,7 +23,7 @@ export function RankRoute({ nivelActual }: { nivelActual: number }) {
         <p className="text-[13px] text-fg-2">{TEXTOS_RANGOS.rutaAyuda}</p>
       </div>
 
-      <div className="-mx-4 overflow-x-auto px-4 sm:-mx-6 sm:px-6">
+      <div className="gn-snap-x -mx-4 overflow-x-auto px-4 sm:-mx-6 sm:px-6">
         <ol className="relative flex min-w-[560px] justify-between gap-2 py-2">
           {/* Línea que conecta los nodos: amarilla hasta el rango actual. */}
           <span className="absolute top-[34px] right-[10%] left-[10%] h-0.5 bg-line" aria-hidden />
