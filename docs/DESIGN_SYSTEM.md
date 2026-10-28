@@ -58,7 +58,7 @@ sólido = activo o destacado), por iconos (alerta, check) y por texto.
   contraseña» junto a «Salir» + pestañas + contenido a 1152 px, secciones a 48 px), `panelTabs(role)`, `ROLE_LABEL`.
 - `src/components/club-tabs.tsx`: pestañas con `aria-current` (solo desde 768 px).
 - Móvil primero (< 768 px): cabecera compacta (logo, tienda truncada y avatar), `bottom-nav.tsx` (barra
-  inferior Tienda · Misiones · Ventas · Clasificación · Más: iconos de 20 px y etiquetas de 11 px en mayúsculas,
+  inferior Perfil · Misiones · Tienda Clan · Recompensas · Más: iconos de 20 px y etiquetas de 11 px en mayúsculas,
   gris y blanco la activa; punto blanco si hay diarias pendientes,
   `src/lib/panel-nav.ts`), `bottom-sheet.tsx` (panel inferior en móvil y ventana en escritorio sobre `<dialog>`,
   cierre visible y al tocar fuera), `rank-mini-bar.tsx` (mini barra fija de rango al desplazarse en Tu tienda).
@@ -76,7 +76,8 @@ sólido = activo o destacado), por iconos (alerta, check) y por texto.
   `MaxRankInsignia`, `Embers`), `rank-hero.tsx` (anillo radial, «+N XP» y subida de rango), `rank-route.tsx`
   (ruta de rangos), `rank-unlocks.tsx` («Liberado en tu rango»).
 - `src/components/license-card.tsx`: credencial de la licencia en Tu tienda (textos en `src/content/licencia-tienda.ts`).
-- Clasificación: podio, lista con movimientos y nombre visible en `src/app/panel/clasificacion/`.
+- Ventas vive dentro de Perfil (`/panel/ventas`, sin pestaña propia). Tienda Clan (`/panel/tienda-clan`) está en
+  «Próximamente». Clasificación y Licencia se retiraron del panel (sus rutas llevan a Perfil).
 - Animaciones `gn-*` en `globals.css`; con `prefers-reduced-motion` no se anima nada y se ocultan las brasas y el
   brillo (`gn-motion-only`). El brillo rotatorio (`gn-halo`, conic-gradient) es la única excepción a «sin
   degradados» y solo aparece en el rango 5.

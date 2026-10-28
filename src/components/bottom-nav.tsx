@@ -10,11 +10,12 @@ import { Icon, type IconName } from "./icons";
 
 type Item = { href: string; label: string; icon: IconName };
 
+// Ventas (/panel/ventas) vive dentro de Perfil: al estar en ella se marca «Perfil».
 const PRINCIPALES: Item[] = [
-  { href: "/panel", label: T.tienda, icon: "store" },
+  { href: "/panel", label: T.perfil, icon: "store" },
   { href: "/panel/misiones", label: T.misiones, icon: "flag" },
-  { href: "/panel/ventas", label: T.ventas, icon: "qr" },
-  { href: "/panel/clasificacion", label: T.clasificacion, icon: "podium" },
+  { href: "/panel/tienda-clan", label: T.tiendaClan, icon: "bag" },
+  { href: "/panel/recompensas", label: T.recompensas, icon: "gift" },
 ];
 
 /** Sección activa: la ruta más específica que coincide. */
@@ -23,15 +24,13 @@ function activa(pathname: string, hrefs: string[]) {
 }
 
 /**
- * Barra inferior fija del teléfono (< 768 px): Tienda · Misiones · Ventas ·
- * Clasificación · Más. «Más» abre un panel inferior con el resto de secciones y la sesión.
+ * Barra inferior fija del teléfono (< 768 px): Perfil · Misiones · Tienda Clan ·
+ * Recompensas · Más. «Más» abre un panel inferior con el resto de secciones y la sesión.
  */
 export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes: boolean; isAdmin: boolean }) {
   const pathname = usePathname();
   const [mas, setMas] = useState(false);
   const extras: Item[] = [
-    { href: "/panel/recompensas", label: T.recompensas, icon: "gift" },
-    { href: "/panel/licencia", label: T.licencia, icon: "document" },
     { href: "/nueva-clave", label: T.contrasena, icon: "key" },
     ...(isAdmin ? [{ href: "/admin", label: T.administracion, icon: "gear" } as const] : []),
   ];
@@ -45,20 +44,9 @@ export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes:
         className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)] md:hidden print:hidden"
       >
         <ul className="mx-auto grid max-w-lg grid-cols-5">
-          {PRINCIPALES.slice(0, 2).map((i) => (
+          {PRINCIPALES.map((i) => (
             <NavItem key={i.href} item={i} active={current === i.href} dot={i.href === "/panel/misiones" && misionesPendientes} />
           ))}
-          <li className="flex justify-center">
-            <Link
-              href="/panel/ventas"
-              aria-current={current === "/panel/ventas" ? "page" : undefined}
-              className={`flex min-h-16 w-full flex-col items-center justify-center gap-1.5 ${current === "/panel/ventas" ? "text-fg" : "text-fg-2"}`}
-            >
-              <Icon name="qr" className="h-5 w-5" />
-              <span className="text-[11px] leading-none font-bold tracking-[0.04em] uppercase">{T.ventas}</span>
-            </Link>
-          </li>
-          <NavItem item={PRINCIPALES[3]} active={current === "/panel/clasificacion"} />
           <li>
             <button
               type="button"
@@ -116,7 +104,8 @@ function NavItem({ item, active, dot }: { item: Item; active: boolean; dot?: boo
           <Icon name={item.icon} className="h-5 w-5" />
           {dot && <span className="absolute -top-0.5 -right-1 h-2 w-2 rounded-full bg-accent" aria-hidden />}
         </span>
-        <span className="max-w-full truncate px-0.5 text-[11px] leading-none font-bold tracking-[0.04em] uppercase">{item.label}</span>
+        {/* Si no cabe en una línea (p. ej. «Tienda Clan» a 360 px) pasa a dos, sin cortar el texto. */}
+        <span className="max-w-full px-0.5 text-center text-[11px] leading-[1.1] font-bold tracking-[0.04em] uppercase">{item.label}</span>
         {dot && <span className="sr-only">{T.misionesPendientes}</span>}
       </Link>
     </li>

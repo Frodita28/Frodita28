@@ -2,18 +2,12 @@ import Link from "next/link";
 import { TEXTOS_TIENDA as T } from "@/content/rangos";
 import { Icon, type IconName } from "./icons";
 
-/** «Acciones rápidas» de Tu tienda: cuadrícula 2×2 de botones grandes; el punto de venta es el principal. */
-export function AccionesRapidas({ puesto, tiendas }: { puesto: number | null; tiendas: number }) {
-  const fmt = (n: number) => new Intl.NumberFormat("es-VE").format(n);
+/** «Acciones rápidas» de Perfil: cuadrícula 2×2 de botones grandes; el punto de venta es el principal. */
+export function AccionesRapidas() {
   const items: { href: string; label: string; icon: IconName; detalle?: string; principal?: boolean }[] = [
     { href: "/panel/ventas", label: T.accionPos, icon: "qr", principal: true },
     { href: "/panel/misiones", label: T.accionMisiones, icon: "flag" },
-    {
-      href: "/panel/clasificacion",
-      label: T.accionClasificacion,
-      icon: "podium",
-      detalle: puesto ? `#${fmt(puesto)} de ${fmt(tiendas)}` : T.sinPosicion,
-    },
+    { href: "/panel/tienda-clan", label: T.accionTiendaClan, icon: "bag", detalle: T.proximamente },
     { href: "/panel/recompensas", label: T.accionRecompensas, icon: "gift" },
   ];
   return (

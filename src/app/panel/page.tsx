@@ -20,7 +20,7 @@ import { createClient } from "@/lib/supabase/server";
 import { daysAgoIso } from "@/lib/time";
 import { getMyTotalXp } from "@/lib/xp";
 
-export const metadata = { title: "Tu Tienda" };
+export const metadata = { title: "Perfil" };
 
 type MissionInfo = {
   code: string;
@@ -177,7 +177,7 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
         totalXp={totalXp}
         tieneLicencia={activeLicense || current.length > 0}
         userId={user.id}
-        acciones={<AccionesRapidas puesto={me?.place ?? null} tiendas={board.length} />}
+        acciones={<AccionesRapidas />}
       />
 
       <section aria-label="Resumen">
@@ -198,7 +198,6 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
                         ? `Primer puesto de ${board.length} ${board.length === 1 ? "tienda" : "tiendas"}`
                         : `Puesto ${me.place} de ${board.length}`}
                 </span>
-                <Link href="/panel/clasificacion" className="ui-link inline-flex min-h-11 items-center self-start sm:min-h-0">Ver clasificación</Link>
               </span>
             }
           />
@@ -239,8 +238,19 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
         <RankUnlocks nivelActual={rango.nivel} />
       </div>
 
-      <section className="ui-card">
-        <SectionHeader title="Gráfica de ventas" aside={<p className="text-[13px] text-fg-2">Últimos 6 meses · ventas registradas</p>} />
+      {/* Ventas vive dentro de Perfil: gráfica y acceso al punto de venta y al registro de ventas. */}
+      <section className="ui-card" aria-labelledby="ventas-titulo">
+        <SectionHeader
+          id="ventas-titulo"
+          title="Ventas"
+          aside={
+            <Link href="/panel/ventas" className="ui-btn-sm">
+              <Icon name="qr" className="h-4 w-4" /> Punto de venta y registro
+            </Link>
+          }
+        >
+          Últimos 6 meses · ventas registradas
+        </SectionHeader>
         <SalesChart months={s.monthly} />
       </section>
 

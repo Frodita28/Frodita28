@@ -16,12 +16,11 @@ export const ROLE_LABEL: Record<Role, string> = { applicant: "Solicitante", lice
 /** Pestañas del panel, en el orden en que se muestran. */
 export function panelTabs(role: Role): ClubTab[] {
   return [
-    { href: "/panel", label: "Tu Tienda", icon: "store" },
-    { href: "/panel/clasificacion", label: "Clasificación", icon: "podium" },
+    // Ventas (/panel/ventas) vive dentro de Perfil: no tiene pestaña propia y marca «Perfil».
+    { href: "/panel", label: "Perfil", icon: "store" },
     { href: "/panel/recompensas", label: "Recompensas", icon: "gift" },
     { href: "/panel/misiones", label: "Misiones", icon: "flag" },
-    { href: "/panel/ventas", label: "Ventas", icon: "qr" },
-    { href: "/panel/licencia", label: "Licencia", icon: "document" },
+    { href: "/panel/tienda-clan", label: "Tienda Clan", icon: "bag" },
     ...(role === "admin" ? [{ href: "/admin", label: "Administración", icon: "gear" } as const] : []),
   ];
 }
