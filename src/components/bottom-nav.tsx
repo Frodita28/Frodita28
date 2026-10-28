@@ -12,7 +12,7 @@ type Item = { href: string; label: string; icon: IconName };
 
 // Ventas (/panel/ventas) vive dentro de Perfil: al estar en ella se marca «Perfil».
 const PRINCIPALES: Item[] = [
-  { href: "/panel", label: T.perfil, icon: "store" },
+  { href: "/panel", label: T.perfil, icon: "idCard" },
   { href: "/panel/misiones", label: T.misiones, icon: "flag" },
   { href: "/panel/tienda-clan", label: T.tiendaClan, icon: "bag" },
   { href: "/panel/recompensas", label: T.recompensas, icon: "gift" },

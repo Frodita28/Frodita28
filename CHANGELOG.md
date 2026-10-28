@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.11.0 — 2026-10-28
+
+- **Perfil con enfoque comercial:** debajo de la cabecera va el botón grande «Punto de venta y registro» (ancho
+  completo en el teléfono) y los cuatro indicadores del negocio: Total generado (con la inversión), Prendas
+  vendidas, Stock actual y Ranking (2×2 en el teléfono, 4 en fila en escritorio). Después, Ventas (gráfica) y
+  una tarjeta compacta de rango (medallón pequeño, XP y barra) en lugar del hero grande de rango.
+- «Misiones de hoy» (con racha y siguiente jugada) y la ruta de rangos pasan a acordeones plegados. Se quitan de
+  Perfil las acciones rápidas, la tarjeta «Tu squad / equipo» (Próximamente) y la mini barra de rango. La
+  animación de subida de rango del hero desaparece con él; el «+N XP» vuela ahora hasta la tarjeta de rango.
+- La página se separa en datos (`page.tsx`) y vista (`perfil-view.tsx`).
+- Ícono nuevo de Perfil: credencial con foto (`idCard`).
+
 ## 0.10.0 — 2026-10-28
 
 - **Secciones del panel reorganizadas:** «Tu Tienda» pasa a llamarse **Perfil**. **Ventas** deja de ser una

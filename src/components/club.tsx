@@ -17,7 +17,7 @@ export const ROLE_LABEL: Record<Role, string> = { applicant: "Solicitante", lice
 export function panelTabs(role: Role): ClubTab[] {
   return [
     // Ventas (/panel/ventas) vive dentro de Perfil: no tiene pestaña propia y marca «Perfil».
-    { href: "/panel", label: "Perfil", icon: "store" },
+    { href: "/panel", label: "Perfil", icon: "idCard" },
     { href: "/panel/recompensas", label: "Recompensas", icon: "gift" },
     { href: "/panel/misiones", label: "Misiones", icon: "flag" },
     { href: "/panel/tienda-clan", label: "Tienda Clan", icon: "bag" },
