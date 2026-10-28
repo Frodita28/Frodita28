@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ESTADO_LICENCIA, ESTADO_PLAN, TEXTOS_LICENCIA_TIENDA as T } from "@/content/licencia-tienda";
 import { vigencia } from "@/lib/licencia";
 import { formatDay } from "@/lib/missions";
@@ -23,7 +22,6 @@ export function LicenseCard({ license, today }: { license: LicenseCardData | nul
       <section className="ui-card">
         <SectionHeader title={T.titulo} />
         <p className="text-fg-2">{T.sinLicencia}</p>
-        <Link href="/panel/licencia" className="ui-btn-secondary mt-4">{T.verTerminos}</Link>
       </section>
     );
   }
@@ -101,11 +99,6 @@ export function LicenseCard({ license, today }: { license: LicenseCardData | nul
           </Block>
         </dl>
 
-        <footer className="border-t border-line p-4 sm:px-6">
-          <Link href="/panel/licencia" className="ui-btn-secondary w-full sm:w-auto">
-            <Icon name="document" className="h-4 w-4" /> {T.verTerminos}
-          </Link>
-        </footer>
       </article>
     </section>
   );

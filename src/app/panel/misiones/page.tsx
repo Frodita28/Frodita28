@@ -105,8 +105,7 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
           <StatCard label="En revisión" value={String(byTab.review.length)} />
         </div>
         <ComingSoon title="Insignias">
-          Insignias permanentes por logros llegan en la Fase 2. Tus XP actuales ya cuentan para la{" "}
-          <Link href="/panel/clasificacion" className="ui-link">clasificación</Link>.
+          Insignias permanentes por logros llegan en la Fase 2. Tus XP actuales ya cuentan para tu rango.
         </ComingSoon>
       </section>
 

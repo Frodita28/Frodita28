@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.10.0 — 2026-10-28
+
+- **Secciones del panel reorganizadas:** «Tu Tienda» pasa a llamarse **Perfil**. **Ventas** deja de ser una
+  pestaña propia y vive dentro de Perfil (sección «Ventas» con la gráfica y el acceso al punto de venta y al
+  registro; `/panel/ventas` sigue en la misma dirección, así que los QR impresos funcionan igual, y marca
+  «Perfil» en la navegación). Se retiran **Clasificación** y **Licencia** del panel: sus direcciones llevan a
+  Perfil y sus enlaces se quitan (acciones rápidas, «Ranking actual», credencial de la licencia, Misiones). No se
+  borra ningún dato ni tabla. Nueva sección **Tienda Clan** (`/panel/tienda-clan`) para mostrar productos para
+  vender, marcada «Próximamente» porque aún no hay productos.
+- Barra inferior del teléfono: Perfil · Misiones · Tienda Clan · Recompensas · Más (contraseña, administración y
+  salir). Pestañas de escritorio: Perfil · Recompensas · Misiones · Tienda Clan.
+
 ## 0.9.0 — 2026-10-24
 
 - **Tu tienda interactiva:** «Cómo ganar XP» pasa a «Misiones de hoy» (pestañas Diarias · Semanales · Mensuales,

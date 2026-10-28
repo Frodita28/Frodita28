@@ -131,7 +131,7 @@ export const TEXTOS_CLASIFICACION = {
 } as const;
 
 /**
- * Textos de la parte interactiva de Tu tienda (misiones de hoy, racha, siguiente jugada,
+ * Textos de la parte interactiva de Perfil (misiones de hoy, racha, siguiente jugada,
  * acciones rápidas) y de la navegación móvil del panel.
  */
 export const TEXTOS_TIENDA = {
@@ -167,21 +167,19 @@ export const TEXTOS_TIENDA = {
   accionesTitulo: "Acciones rápidas",
   accionPos: "Abrir punto de venta",
   accionMisiones: "Mis misiones",
-  accionClasificacion: "Clasificación",
+  accionTiendaClan: "Tienda Clan",
   accionRecompensas: "Recompensas",
-  sinPosicion: "Sin posición aún",
+  proximamente: "Próximamente",
 } as const;
 
 /** Navegación inferior del panel en el teléfono. */
 export const TEXTOS_NAV = {
-  tienda: "Tienda",
+  perfil: "Perfil",
   misiones: "Misiones",
-  ventas: "Ventas",
-  clasificacion: "Clasificación",
+  tiendaClan: "Tienda Clan",
   mas: "Más",
   masTitulo: "Más opciones",
   recompensas: "Recompensas",
-  licencia: "Licencia",
   contrasena: "Cambiar contraseña",
   administracion: "Administración",
   salir: "Salir",

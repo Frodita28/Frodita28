@@ -16,7 +16,6 @@ export const TEXTOS_LICENCIA_TIENDA = {
   contratoRegistrado: "Registrado",
   plan: "Plan",
   sinPlan: "Plan por asignar",
-  verTerminos: "Ver términos y beneficios",
   sinLicencia:
     "Tu tienda todavía no tiene una licencia activa. Gallo Negro revisa cada solicitud y activa la licencia después de formalizar el contrato y el pago.",
   /** Días antes del cierre en que la vigencia se marca como por vencer. */

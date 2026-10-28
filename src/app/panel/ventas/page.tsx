@@ -53,7 +53,7 @@ export default async function SalesPage({ searchParams }: PageProps<"/panel/vent
         <Flash ok={sp.ok} error={sp.error} variant="panel" />
         <PageBanner title="Ventas de tu tienda">
           Cada prenda que sale se registra escaneando su QR. La venta queda registrada al instante, la prenda sale de tu stock
-          y cuenta para Tu Tienda y tus misiones.
+          y cuenta para tu Perfil y tus misiones.
         </PageBanner>
       </div>
 

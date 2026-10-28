@@ -34,12 +34,12 @@ ver [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md) §6 (panel de Supabase + SQL Editor
 Flujo de licencias: el admin crea la cuenta (como solicitante) y la persona envía su solicitud en `/panel/solicitud`; el admin la revisa en
 `/admin/solicitudes` (en revisión, pedir correcciones, aprobar con plan o rechazar) y, con contrato y pago
 formalizados, activa la licencia desde la misma solicitud. Los planes y sus beneficios se editan en `/admin/planes`.
-Cada licenciado opera una tienda virtual: su inicio es **Tu Tienda** (`/panel`), con ventas, XP, rango, stock,
+Cada licenciado opera una tienda virtual: su inicio es **Perfil** (`/panel`), con ventas, XP, rango, stock,
 prendas vendidas, total generado e inversión. El admin registra entregas de prendas e inversiones en `/admin/tiendas`.
 
 Ventas: el admin entrega prendas con **QR único y precio** desde `/admin/etiquetas` e imprime las etiquetas. La tienda
-vende en **Ventas** (`/panel/ventas`) escaneando cada QR con la cámara del móvil (o escribiendo el código): al cerrar
-la venta la prenda sale del stock y cuenta al instante para Tu Tienda y las misiones. Un QR no se vende dos veces.
+vende en **Ventas** (`/panel/ventas`, dentro de Perfil) escaneando cada QR con la cámara del móvil (o escribiendo el código): al cerrar
+la venta la prenda sale del stock y cuenta al instante para Perfil y las misiones. Un QR no se vende dos veces.
 
 ## Pruebas
 
@@ -57,7 +57,7 @@ la venta la prenda sale del stock y cuenta al instante para Tu Tienda y las misi
 supabase/migrations/   esquema, funciones y políticas RLS (fuente de verdad de las reglas)
 supabase/seed.sql      planes provisionales, categorías, productos DEMO, las misiones de la spec (sin D09, retirada), niveles e insignias
 src/app/page.tsx       página pública (marca, modelo, planes, preguntas frecuentes, contacto)
-src/app/panel/         panel del solicitante y licenciado (Tu Tienda, misiones, punto de venta)
+src/app/panel/         panel del solicitante y licenciado (Perfil con ventas, misiones, recompensas, Tienda Clan)
 scripts/               SQL único de instalación y creación manual de cuentas
 src/app/admin/         panel administrativo (usuarios, solicitudes, misiones, evidencias, ventas, etiquetas QR, licencias, tiendas, planes, XP, auditoría)
 src/lib/               cliente Supabase, sesión, utilidades
