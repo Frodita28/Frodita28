@@ -4,53 +4,62 @@ Alcance: todo lo que se ve dentro del panel (`/panel/*` y el cambio de contrase�
 administración (`/admin`), el acceso y la página pública conservan su estilo anterior (tokens `obsidian`, `ivory`,
 `bronze`… en `globals.css`) y no se tocaron.
 
-Principio: streetwear premium con claridad de app financiera. Oscuro, sobrio, pocos colores, números siempre legibles.
+Principio: tema «Mando Central» (referencia: Gallo Negro Mando Central V2.6, oct 2026). Monocromo: fondo casi negro,
+tarjetas gris oscuro con borde fino y esquinas muy redondeadas, texto blanco, botones y pills blancos con texto negro.
+Sin amarillo ni rojo de acento (sustituye las reglas de acento amarillo/rojo/verde anteriores, a pedido de Fernando
+el 28 oct 2026).
 
 ## Tokens (`src/app/globals.css`, bloque `:root`)
 
 | Token | Valor | Alias Tailwind | Uso |
 |---|---|---|---|
-| `--bg` | `#0B0B0C` | `bg-bg`, `text-bg` | Fondo de página; texto sobre amarillo |
-| `--surface` | `#141416` | `bg-surface` | Tarjetas |
-| `--surface-2` | `#1C1C1F` | `bg-surface-2` | Capas dentro de tarjetas, hover |
-| `--border` | `#2A2A2E` | `border-line` | Bordes de 1 px |
-| `--text` | `#F5F5F4` | `text-fg` | Texto principal |
-| `--text-2` | `#A1A1A6` | `text-fg-2` | Texto secundario (mínimo permitido para texto) |
-| `--text-3` | `#6B6B72` | `text-fg-3` | Solo placeholders y subrayados decorativos (3.5:1) |
-| `--accent` | `#E9B824` | `accent` | Pestaña activa, botón principal, barras, destacados |
-| `--brand-red` | `#E5484D` | `brand-red` | Borde del banner de página y alertas |
-| `--success` | `#3FB950` | `success` | Metas alcanzadas |
-| `--radius` | `4px` | `rounded-ui` | Esquinas |
-| `--font-heading` | Barlow Condensed | `font-title` | Títulos, pestañas, botones |
-| `--font-body` | Inter | `font-text` | Texto y cifras |
+| `--bg` | `#121212` | `bg-bg`, `text-bg` | Fondo de página, cabecera y barra inferior |
+| `--surface` | `#1A1A1A` | `bg-surface` | Tarjetas |
+| `--surface-2` | `#262626` | `bg-surface-2` | Hover, pista de las barras, esqueletos de carga |
+| `--inset` | `#000000` | `bg-inset` | Bloques negros dentro de tarjetas (`ui-card-inset`), badges neutros |
+| `--border` | `#2A2A2A` | `border-line` | Bordes de 1 px |
+| `--text` | `#FFFFFF` | `text-fg` | Texto principal |
+| `--text-2` | `#A3A3A3` | `text-fg-2` | Texto secundario (mínimo permitido para texto) |
+| `--text-3` | `#737373` | `text-fg-3` | Solo placeholders y detalles decorativos |
+| `--accent` | `#FFFFFF` | `accent` | Botón principal, pestaña y filtro activos, barras de progreso (siempre con texto negro encima) |
+| `--accent-hover` | `#E5E5E5` | `accent-hover` | Hover del botón principal |
+| `--brand-red` | `#D4D4D4` | `brand-red` | Nombre heredado: borde de alertas y detalles de emblemas, ahora gris claro |
+| `--success` | `#FFFFFF` | `success` | Nombre heredado: metas alcanzadas, ahora blanco |
+| `--radius` | `12px` | `rounded-ui` | Botones, filtros, campos, bloques internos |
+| `--radius-card` | `16px` | `rounded-card` | Tarjetas, acordeones y tablas |
+| `--font-heading` | Inter 800-900 | `font-title` | Títulos en mayúsculas |
+| `--font-body` | Inter | `font-text` | Texto, botones y cifras |
+| `--font-mono` | JetBrains Mono | `font-code` (`ui-mono`) | Etiquetas técnicas: badges neutros («Lote #4092», «1000 PGN») |
 
-Las fuentes se cargan con `next/font` (display swap) en `src/app/panel/fonts.ts`, solo en las rutas del panel,
-y escriben directamente `--font-heading` y `--font-body`.
+Las fuentes se cargan con `next/font` (display swap) en `src/app/panel/fonts.ts`, solo en las rutas del panel;
+escriben `--font-body` y `--font-mono`, y `.gn-panel` apunta `--font-heading` a la misma Inter.
 
-Contraste medido (WCAG): texto 18:1 / 16.9:1 / 15.6:1 sobre bg / surface / surface-2; texto-2 7.7 / 7.2 / 6.6;
-amarillo 10.6 / 9.9 / 9.2; texto oscuro sobre amarillo 10.6; verde 7.7 / 7.2 / 6.7. El rojo solo se usa en bordes e
-iconos (sobre surface-2 daría 4.3:1, por eso nunca como color de texto).
+Contraste medido (WCAG): blanco 18.7:1 / 17.4:1 / 15.1:1 sobre bg / surface / surface-2; texto-2 7.4:1 / 6.9:1 / 6:1
+(8.3:1 sobre negro); negro sobre botón blanco 21:1. Al no haber color, los estados se distinguen por relleno (blanco
+sólido = activo o destacado), por iconos (alerta, check) y por texto.
 
 ## Utilidades (`@utility` en `globals.css`)
 
-- Tipografía: `ui-title-page` (`clamp()` de 32 a 44 px), `ui-title-section` (24 px), `ui-title-card` (20 px), `ui-label`
-  (12 px mayúsculas), `ui-num` (Inter 600, `tabular-nums`), `ui-link`.
-- Superficies: `ui-card`, `ui-card-inset`.
-- Botones (mín. 44 px): `ui-btn-primary`, `ui-btn-secondary`, `ui-btn-sm`.
+- Tipografía: `ui-title-page` (`clamp()` de 24 a 32 px, Inter 900 mayúsculas), `ui-title-section` (18 px, 800 mayúsculas),
+  `ui-title-card` (18 px, 700), `ui-label` (12 px mayúsculas), `ui-num` (Inter 600, `tabular-nums`), `ui-mono`, `ui-link`.
+- Superficies: `ui-card` (16 px de radio), `ui-card-inset` (bloque negro).
+- Botones (mín. 44 px, Inter 700 sin mayúsculas): `ui-btn-primary` (blanco, texto negro), `ui-btn-secondary` (gris con borde), `ui-btn-sm`.
 - Formularios: `ui-input` (16 px para que iOS no haga zoom), `ui-field-label`.
-- Navegación: `ui-tab` (pestañas del panel y selector de plan), `ui-chip` (filtros dentro de una página).
+- Navegación: `ui-tab` (pestañas del panel y selector de plan; activa en blanco), `ui-chip` (filtros dentro de una página; activo
+  relleno blanco con texto negro, como «Todos» en la referencia).
 - Tabla: `ui-table-wrap` + `ui-table` (cabecera pequeña en mayúsculas, filas con línea fina).
 - Listas horizontales: `gn-snap-x` (scroll-snap por elemento, deja ver el siguiente).
-- Raíz `.gn-panel`: resaltado táctil sutil, texto base de 15 px, foco amarillo de 2 px, placeholders y apertura suave de `<details>`;
+- Raíz `.gn-panel`: resaltado táctil sutil, texto base de 15 px, foco blanco de 2 px, placeholders y apertura suave de `<details>`;
   respeta `prefers-reduced-motion`.
 
 ## Componentes
 
-- `src/components/club.tsx`: `StoreShell` (cabecera con avatar enmarcado según el rango y botón «Cambiar
+- `src/components/club.tsx`: `StoreShell` (cabecera con logo blanco «GN», «GALLO NEGRO» y subtítulo gris en mayúsculas, avatar enmarcado según el rango y botón «Cambiar
   contraseña» junto a «Salir» + pestañas + contenido a 1152 px, secciones a 48 px), `panelTabs(role)`, `ROLE_LABEL`.
 - `src/components/club-tabs.tsx`: pestañas con `aria-current` (solo desde 768 px).
 - Móvil primero (< 768 px): cabecera compacta (logo, tienda truncada y avatar), `bottom-nav.tsx` (barra
-  inferior Tienda · Misiones · Ventas · Clasificación · Más, con punto amarillo si hay diarias pendientes,
+  inferior Tienda · Misiones · Ventas · Clasificación · Más: iconos de 20 px y etiquetas de 11 px en mayúsculas,
+  gris y blanco la activa; punto blanco si hay diarias pendientes,
   `src/lib/panel-nav.ts`), `bottom-sheet.tsx` (panel inferior en móvil y ventana en escritorio sobre `<dialog>`,
   cierre visible y al tocar fuera), `rank-mini-bar.tsx` (mini barra fija de rango al desplazarse en Tu tienda).
   `main` deja sitio al final para la barra (`env(safe-area-inset-bottom)`). Las tablas pasan a listas de dos
@@ -58,8 +67,9 @@ iconos (sobre surface-2 daría 4.3:1, por eso nunca como color de texto).
 - Tu tienda: `tienda-juego.tsx` («Misiones de hoy», racha, «Tu siguiente jugada» y panel de evidencia; cálculos
   en `src/lib/misiones-hoy.ts`, coordinación del vuelo «+N XP» con el hero en `src/lib/xp-celebracion.ts`) y
   `acciones-rapidas.tsx`. Textos en `TEXTOS_TIENDA` y `TEXTOS_NAV` de `src/content/rangos.ts`.
-- `src/components/ui.tsx`: `PageBanner`, `SectionHeader`, `StatCard`, `Figure`, `ProgressBar` (8 px, % a la
-  derecha, verde al llegar a la meta), `Badge` (neutral, accent, success, alert), `Accordion`, `Alert`,
+- `src/components/ui.tsx`: `PageBanner` (sin borde lateral), `SectionHeader`, `StatCard`, `Figure`, `ProgressBar` (8 px
+  redondeada, blanca sobre gris, % a la derecha), `Badge` (neutral: monoespaciada sobre negro; accent: blanca con texto
+  negro; success y alert: borde claro), `Accordion`, `Alert`,
   `ComingSoon`, `EmptyState`.
 - Rangos (contenido y cifras en `src/content/rangos.ts`, cálculo en `src/lib/rangos.ts`):
   `src/components/rangos.tsx` (`RankEmblem`, `RankAvatar` con el marco de cada rango, `RankBadge`,
@@ -73,7 +83,7 @@ iconos (sobre surface-2 daría 4.3:1, por eso nunca como color de texto).
 - `Flash` acepta `variant="panel"`.
 - Iconos: `src/components/icons.tsx` (SVG lineal propio, trazo 1.75 px, sin emojis).
 
-## Auditoría previa (22 oct 2026)
+## Auditoría previa (22 oct 2026, antes del tema «Mando Central»)
 
 Estilos sueltos que había en el panel y dónde:
 
@@ -96,3 +106,6 @@ Estilos sueltos que había en el panel y dónde:
 - Las cifras de ventas (`money()` de `src/lib/store.ts`) siguen en formato es-VE (1.500,00) sin símbolo de moneda:
   la moneda de las ventas no está configurada y `money()` también lo usa admin. La Licencia ya muestra "$1,500 USD".
 - `ApplicationStatusPill` y `ApplicationTimeline` (Mi solicitud) se comparten con admin y conservan su estilo.
+
+- Algunos textos de contenido describen colores del tema anterior (p. ej. «Marco amarillo», «detalle rojo» en
+  `src/content/rangos.ts`); no se tocaron porque el cambio de tema fue solo visual.

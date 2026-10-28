@@ -86,24 +86,30 @@ body {
    Sistema de diseño del panel de licenciatarios.
    Fuente única de los tokens: aquí se definen colores, radio y fuentes;
    el resto del panel solo usa estas variables o las utilidades de abajo.
-   Las fuentes reales (Barlow Condensed e Inter) las inyecta next/font en
-   src/app/panel/fonts.ts sobre --font-heading y --font-body.
+   Tema «Mando Central»: monocromo (casi negro, grises y blanco), tarjetas
+   muy redondeadas y botones blancos con texto negro.
+   Las fuentes reales (Inter y JetBrains Mono) las inyecta next/font en
+   src/app/panel/fonts.ts sobre --font-heading, --font-body y --font-mono.
    ===================================================================== */
 
 :root {
-  --bg: #0b0b0c;
-  --surface: #141416;
-  --surface-2: #1c1c1f;
-  --border: #2a2a2e;
-  --text: #f5f5f4;
-  --text-2: #a1a1a6;
-  --text-3: #6b6b72;
-  --accent: #e9b824;
-  --brand-red: #e5484d;
-  --success: #3fb950;
-  --radius: 4px;
-  --font-heading: "Barlow Condensed", "Oswald", sans-serif;
+  --bg: #121212;
+  --surface: #1a1a1a;
+  --surface-2: #262626;
+  --inset: #000000;
+  --border: #2a2a2a;
+  --text: #ffffff;
+  --text-2: #a3a3a3;
+  --text-3: #737373;
+  --accent: #ffffff;
+  --accent-hover: #e5e5e5;
+  --brand-red: #d4d4d4;
+  --success: #ffffff;
+  --radius: 12px;
+  --radius-card: 16px;
+  --font-heading: "Inter", system-ui, sans-serif;
   --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 /* Alias de Tailwind para los tokens: bg-surface, text-fg-2, border-line, font-title… */
@@ -111,21 +117,26 @@ body {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-inset: var(--inset);
   --color-line: var(--border);
   --color-fg: var(--text);
   --color-fg-2: var(--text-2);
   --color-fg-3: var(--text-3);
   --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
   --color-brand-red: var(--brand-red);
   --color-success: var(--success);
   --radius-ui: var(--radius);
+  --radius-card: var(--radius-card);
   --font-title: var(--font-heading);
   --font-text: var(--font-body);
+  --font-code: var(--font-mono);
 }
 
-/* Raíz del panel: fondo, tipografía base (15 px), foco amarillo y apertura suave de acordeones. */
+/* Raíz del panel: fondo, tipografía base (15 px), foco blanco y apertura suave de acordeones. */
 .gn-panel {
-  -webkit-tap-highlight-color: rgb(233 184 36 / 0.12);
+  --font-heading: var(--font-body);
+  -webkit-tap-highlight-color: rgb(255 255 255 / 0.08);
   background-color: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
@@ -168,19 +179,24 @@ body {
 /* ---------- Tipografía ---------- */
 
 @utility ui-title-page {
-  @apply font-title text-[clamp(2rem,9vw,2.75rem)] leading-none font-bold tracking-[0.02em] uppercase;
+  @apply font-title text-[clamp(1.5rem,6.5vw,2rem)] leading-tight font-black tracking-[-0.02em] uppercase;
 }
 
 @utility ui-title-section {
-  @apply font-title text-2xl leading-tight font-bold tracking-[0.02em] uppercase;
+  @apply font-title text-lg leading-tight font-extrabold tracking-[-0.01em] uppercase;
 }
 
 @utility ui-title-card {
-  @apply font-title text-xl leading-tight font-bold tracking-[0.02em] uppercase;
+  @apply font-title text-lg leading-tight font-bold tracking-[-0.01em];
 }
 
 @utility ui-label {
-  @apply text-xs leading-tight font-medium tracking-[0.06em] text-fg-2 uppercase;
+  @apply text-xs leading-tight font-semibold tracking-[0.04em] text-fg-2 uppercase;
+}
+
+/* Etiquetas técnicas en monoespaciada: «Lote #4092», «1000 PGN», códigos. */
+@utility ui-mono {
+  @apply font-code tracking-normal;
 }
 
 @utility ui-num {
@@ -188,42 +204,43 @@ body {
 }
 
 @utility ui-link {
-  @apply text-fg underline decoration-fg-3 underline-offset-4 transition-colors duration-150 hover:decoration-accent;
+  @apply text-fg underline decoration-fg-3 underline-offset-4 transition-colors duration-150 hover:decoration-fg;
 }
 
 /* ---------- Superficies ---------- */
 
 @utility ui-card {
-  @apply rounded-ui border border-line bg-surface p-4 sm:p-6;
+  @apply rounded-card border border-line bg-surface p-4 sm:p-5;
 }
 
+/* Bloque negro dentro de una tarjeta (detalle de pack, cifras del perfil). */
 @utility ui-card-inset {
-  @apply rounded-ui border border-line bg-surface-2 p-4;
+  @apply rounded-ui border border-line bg-inset p-4;
 }
 
 /* ---------- Botones (mínimo 44 px de alto) ---------- */
 
 @utility ui-btn {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-ui px-4 font-title text-lg leading-none font-bold tracking-[0.02em] uppercase transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-ui px-4 font-text text-[15px] leading-none font-bold tracking-normal transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 @utility ui-btn-primary {
-  @apply ui-btn bg-accent text-bg hover:bg-accent/90;
+  @apply ui-btn bg-accent text-black hover:bg-accent-hover;
 }
 
 @utility ui-btn-secondary {
-  @apply ui-btn border border-line bg-transparent text-fg hover:border-fg-2 hover:bg-surface-2;
+  @apply ui-btn border border-line bg-surface text-fg hover:border-fg-2 hover:bg-surface-2;
 }
 
 /* Acción secundaria pequeña dentro de listas y tablas (44 px en móvil, 36 px en escritorio). */
 @utility ui-btn-sm {
-  @apply ui-btn-secondary px-3 font-text text-[13px] font-medium tracking-normal normal-case sm:min-h-9;
+  @apply ui-btn-secondary px-3 font-text text-[13px] font-semibold tracking-normal normal-case sm:min-h-9;
 }
 
 /* ---------- Formularios ---------- */
 
 @utility ui-input {
-  @apply min-h-11 w-full rounded-ui border border-line bg-bg px-3 py-2 text-base text-fg transition-colors duration-150 focus:border-accent focus:outline-none;
+  @apply min-h-11 w-full rounded-ui border border-line bg-bg px-3 py-2 text-base text-fg transition-colors duration-150 focus:border-fg-2 focus:outline-none;
 }
 
 @utility ui-field-label {
@@ -233,38 +250,40 @@ body {
 /* ---------- Navegación ---------- */
 
 @utility ui-tab {
-  @apply inline-flex min-h-11 items-center gap-2 rounded-ui px-3 font-title text-lg leading-none font-bold tracking-[0.02em] whitespace-nowrap text-fg-2 uppercase transition-colors duration-150 hover:bg-surface-2 hover:text-fg sm:px-4;
+  @apply inline-flex min-h-11 items-center gap-2 rounded-ui px-3 font-text text-xs leading-none font-bold tracking-[0.04em] whitespace-nowrap text-fg-2 uppercase transition-colors duration-150 hover:bg-surface-2 hover:text-fg sm:px-4;
   &[aria-current="page"],
   &[aria-pressed="true"],
   &[aria-current="page"]:hover,
   &[aria-pressed="true"]:hover {
     background-color: var(--accent);
-    color: var(--bg);
+    color: #000;
   }
 }
 
 /* Filtro secundario dentro de una página (misiones, escalones…). */
 @utility ui-chip {
-  @apply inline-flex min-h-11 items-center gap-1 rounded-ui border border-line px-3 text-[13px] font-medium tracking-[0.04em] whitespace-nowrap text-fg-2 uppercase transition-colors duration-150 hover:border-fg-2 hover:text-fg sm:min-h-9;
+  @apply inline-flex min-h-11 items-center gap-1 rounded-ui border border-line bg-surface px-3 text-[13px] font-medium whitespace-nowrap text-fg-2 transition-colors duration-150 hover:border-fg-2 hover:text-fg sm:min-h-9;
   &[aria-current="page"],
   &[aria-pressed="true"],
   &[aria-current="page"]:hover,
   &[aria-pressed="true"]:hover {
     border-color: var(--accent);
-    color: var(--accent);
+    background-color: var(--accent);
+    color: #000;
+    font-weight: 700;
   }
 }
 
 /* ---------- Tabla ---------- */
 
 @utility ui-table-wrap {
-  @apply relative overflow-x-auto rounded-ui border border-line bg-surface;
+  @apply relative overflow-x-auto rounded-card border border-line bg-surface;
 }
 
 @utility ui-table {
   @apply w-full text-left text-[15px];
   & th {
-    @apply border-b border-line px-4 py-3 text-xs font-medium tracking-[0.06em] whitespace-nowrap text-fg-2 uppercase;
+    @apply border-b border-line px-4 py-3 text-xs font-semibold tracking-[0.04em] whitespace-nowrap text-fg-2 uppercase;
   }
   & td {
     @apply border-b border-line px-4 py-3 align-top;

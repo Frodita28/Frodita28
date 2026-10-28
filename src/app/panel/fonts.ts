@@ -1,17 +1,10 @@
-import { Barlow_Condensed, Inter } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
 /**
- * Fuentes del panel de licenciatarios. Se cargan solo en las rutas del panel y
- * escriben directamente los tokens --font-heading y --font-body (ver globals.css).
+ * Fuentes del panel de licenciatarios (tema «Mando Central»). Se cargan solo en las rutas
+ * del panel y escriben directamente los tokens --font-body y --font-mono (ver globals.css).
+ * Los títulos (--font-heading) usan la misma Inter en peso 800-900 y mayúsculas.
  */
-const heading = Barlow_Condensed({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  weight: ["600", "700"],
-  display: "swap",
-  fallback: ["Oswald", "sans-serif"],
-});
-
 const body = Inter({
   variable: "--font-body",
   subsets: ["latin"],
@@ -19,4 +12,12 @@ const body = Inter({
   fallback: ["system-ui", "sans-serif"],
 });
 
-export const panelFonts = `${heading.variable} ${body.variable}`;
+const mono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["500", "700"],
+  display: "swap",
+  fallback: ["ui-monospace", "monospace"],
+});
+
+export const panelFonts = `${body.variable} ${mono.variable}`;
