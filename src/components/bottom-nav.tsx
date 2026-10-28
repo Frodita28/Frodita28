@@ -23,7 +23,7 @@ function activa(pathname: string, hrefs: string[]) {
 }
 
 /**
- * Barra inferior fija del teléfono (< 768 px): Tienda · Misiones · Ventas (central, amarilla) ·
+ * Barra inferior fija del teléfono (< 768 px): Tienda · Misiones · Ventas ·
  * Clasificación · Más. «Más» abre un panel inferior con el resto de secciones y la sesión.
  */
 export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes: boolean; isAdmin: boolean }) {
@@ -44,7 +44,7 @@ export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes:
         aria-label="Secciones"
         className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)] md:hidden print:hidden"
       >
-        <ul className="mx-auto grid max-w-lg grid-cols-[1fr_1fr_68px_1fr_1fr]">
+        <ul className="mx-auto grid max-w-lg grid-cols-5">
           {PRINCIPALES.slice(0, 2).map((i) => (
             <NavItem key={i.href} item={i} active={current === i.href} dot={i.href === "/panel/misiones" && misionesPendientes} />
           ))}
@@ -52,12 +52,10 @@ export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes:
             <Link
               href="/panel/ventas"
               aria-current={current === "/panel/ventas" ? "page" : undefined}
-              className={`-mt-4 flex min-h-[60px] w-16 flex-col items-center justify-center gap-0.5 rounded-ui border-4 border-bg bg-accent text-bg ${
-                current === "/panel/ventas" ? "ring-2 ring-accent" : ""
-              }`}
+              className={`flex min-h-16 w-full flex-col items-center justify-center gap-1.5 ${current === "/panel/ventas" ? "text-fg" : "text-fg-2"}`}
             >
-              <Icon name="qr" className="h-6 w-6" />
-              <span className="text-xs leading-none font-semibold">{T.ventas}</span>
+              <Icon name="qr" className="h-5 w-5" />
+              <span className="text-[11px] leading-none font-bold tracking-[0.04em] uppercase">{T.ventas}</span>
             </Link>
           </li>
           <NavItem item={PRINCIPALES[3]} active={current === "/panel/clasificacion"} />
@@ -67,10 +65,10 @@ export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes:
               onClick={() => setMas(true)}
               aria-haspopup="dialog"
               aria-expanded={mas}
-              className={`flex min-h-14 w-full flex-col items-center justify-center gap-1 ${enMas ? "text-accent" : "text-fg-2"}`}
+              className={`flex min-h-16 w-full flex-col items-center justify-center gap-1.5 ${enMas ? "text-fg" : "text-fg-2"}`}
             >
-              <Icon name="more" className="h-6 w-6" />
-              <span className="text-xs leading-none font-medium">{T.mas}</span>
+              <Icon name="more" className="h-5 w-5" />
+              <span className="text-[11px] leading-none font-bold tracking-[0.04em] uppercase">{T.mas}</span>
             </button>
           </li>
         </ul>
@@ -84,7 +82,7 @@ export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes:
                 href={i.href}
                 onClick={() => setMas(false)}
                 aria-current={current === i.href ? "page" : undefined}
-                className="flex min-h-12 items-center gap-3 rounded-ui px-2 text-[16px] hover:bg-surface-2 aria-[current=page]:text-accent"
+                className="flex min-h-12 items-center gap-3 rounded-ui px-2 text-[16px] hover:bg-surface-2 aria-[current=page]:font-bold"
               >
                 <Icon name={i.icon} className="h-5 w-5 shrink-0" />
                 <span className="flex-1">{i.label}</span>
@@ -112,13 +110,13 @@ function NavItem({ item, active, dot }: { item: Item; active: boolean; dot?: boo
       <Link
         href={item.href}
         aria-current={active ? "page" : undefined}
-        className={`flex min-h-14 flex-col items-center justify-center gap-1 ${active ? "text-accent" : "text-fg-2"}`}
+        className={`flex min-h-16 flex-col items-center justify-center gap-1.5 ${active ? "text-fg" : "text-fg-2"}`}
       >
         <span className="relative">
-          <Icon name={item.icon} className="h-6 w-6" />
+          <Icon name={item.icon} className="h-5 w-5" />
           {dot && <span className="absolute -top-0.5 -right-1 h-2 w-2 rounded-full bg-accent" aria-hidden />}
         </span>
-        <span className="max-w-full truncate px-0.5 text-xs leading-none font-medium tracking-tight">{item.label}</span>
+        <span className="max-w-full truncate px-0.5 text-[11px] leading-none font-bold tracking-[0.04em] uppercase">{item.label}</span>
         {dot && <span className="sr-only">{T.misionesPendientes}</span>}
       </Link>
     </li>

@@ -58,21 +58,21 @@ export function StoreShell({
       <header className="border-b border-line bg-bg pt-[env(safe-area-inset-top)] print:hidden">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2 md:gap-4 md:px-6 md:py-4">
           <Link href="/panel" className="flex min-w-0 items-center gap-3 rounded-ui">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-ui bg-accent font-title text-xl font-bold text-bg">GN</span>
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-ui bg-accent font-title text-lg font-black text-black">GN</span>
             {/* Teléfono: nombre de la tienda junto al logo. */}
             <span className="min-w-0 md:hidden">
-              <span className="ui-label block">Gallo Negro</span>
-              <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[15px] leading-tight font-semibold">
+              <span className="block font-title text-[15px] leading-tight font-extrabold uppercase">Gallo Negro</span>
+              <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[11px] leading-tight font-bold tracking-[0.08em] text-fg-2 uppercase">
                 <span className="truncate">{storeName}</span>
                 {rango.nivel === 5 && <MaxRankInsignia />}
               </span>
             </span>
             <span className="hidden min-w-0 md:block">
               <span className="flex items-center gap-2">
-                <span className="font-title text-2xl leading-none font-bold tracking-[0.02em] uppercase">Gallo Negro</span>
+                <span className="font-title text-lg leading-none font-extrabold uppercase">Gallo Negro</span>
                 <Badge>Licencias</Badge>
               </span>
-              <span className="ui-label mt-1 block">Club de licenciatarios</span>
+              <span className="mt-1 block text-[11px] leading-tight font-bold tracking-[0.08em] text-fg-2 uppercase">Club de licenciatarios</span>
             </span>
           </Link>
           <div className="flex shrink-0 items-center gap-3">

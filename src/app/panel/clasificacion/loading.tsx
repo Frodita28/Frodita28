@@ -2,7 +2,7 @@
 export default function Loading() {
   return (
     <div className="flex flex-col gap-8 motion-safe:animate-pulse" role="status" aria-label="Cargando">
-      <div className="space-y-3 border-l-4 border-brand-red pl-4 sm:pl-6">
+      <div className="space-y-3 ">
         <div className="h-10 w-64 max-w-full rounded-ui bg-surface-2" />
         <div className="h-4 w-full max-w-xl rounded-ui bg-surface" />
       </div>

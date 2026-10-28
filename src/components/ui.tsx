@@ -7,13 +7,13 @@ import { Icon, type IconName } from "./icons";
  * guía completa en docs/DESIGN_SYSTEM.md.
  */
 
-/** Banner de página: título grande, subtítulo en gris y borde izquierdo rojo (uno por página). */
+/** Banner de página: título en mayúsculas y subtítulo en gris (uno por página). */
 export function PageBanner({ title, aside, children }: { title: string; aside?: React.ReactNode; children?: React.ReactNode }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-6 border-l-4 border-brand-red py-1 pl-4 sm:pl-6">
+    <div className="flex flex-wrap items-end justify-between gap-6 py-1">
       <div className="min-w-0 max-w-3xl">
         <h1 className="ui-title-page [overflow-wrap:anywhere]">{title}</h1>
-        {children && <div className="mt-3 text-base text-fg-2">{children}</div>}
+        {children && <div className="mt-1 text-[15px] text-fg-2">{children}</div>}
       </div>
       {aside}
     </div>
@@ -85,7 +85,7 @@ export function Figure({ label, value }: { label: string; value: React.ReactNode
   );
 }
 
-/** Barra de progreso de 8 px: amarilla, porcentaje a la derecha y verde al alcanzar la meta. */
+/** Barra de progreso de 8 px: blanca sobre gris, porcentaje a la derecha. */
 export function ProgressBar({
   value,
   target,
@@ -105,7 +105,7 @@ export function ProgressBar({
   return (
     <div className="flex items-center gap-3">
       <div
-        className="h-2 flex-1 overflow-hidden rounded-ui bg-surface-2"
+        className="h-2 flex-1 overflow-hidden rounded-full bg-surface-2"
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
@@ -113,7 +113,7 @@ export function ProgressBar({
         aria-label={label}
       >
         <div
-          className={`h-full rounded-ui transition-[width,background-color] duration-200 ${reached ? "bg-success" : "bg-accent"}`}
+          className={`h-full rounded-full transition-[width,background-color] duration-200 ${reached ? "bg-success" : "bg-accent"}`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -127,17 +127,17 @@ export function ProgressBar({
 }
 
 const BADGE_TONE = {
-  neutral: "border-line text-fg-2",
-  accent: "border-accent text-accent",
-  success: "border-success text-success",
-  alert: "border-brand-red text-fg",
+  neutral: "border-line bg-inset font-code text-fg-2 normal-case tracking-normal",
+  accent: "border-accent bg-accent font-bold text-black",
+  success: "border-success text-success font-bold",
+  alert: "border-brand-red text-fg font-bold",
 } as const;
 export type BadgeTone = keyof typeof BADGE_TONE;
 
-/** Badge: rectángulo pequeño con borde y texto en mayúsculas de 12 px. */
+/** Badge: etiqueta pequeña de 12 px (neutral en monoespaciada sobre negro; accent blanca con texto negro). */
 export function Badge({ tone = "neutral", children }: { tone?: BadgeTone; children: React.ReactNode }) {
   return (
-    <span className={`inline-flex min-h-6 items-center gap-1 rounded-[2px] border px-2 py-1 text-xs leading-tight font-medium tracking-[0.04em] uppercase ${BADGE_TONE[tone]}`}>
+    <span className={`inline-flex min-h-6 items-center gap-1 rounded-[6px] border px-2 py-1 text-xs leading-tight font-medium tracking-[0.02em] uppercase ${BADGE_TONE[tone]}`}>
       {children}
     </span>
   );
@@ -156,10 +156,10 @@ export function Accordion({
   children: React.ReactNode;
 }) {
   return (
-    <details className="group rounded-ui border border-line bg-surface" open={defaultOpen}>
-      <summary className="flex min-h-14 cursor-pointer list-none items-center gap-4 rounded-ui px-4 py-3 transition-colors duration-150 hover:bg-surface-2 sm:px-6 [&::-webkit-details-marker]:hidden">
+    <details className="group rounded-card border border-line bg-surface" open={defaultOpen}>
+      <summary className="flex min-h-14 cursor-pointer list-none items-center gap-4 rounded-card px-4 py-3 transition-colors duration-150 hover:bg-surface-2 sm:px-6 [&::-webkit-details-marker]:hidden">
         {index !== undefined && <span className="ui-num w-6 shrink-0 text-[15px] text-fg-2">{String(index).padStart(2, "0")}</span>}
-        <span className="min-w-0 flex-1 font-title text-lg leading-tight font-bold tracking-[0.02em] uppercase">{title}</span>
+        <span className="min-w-0 flex-1 font-title text-base leading-tight font-extrabold uppercase">{title}</span>
         <Icon name="chevronDown" className="h-5 w-5 shrink-0 text-fg-2 transition-transform duration-200 group-open:rotate-180" />
       </summary>
       <div className={`px-4 pb-4 sm:px-6 ${index !== undefined ? "sm:pl-16" : ""}`}>{children}</div>
@@ -167,10 +167,10 @@ export function Accordion({
   );
 }
 
-/** Alerta: borde izquierdo rojo, icono y texto legible. */
+/** Alerta: borde izquierdo claro, icono y texto legible. */
 export function Alert({ children }: { children: React.ReactNode }) {
   return (
-    <div role="alert" className="flex items-start gap-3 rounded-ui border border-line border-l-4 border-l-brand-red bg-surface p-4 text-[15px]">
+    <div role="alert" className="flex items-start gap-3 rounded-card border border-line border-l-4 border-l-brand-red bg-surface p-4 text-[15px]">
       <Icon name="alert" className="mt-0.5 h-5 w-5 shrink-0 text-brand-red" />
       <div className="min-w-0">{children}</div>
     </div>
@@ -180,8 +180,8 @@ export function Alert({ children }: { children: React.ReactNode }) {
 /** Aviso de algo que aún no existe en la plataforma (sin datos de ejemplo). */
 export function ComingSoon({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-ui border border-dashed border-line p-4 sm:p-6">
-      <p className="mb-2 flex flex-wrap items-center gap-2 font-title text-lg leading-tight font-bold tracking-[0.02em] uppercase">
+    <div className="rounded-card border border-dashed border-line p-4 sm:p-6">
+      <p className="mb-2 flex flex-wrap items-center gap-2 font-title text-base leading-tight font-extrabold uppercase">
         {title}
         <Badge>Próximamente</Badge>
       </p>
