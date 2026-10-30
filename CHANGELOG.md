@@ -23,6 +23,9 @@
 - **Licencia vuelve** (`/panel/licencia`, mismo contenido de antes) con los acentos dorados de Perfil; va al final
   de «Más», debajo de «Salir» (pestaña en escritorio). Su enlace a Clasificación pasa a Ruta de rangos.
 - Barra inferior: Perfil · Recompensas · Tienda Clan · Misiones · Más (Recompensas y Misiones cambian de lugar).
+- **Licencia simplificada:** se quitan «Tu inversión en números» y el simulador de recuperación (con el selector
+  de plan); «Cláusulas que dan confianza» pasa a «Cláusulas para ti», sin las cláusulas 03-05, y «Salida y
+  renovación» pasa a ser la cláusula 03 con sus pasos.
 
 ## 0.10.0 — 2026-10-28
 

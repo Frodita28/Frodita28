@@ -3,14 +3,12 @@ import { Accordion, Badge, PageBanner, SectionHeader } from "@/components/ui";
 import { Icon } from "@/components/icons";
 import { licencia } from "@/content/licencia";
 import { requireUser } from "@/lib/auth";
-import { PlanSimulador } from "./plan-simulador";
 
 export const metadata = { title: "Licencia" };
 
 export default async function LicensePage() {
   await requireUser("/panel/licencia");
-  // Los planes de la base (Plan 1-4) aún no tienen equivalencia confirmada con estos planes, así que no se preselecciona.
-  const { encabezado, beneficios, reconocimiento, clausulas, salida, pie } = licencia;
+  const { encabezado, beneficios, reconocimiento, clausulas, pie } = licencia;
 
   return (
     <>
@@ -27,8 +25,6 @@ export default async function LicensePage() {
           )}
         </div>
       </div>
-
-      <PlanSimulador planInicial={licencia.selectorPlan.planInicial} />
 
       <section>
         <SectionHeader title={beneficios.titulo} />
@@ -74,23 +70,18 @@ export default async function LicensePage() {
           {clausulas.lista.map((c, i) => (
             <Accordion key={c.titulo} index={i + 1} title={c.titulo}>
               <p className="text-fg-2">{c.texto}</p>
+              {c.pasos && (
+                <ol className="mt-3 space-y-3">
+                  {c.pasos.map((p, j) => (
+                    <li key={p} className="flex gap-3">
+                      <span className="ui-num w-6 shrink-0 text-gold">{String(j + 1).padStart(2, "0")}</span>
+                      <span className="text-fg-2">{p}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
             </Accordion>
           ))}
-        </div>
-      </section>
-
-      <section>
-        <SectionHeader title={salida.titulo} />
-        <div className="ui-card">
-          <p className="font-medium">{salida.intro}</p>
-          <ol className="mt-4 space-y-3">
-            {salida.pasos.map((p, i) => (
-              <li key={p} className="flex gap-3">
-                <span className="ui-num w-6 shrink-0 text-gold">{String(i + 1).padStart(2, "0")}</span>
-                <span className="text-fg-2">{p}</span>
-              </li>
-            ))}
-          </ol>
         </div>
       </section>
 
