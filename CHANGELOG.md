@@ -16,6 +16,10 @@
   «¡Listo para vender!»; indicadores con icono dorado, figura y mini gráfico de tendencia con la variación frente
   al mes anterior; ventas como línea dorada con puntos (`sales-line.tsx`). Token nuevo `--gold` (#d4a94f), solo en
   acentos; la pestaña activa de la barra inferior va en dorado.
+- **Ajustes de Perfil:** el botón del punto de venta muestra solo el QR y «¡Listo para vender!»; las tarjetas de
+  indicadores ya no llevan textos debajo (solo se avisa si hay stock negativo); la gráfica de Ventas tiene selector
+  1M (por días, últimos 30) · 3M · 6M · 1A (por mes; `store_summary` pide 12 meses). La tarjeta de rango lleva a la
+  nueva página **Ruta de rangos** (`/panel/rangos`), que sale de Perfil y pasa al menú «Más» (pestaña en escritorio).
 
 ## 0.10.0 — 2026-10-28
 

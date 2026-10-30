@@ -4,9 +4,9 @@ import { requireUser } from "@/lib/auth";
 import { parseBoard, xpToNextPlace } from "@/lib/leaderboard";
 import { canSubmitEvidence, isPeriodOpen, todayIn, type Frequency, type ParticipationStatus } from "@/lib/missions";
 import { ultimos7Dias, type MisionHoy } from "@/lib/misiones-hoy";
-import { parseStoreSummary } from "@/lib/store";
+import { parseStoreSummary, puntosDiarios } from "@/lib/store";
 import { createClient } from "@/lib/supabase/server";
-import { daysAgoIso } from "@/lib/time";
+import { DEFAULT_TZ, daysAgoIso, utcToZonedLocal } from "@/lib/time";
 import { getMyTotalXp } from "@/lib/xp";
 import { PerfilView } from "./perfil-view";
 
@@ -48,7 +48,7 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
-    supabase.rpc("store_summary", { p_user: user.id, p_months: 6 }),
+    supabase.rpc("store_summary", { p_user: user.id, p_months: 12 }),
     supabase.rpc("store_leaderboard", { p_limit: 200 }),
     // La política de la tabla solo entrega las misiones activas que aplican a la tienda.
     supabase
@@ -61,6 +61,13 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
     supabase.rpc("refresh_my_missions"),
   ]);
   // Participaciones del período actual y de las últimas semanas (para la racha), con sus evidencias.
+  // Ventas verificadas de los últimos 31 días, para la vista «1 mes» de la gráfica de Perfil.
+  const ventasMes = supabase
+    .from("sales")
+    .select("sold_at, sale_items(quantity, unit_price)")
+    .eq("licensee_id", user.id)
+    .eq("status", "verified")
+    .gte("sold_at", daysAgoIso(31));
   const { data: partData } = await supabase
     .from("mission_participations")
     .select(
@@ -70,6 +77,17 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
     .gte("period_end", daysAgoIso(62))
     .order("period_start", { ascending: false });
   const parts = (partData ?? []) as unknown as PartRow[];
+  const { data: ventasData } = await ventasMes;
+  const porDia = new Map<string, { revenue: number; units: number }>();
+  for (const v of (ventasData ?? []) as unknown as { sold_at: string; sale_items: { quantity: number; unit_price: number }[] }[]) {
+    const dia = utcToZonedLocal(new Date(v.sold_at), DEFAULT_TZ).slice(0, 10);
+    const acc = porDia.get(dia) ?? { revenue: 0, units: 0 };
+    for (const i of v.sale_items) {
+      acc.revenue += Number(i.quantity) * Number(i.unit_price);
+      acc.units += Number(i.quantity);
+    }
+    porDia.set(dia, acc);
+  }
 
   const s = parseStoreSummary(rawSummary);
   const board = parseBoard(rawBoard);
@@ -149,6 +167,7 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
       flash={{ ok: sp.ok, error: sp.error ?? (refreshError ? "No se pudieron actualizar tus misiones" : undefined) }}
       storeName={storeName}
       summary={s}
+      ventasDiarias={puntosDiarios(porDia, todayIn(DEFAULT_TZ), 30)}
       ranking={me ? { place: me.place, tiendas: board.length, next } : null}
       totalXp={totalXp}
       misiones={misiones}

@@ -21,6 +21,7 @@ export function panelTabs(role: Role): ClubTab[] {
     { href: "/panel/recompensas", label: "Recompensas", icon: "gift" },
     { href: "/panel/misiones", label: "Misiones", icon: "flag" },
     { href: "/panel/tienda-clan", label: "Tienda Clan", icon: "bag" },
+    { href: "/panel/rangos", label: "Ruta de rangos", icon: "podium" },
     ...(role === "admin" ? [{ href: "/admin", label: "Administración", icon: "gear" } as const] : []),
   ];
 }

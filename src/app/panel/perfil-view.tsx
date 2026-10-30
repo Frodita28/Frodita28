@@ -5,19 +5,17 @@ import { Flash } from "@/components/flash";
 import { Icon, type IconName } from "@/components/icons";
 import { LicenseCard, type LicenseCardData } from "@/components/license-card";
 import { RankCompact } from "@/components/rank-compact";
-import { RankRoute } from "@/components/rank-route";
-import { RankUnlocks } from "@/components/rank-unlocks";
-import { SalesLine } from "@/components/sales-line";
+import { VentasPanel } from "@/components/sales-line";
 import { TiendaJuego, type DiaRacha } from "@/components/tienda-juego";
-import { formatXp } from "@/lib/missions";
 import type { MisionHoy } from "@/lib/misiones-hoy";
-import { estadoRango } from "@/lib/rangos";
-import { money, units, type StoreSummary } from "@/lib/store";
+import { money, puntosMensuales, units, type PuntoVentas, type StoreSummary } from "@/lib/store";
 
 export type PerfilData = {
   flash: { ok?: string | string[]; error?: string | string[] };
   storeName: string;
   summary: StoreSummary;
+  /** Ventas por día de los últimos 30 días (vista «1 mes» de la gráfica). */
+  ventasDiarias: PuntoVentas[];
   /** Puesto en la clasificación (null sin licencia activa). */
   ranking: { place: number; tiendas: number; next: { gap: number; place: number } | null } | null;
   totalXp: number;
@@ -39,6 +37,7 @@ export function PerfilView({
   flash,
   storeName,
   summary,
+  ventasDiarias,
   ranking,
   totalXp,
   misiones,
@@ -50,8 +49,6 @@ export function PerfilView({
   license,
   today,
 }: PerfilData) {
-  const nivel = estadoRango(totalXp).rango.nivel;
-  const variacion = variacionMensual(summary.monthly.map((m) => m.revenue));
   const pendientes = misiones.filter((m) => m.status !== null && m.status !== "completed").length;
 
   return (
@@ -81,73 +78,42 @@ export function PerfilView({
           </div>
         </section>
 
-        {/* Acceso principal: grande, con borde dorado y fácil de pulsar. */}
+        {/* Acceso principal: solo el QR y «¡Listo para vender!», grande y fácil de pulsar. */}
         <Link
           href="/panel/ventas"
-          className="group flex min-h-24 items-stretch overflow-hidden rounded-card border border-gold/70 bg-gradient-to-r from-[#1c160b] to-black shadow-[0_0_24px_-8px_var(--gold)] transition-colors hover:border-gold"
+          aria-label="Punto de venta y registro"
+          className="group flex min-h-24 items-center gap-4 rounded-card border border-gold/70 bg-gradient-to-r from-[#1c160b] to-black p-4 shadow-[0_0_24px_-8px_var(--gold)] transition-colors hover:border-gold sm:p-5"
         >
-          <span className="flex flex-1 items-center gap-4 p-4 sm:p-5">
-            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-ui border border-line bg-black">
-              <Icon name="qr" className="h-7 w-7 text-gold" />
-            </span>
-            <span className="min-w-0 flex-1 font-title text-[clamp(0.95rem,4.2vw,1.25rem)] leading-tight font-extrabold uppercase">Punto de venta y registro</span>
-            <Icon name="chevronRight" className="h-6 w-6 shrink-0 text-gold transition-transform group-hover:translate-x-1" />
+          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-ui border border-line bg-black">
+            <Icon name="qr" className="h-7 w-7 text-gold" />
           </span>
-          <span className="hidden w-28 shrink-0 flex-col items-center justify-center gap-2 border-l border-gold/40 bg-black/40 px-3 text-center text-[13px] text-gold min-[360px]:flex">
-            <Icon name="bag" className="h-6 w-6" />
+          <span className="flex min-w-0 flex-1 items-center gap-2 font-title text-[clamp(1.05rem,5vw,1.375rem)] leading-tight font-extrabold text-gold">
+            <Icon name="bag" className="h-6 w-6 shrink-0" />
             ¡Listo para vender!
           </span>
+          <Icon name="chevronRight" className="h-6 w-6 shrink-0 text-gold transition-transform group-hover:translate-x-1" />
         </Link>
 
         <section aria-label="Indicadores del negocio" className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
           <Kpi label="Total generado" icon="chartUp" value={money(summary.revenue)} glow>
-            <p className="text-[13px] text-fg-2">{variacion}</p>
-            <Sparkline values={summary.monthly.map((m) => m.revenue)} />
+            <Sparkline values={summary.monthly.slice(-6).map((m) => m.revenue)} />
           </Kpi>
-          <Kpi label="Prendas vendidas" icon="box" value={new Intl.NumberFormat("es-VE").format(summary.unitsSold)} figure="shirt">
-            <p className="text-[13px] text-fg-2">{units(summary.unitsSold)}</p>
-          </Kpi>
+          <Kpi label="Prendas vendidas" icon="box" value={new Intl.NumberFormat("es-VE").format(summary.unitsSold)} figure="shirt" />
           <Kpi label="Stock actual" icon="box" value={new Intl.NumberFormat("es-VE").format(Math.max(summary.stockBalance, 0))} figure="store">
-            <p className="text-[13px] text-fg-2">
-              {summary.stockBalance < 0 ? (
-                <span className="flex items-start gap-2 text-fg">
-                  <Icon name="alert" className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-                  {units(-summary.stockBalance)} sin entrega registrada
-                </span>
-              ) : summary.unitsDelivered === 0 ? (
-                "Sin entregas registradas"
-              ) : (
-                `${units(summary.unitsDelivered)} recibidas`
-              )}
-            </p>
+            {/* Solo se avisa si hay ventas sin entrega registrada (stock negativo). */}
+            {summary.stockBalance < 0 && (
+              <p className="flex items-start gap-2 text-[13px] text-fg">
+                <Icon name="alert" className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+                {units(-summary.stockBalance)} sin entrega
+              </p>
+            )}
           </Kpi>
-          <Kpi label="Ranking" icon="trophy" value={ranking ? `#${ranking.place}` : "—"} figure="crown">
-            <p className="text-[13px] text-fg-2">
-              {!ranking
-                ? "Con licencia activa"
-                : ranking.next
-                  ? `A ${formatXp(ranking.next.gap)} del #${ranking.next.place}`
-                  : `De ${ranking.tiendas} ${ranking.tiendas === 1 ? "tienda" : "tiendas"}`}
-            </p>
-          </Kpi>
+          <Kpi label="Ranking" icon="trophy" value={ranking ? `#${ranking.place}` : "—"} figure="crown" />
         </section>
 
         <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
-          {/* Ventas vive dentro de Perfil: gráfica y acceso al punto de venta y al registro de ventas. */}
-          <section className="ui-card" aria-labelledby="ventas-titulo">
-            <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0">
-                <h2 id="ventas-titulo" className="flex items-center gap-2 ui-title-section">
-                  <Icon name="chartBars" className="h-6 w-6 text-gold" /> Ventas
-                </h2>
-                <p className="mt-1 text-[15px] text-fg-2">Últimos 6 meses</p>
-              </div>
-              <Link href="/panel/ventas" className="ui-btn-sm min-h-11">
-                Ver registro <Icon name="chevronRight" className="h-4 w-4" />
-              </Link>
-            </div>
-            <SalesLine months={summary.monthly} />
-          </section>
+          {/* Ventas vive dentro de Perfil: gráfica con selector de período y acceso al registro. */}
+          <VentasPanel diarias={ventasDiarias} mensuales={puntosMensuales(summary.monthly)} />
           <RankCompact totalXp={totalXp} />
         </div>
 
@@ -171,27 +137,11 @@ export function PerfilView({
           />
         </Accordion>
 
-        <Accordion title="Ruta de rangos">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-            <RankRoute nivelActual={nivel} />
-            <RankUnlocks nivelActual={nivel} />
-          </div>
-        </Accordion>
       </div>
 
       <LicenseCard license={license} today={today} />
     </>
   );
-}
-
-/** Texto de la variación del último mes frente al anterior («+12 % vs. mes anterior»). */
-function variacionMensual(valores: number[]): string {
-  if (valores.length < 2) return "Ventas registradas";
-  const actual = valores[valores.length - 1];
-  const anterior = valores[valores.length - 2];
-  if (anterior === 0) return actual > 0 ? "Primer mes con ventas" : "+0 % vs. mes anterior";
-  const pct = Math.round(((actual - anterior) / anterior) * 100);
-  return `${pct >= 0 ? "+" : "−"}${Math.abs(pct)} % vs. mes anterior`;
 }
 
 /** Tarjeta de indicador del tema de Perfil: icono dorado, cifra grande y figura opcional abajo a la derecha. */
@@ -221,7 +171,7 @@ function Kpi({
         <span className="min-w-0">{label}</span>
       </p>
       <p className="ui-num mt-3 text-[clamp(1.5rem,7vw,2.25rem)] leading-none font-bold [overflow-wrap:anywhere]">{value}</p>
-      <div className={`mt-2 flex flex-col gap-2 ${figure ? "pr-12" : ""}`}>{children}</div>
+      {children && <div className={`mt-2 flex flex-col gap-2 ${figure ? "pr-12" : ""}`}>{children}</div>}
       {figure && (
         <span className="absolute right-3 bottom-3 grid h-11 w-11 place-items-center rounded-ui border border-line bg-surface-2" aria-hidden>
           <Icon name={figure} className="h-6 w-6 text-fg-2" />

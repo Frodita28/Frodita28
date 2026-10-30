@@ -31,6 +31,7 @@ export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes:
   const pathname = usePathname();
   const [mas, setMas] = useState(false);
   const extras: Item[] = [
+    { href: "/panel/rangos", label: T.rutaRangos, icon: "podium" },
     { href: "/nueva-clave", label: T.contrasena, icon: "key" },
     ...(isAdmin ? [{ href: "/admin", label: T.administracion, icon: "gear" } as const] : []),
   ];
