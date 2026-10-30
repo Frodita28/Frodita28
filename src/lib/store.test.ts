@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { monthLabel, niceMax, parseStoreSummary } from "./store";
+import { monthLabel, niceMax, parseStoreSummary, puntosDiarios } from "./store";
 
 describe("parseStoreSummary", () => {
   it("deja en cero lo que falte, sin inventar datos", () => {
@@ -37,5 +37,22 @@ describe("utilidades de la gráfica", () => {
   it("nombra los meses en español", () => {
     assert.equal(monthLabel("2026-10"), "oct");
     assert.equal(monthLabel("2026-01", true), "enero de 2026");
+  });
+});
+
+describe("puntosDiarios", () => {
+  it("da un punto por día hasta hoy y deja en 0 los días sin ventas", () => {
+    const p = puntosDiarios(new Map([["2026-10-28", { revenue: 50, units: 2 }]]), "2026-10-30", 30);
+    assert.equal(p.length, 30);
+    assert.equal(p[0].key, "2026-10-01");
+    assert.equal(p[29].key, "2026-10-30");
+    assert.deepEqual([p[27].revenue, p[27].units], [50, 2]);
+    assert.equal(p[29].revenue, 0);
+    assert.equal(p[27].largo, "28 de octubre");
+  });
+
+  it("cruza meses y años", () => {
+    const p = puntosDiarios(new Map(), "2026-01-02", 3);
+    assert.deepEqual(p.map((x) => x.key), ["2025-12-31", "2026-01-01", "2026-01-02"]);
   });
 });

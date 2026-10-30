@@ -45,7 +45,7 @@ export type Beneficio = {
   aplicaA: string;
 };
 
-export type Clausula = { titulo: string; texto: string };
+export type Clausula = { titulo: string; texto: string; pasos?: string[] };
 
 const AMBOS = "Ambos planes";
 
@@ -200,14 +200,14 @@ export const licencia = {
       "No se paga ni se da puntos por reclutar otros licenciatarios.",
     ],
     enlaces: [
-      { href: "/panel/clasificacion", texto: "Clasificación", icono: "podium" },
+      { href: "/panel/rangos", texto: "Ruta de rangos", icono: "podium" },
       { href: "/panel/misiones", texto: "Misiones", icono: "flag" },
       { href: "/panel/recompensas", texto: "Recompensas", icono: "gift" },
     ] as const,
   },
 
   clausulas: {
-    titulo: "Cláusulas que dan confianza",
+    titulo: "Cláusulas para ti",
     lista: [
       {
         titulo: "Reglas por escrito",
@@ -215,35 +215,15 @@ export const licencia = {
           "Cómo se calculan los puntos, las fechas de corte y los desempates está publicado y no cambia a mitad de un período sin aviso previo.",
       },
       {
-        titulo: "Simulador de recuperación",
-        texto:
-          "Puedes calcular cuánto necesitas vender para recuperar tu inversión. Las cifras salen directamente de tu contrato.",
-      },
-      {
-        titulo: "Cero pagos por reclutar",
-        texto:
-          "Gallo Negro no paga ni da puntos por traer nuevos licenciatarios. Solo se reconoce la venta real de prendas.",
-      },
-      {
-        titulo: "Margen garantizado, sin promesas de ventas",
-        texto:
-          "Te garantizamos el margen mínimo sobre el precio de venta sugerido. No prometemos un volumen de ventas ni ganancias: lo que vendas depende de tu trabajo y de tu mercado.",
-      },
-      {
-        titulo: "Salida clara",
-        texto: "Al terminar tus 12 meses puedes renovar o salir, sin penalización. Te avisamos 30 días antes del cierre.",
+        titulo: "Salida y renovación",
+        texto: "Si decides no renovar:",
+        pasos: [
+          "Gallo Negro te recompra el sobrante según el beneficio 2.",
+          "Tienes 60 días para liquidar el resto del inventario respetando el PVP mínimo.",
+          "Tu información de ventas queda disponible durante ese plazo.",
+        ],
       },
     ] satisfies Clausula[] as Clausula[],
-  },
-
-  salida: {
-    titulo: "Salida y renovación",
-    intro: "Si decides no renovar:",
-    pasos: [
-      "Gallo Negro te recompra el sobrante según el beneficio 2.",
-      "Tienes 60 días para liquidar el resto del inventario respetando el PVP mínimo.",
-      "Tu información de ventas queda disponible durante ese plazo.",
-    ],
   },
 
   pie: {

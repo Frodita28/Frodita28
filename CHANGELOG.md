@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.11.0 — 2026-10-28
+
+- **Perfil con enfoque comercial:** debajo de la cabecera va el botón grande «Punto de venta y registro» (ancho
+  completo en el teléfono) y los cuatro indicadores del negocio: Total generado (con la inversión), Prendas
+  vendidas, Stock actual y Ranking (2×2 en el teléfono, 4 en fila en escritorio). Después, Ventas (gráfica) y
+  una tarjeta compacta de rango (medallón pequeño, XP y barra) en lugar del hero grande de rango.
+- «Misiones de hoy» (con racha y siguiente jugada) y la ruta de rangos pasan a acordeones plegados. Se quitan de
+  Perfil las acciones rápidas, la tarjeta «Tu squad / equipo» (Próximamente) y la mini barra de rango. La
+  animación de subida de rango del hero desaparece con él; el «+N XP» vuela ahora hasta la tarjeta de rango.
+- La página se separa en datos (`page.tsx`) y vista (`perfil-view.tsx`).
+- Ícono nuevo de Perfil: credencial con foto (`idCard`).
+- **Tema del mockup de Perfil:** banner de bienvenida con el gallo (`public/perfil/gallo-banner.jpg`, recortado
+  del mockup) y «Disciplina también es hacer crecer tu negocio.»; botón del punto de venta con borde dorado y
+  «¡Listo para vender!»; indicadores con icono dorado, figura y mini gráfico de tendencia con la variación frente
+  al mes anterior; ventas como línea dorada con puntos (`sales-line.tsx`). Token nuevo `--gold` (#d4a94f), solo en
+  acentos; la pestaña activa de la barra inferior va en dorado.
+- **Ajustes de Perfil:** el botón del punto de venta muestra solo el QR y «¡Listo para vender!»; las tarjetas de
+  indicadores ya no llevan textos debajo (solo se avisa si hay stock negativo); la gráfica de Ventas tiene selector
+  1M (por días, últimos 30) · 3M · 6M · 1A (por mes; `store_summary` pide 12 meses). La tarjeta de rango lleva a la
+  nueva página **Ruta de rangos** (`/panel/rangos`), que sale de Perfil y pasa al menú «Más» (pestaña en escritorio).
+- **Licencia vuelve** (`/panel/licencia`, mismo contenido de antes) con los acentos dorados de Perfil; va al final
+  de «Más», debajo de «Salir» (pestaña en escritorio). Su enlace a Clasificación pasa a Ruta de rangos.
+- Barra inferior: Perfil · Recompensas · Tienda Clan · Misiones · Más (Recompensas y Misiones cambian de lugar).
+- **Licencia simplificada:** se quitan «Tu inversión en números» y el simulador de recuperación (con el selector
+  de plan); «Cláusulas que dan confianza» pasa a «Cláusulas para ti», sin las cláusulas 03-05, y «Salida y
+  renovación» pasa a ser una cláusula con sus pasos. También se quita la cláusula «Simulador de recuperación».
+
 ## 0.10.0 — 2026-10-28
 
 - **Secciones del panel reorganizadas:** «Tu Tienda» pasa a llamarse **Perfil**. **Ventas** deja de ser una

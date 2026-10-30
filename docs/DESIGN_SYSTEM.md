@@ -61,19 +61,20 @@ sólido = activo o destacado), por iconos (alerta, check) y por texto.
   inferior Perfil · Misiones · Tienda Clan · Recompensas · Más: iconos de 20 px y etiquetas de 11 px en mayúsculas,
   gris y blanco la activa; punto blanco si hay diarias pendientes,
   `src/lib/panel-nav.ts`), `bottom-sheet.tsx` (panel inferior en móvil y ventana en escritorio sobre `<dialog>`,
-  cierre visible y al tocar fuera), `rank-mini-bar.tsx` (mini barra fija de rango al desplazarse en Tu tienda).
+  cierre visible y al tocar fuera), `rank-compact.tsx` (tarjeta compacta de rango en Perfil).
   `main` deja sitio al final para la barra (`env(safe-area-inset-bottom)`). Las tablas pasan a listas de dos
   líneas en móvil (ventas, historial de XP).
-- Tu tienda: `tienda-juego.tsx` («Misiones de hoy», racha, «Tu siguiente jugada» y panel de evidencia; cálculos
-  en `src/lib/misiones-hoy.ts`, coordinación del vuelo «+N XP» con el hero en `src/lib/xp-celebracion.ts`) y
-  `acciones-rapidas.tsx`. Textos en `TEXTOS_TIENDA` y `TEXTOS_NAV` de `src/content/rangos.ts`.
+- Perfil (`/panel`, vista en `src/app/panel/perfil-view.tsx`): botón del punto de venta, 4 indicadores, ventas y
+  `rank-compact.tsx`; en acordeones plegados `tienda-juego.tsx` («Misiones de hoy», racha, «Tu siguiente jugada» y
+  panel de evidencia; cálculos en `src/lib/misiones-hoy.ts`, vuelo «+N XP» hasta la tarjeta de rango con
+  `src/lib/xp-celebracion.ts`) y la ruta de rangos. Textos en `TEXTOS_TIENDA` y `TEXTOS_NAV` de `src/content/rangos.ts`.
 - `src/components/ui.tsx`: `PageBanner` (sin borde lateral), `SectionHeader`, `StatCard`, `Figure`, `ProgressBar` (8 px
   redondeada, blanca sobre gris, % a la derecha), `Badge` (neutral: monoespaciada sobre negro; accent: blanca con texto
   negro; success y alert: borde claro), `Accordion`, `Alert`,
   `ComingSoon`, `EmptyState`.
 - Rangos (contenido y cifras en `src/content/rangos.ts`, cálculo en `src/lib/rangos.ts`):
   `src/components/rangos.tsx` (`RankEmblem`, `RankAvatar` con el marco de cada rango, `RankBadge`,
-  `MaxRankInsignia`, `Embers`), `rank-hero.tsx` (anillo radial, «+N XP» y subida de rango), `rank-route.tsx`
+  `MaxRankInsignia`, `Embers`), `rank-compact.tsx` (tarjeta compacta), `rank-route.tsx`
   (ruta de rangos), `rank-unlocks.tsx` («Liberado en tu rango»).
 - `src/components/license-card.tsx`: credencial de la licencia en Tu tienda (textos en `src/content/licencia-tienda.ts`).
 - Ventas vive dentro de Perfil (`/panel/ventas`, sin pestaña propia). Tienda Clan (`/panel/tienda-clan`) está en

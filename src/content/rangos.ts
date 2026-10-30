@@ -180,6 +180,8 @@ export const TEXTOS_NAV = {
   mas: "Más",
   masTitulo: "Más opciones",
   recompensas: "Recompensas",
+  rutaRangos: "Ruta de rangos",
+  licencia: "Licencia",
   contrasena: "Cambiar contraseña",
   administracion: "Administración",
   salir: "Salir",
