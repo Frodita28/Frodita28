@@ -215,11 +215,6 @@ export const licencia = {
           "Cómo se calculan los puntos, las fechas de corte y los desempates está publicado y no cambia a mitad de un período sin aviso previo.",
       },
       {
-        titulo: "Simulador de recuperación",
-        texto:
-          "Puedes calcular cuánto necesitas vender para recuperar tu inversión. Las cifras salen directamente de tu contrato.",
-      },
-      {
         titulo: "Salida y renovación",
         texto: "Si decides no renovar:",
         pasos: [

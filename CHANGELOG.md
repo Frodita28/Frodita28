@@ -25,7 +25,7 @@
 - Barra inferior: Perfil · Recompensas · Tienda Clan · Misiones · Más (Recompensas y Misiones cambian de lugar).
 - **Licencia simplificada:** se quitan «Tu inversión en números» y el simulador de recuperación (con el selector
   de plan); «Cláusulas que dan confianza» pasa a «Cláusulas para ti», sin las cláusulas 03-05, y «Salida y
-  renovación» pasa a ser la cláusula 03 con sus pasos.
+  renovación» pasa a ser una cláusula con sus pasos. También se quita la cláusula «Simulador de recuperación».
 
 ## 0.10.0 — 2026-10-28
 
