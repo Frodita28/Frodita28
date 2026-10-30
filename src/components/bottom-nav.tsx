@@ -98,7 +98,7 @@ function NavItem({ item, active, dot }: { item: Item; active: boolean; dot?: boo
       <Link
         href={item.href}
         aria-current={active ? "page" : undefined}
-        className={`flex min-h-16 flex-col items-center justify-center gap-1.5 ${active ? "text-fg" : "text-fg-2"}`}
+        className={`flex min-h-16 flex-col items-center justify-center gap-1.5 ${active ? "text-gold" : "text-fg-2"}`}
       >
         <span className="relative">
           <Icon name={item.icon} className="h-5 w-5" />

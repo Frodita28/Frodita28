@@ -11,6 +11,11 @@
   animación de subida de rango del hero desaparece con él; el «+N XP» vuela ahora hasta la tarjeta de rango.
 - La página se separa en datos (`page.tsx`) y vista (`perfil-view.tsx`).
 - Ícono nuevo de Perfil: credencial con foto (`idCard`).
+- **Tema del mockup de Perfil:** banner de bienvenida con el gallo (`public/perfil/gallo-banner.jpg`, recortado
+  del mockup) y «Disciplina también es hacer crecer tu negocio.»; botón del punto de venta con borde dorado y
+  «¡Listo para vender!»; indicadores con icono dorado, figura y mini gráfico de tendencia con la variación frente
+  al mes anterior; ventas como línea dorada con puntos (`sales-line.tsx`). Token nuevo `--gold` (#d4a94f), solo en
+  acentos; la pestaña activa de la barra inferior va en dorado.
 
 ## 0.10.0 — 2026-10-28
 
