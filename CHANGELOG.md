@@ -20,6 +20,9 @@
   indicadores ya no llevan textos debajo (solo se avisa si hay stock negativo); la gráfica de Ventas tiene selector
   1M (por días, últimos 30) · 3M · 6M · 1A (por mes; `store_summary` pide 12 meses). La tarjeta de rango lleva a la
   nueva página **Ruta de rangos** (`/panel/rangos`), que sale de Perfil y pasa al menú «Más» (pestaña en escritorio).
+- **Licencia vuelve** (`/panel/licencia`, mismo contenido de antes) con los acentos dorados de Perfil; va al final
+  de «Más», debajo de «Salir» (pestaña en escritorio). Su enlace a Clasificación pasa a Ruta de rangos.
+- Barra inferior: Perfil · Recompensas · Tienda Clan · Misiones · Más (Recompensas y Misiones cambian de lugar).
 
 ## 0.10.0 — 2026-10-28
 

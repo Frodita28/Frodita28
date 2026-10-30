@@ -13,9 +13,9 @@ type Item = { href: string; label: string; icon: IconName };
 // Ventas (/panel/ventas) vive dentro de Perfil: al estar en ella se marca «Perfil».
 const PRINCIPALES: Item[] = [
   { href: "/panel", label: T.perfil, icon: "idCard" },
-  { href: "/panel/misiones", label: T.misiones, icon: "flag" },
-  { href: "/panel/tienda-clan", label: T.tiendaClan, icon: "bag" },
   { href: "/panel/recompensas", label: T.recompensas, icon: "gift" },
+  { href: "/panel/tienda-clan", label: T.tiendaClan, icon: "bag" },
+  { href: "/panel/misiones", label: T.misiones, icon: "flag" },
 ];
 
 /** Sección activa: la ruta más específica que coincide. */
@@ -24,8 +24,8 @@ function activa(pathname: string, hrefs: string[]) {
 }
 
 /**
- * Barra inferior fija del teléfono (< 768 px): Perfil · Misiones · Tienda Clan ·
- * Recompensas · Más. «Más» abre un panel inferior con el resto de secciones y la sesión.
+ * Barra inferior fija del teléfono (< 768 px): Perfil · Recompensas · Tienda Clan ·
+ * Misiones · Más. En «Más»: Ruta de rangos, contraseña, administración, Salir y, al final, Licencia. «Más» abre un panel inferior con el resto de secciones y la sesión.
  */
 export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes: boolean; isAdmin: boolean }) {
   const pathname = usePathname();
@@ -35,8 +35,10 @@ export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes:
     { href: "/nueva-clave", label: T.contrasena, icon: "key" },
     ...(isAdmin ? [{ href: "/admin", label: T.administracion, icon: "gear" } as const] : []),
   ];
-  const current = activa(pathname, [...PRINCIPALES, ...extras].map((i) => i.href));
-  const enMas = extras.some((i) => i.href === current);
+  // Licencia va al final del panel «Más», debajo de «Salir».
+  const licencia: Item = { href: "/panel/licencia", label: T.licencia, icon: "document" };
+  const current = activa(pathname, [...PRINCIPALES, ...extras, licencia].map((i) => i.href));
+  const enMas = [...extras, licencia].some((i) => i.href === current);
 
   return (
     <>
@@ -86,6 +88,18 @@ export function BottomNav({ misionesPendientes, isAdmin }: { misionesPendientes:
                 {T.salir}
               </button>
             </form>
+          </li>
+          <li className="mt-2 border-t border-line pt-2">
+            <Link
+              href={licencia.href}
+              onClick={() => setMas(false)}
+              aria-current={current === licencia.href ? "page" : undefined}
+              className="flex min-h-12 items-center gap-3 rounded-ui px-2 text-[16px] hover:bg-surface-2 aria-[current=page]:font-bold"
+            >
+              <Icon name={licencia.icon} className="h-5 w-5 shrink-0 text-gold" />
+              <span className="flex-1">{licencia.label}</span>
+              <Icon name="chevronRight" className="h-4 w-4 text-fg-3" />
+            </Link>
           </li>
         </ul>
       </BottomSheet>

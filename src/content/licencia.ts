@@ -200,7 +200,7 @@ export const licencia = {
       "No se paga ni se da puntos por reclutar otros licenciatarios.",
     ],
     enlaces: [
-      { href: "/panel/clasificacion", texto: "Clasificación", icono: "podium" },
+      { href: "/panel/rangos", texto: "Ruta de rangos", icono: "podium" },
       { href: "/panel/misiones", texto: "Misiones", icono: "flag" },
       { href: "/panel/recompensas", texto: "Recompensas", icono: "gift" },
     ] as const,
