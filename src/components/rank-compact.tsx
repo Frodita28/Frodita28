@@ -9,8 +9,8 @@ import { ProgressBar } from "./ui";
  * Rango en una tarjeta compacta de Perfil: medallón pequeño, XP total y barra hacia el siguiente rango.
  * Toda la tarjeta lleva a la ruta de rangos; «Ganar XP» lleva a Misiones.
  */
-export function RankCompact({ totalXp }: { totalXp: number }) {
-  const { rango, siguiente, progreso, maximoCompletado } = estadoRango(totalXp);
+export function RankCompact({ totalXp, nivel = null }: { totalXp: number; nivel?: number | null }) {
+  const { rango, siguiente, progreso, maximoCompletado } = estadoRango(totalXp, undefined, nivel);
   return (
     <section className="ui-card relative flex flex-col gap-4 transition-colors hover:border-gold/60" aria-labelledby="rango-titulo">
       <div className="flex items-center gap-3">

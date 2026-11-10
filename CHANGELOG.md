@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.12.0 — 2026-11-10
+
+- **GN del club (Recompensas v3), detrás del interruptor `recompensas_v3_activa` (apagado) y una lista de prueba.**
+  Con el interruptor apagado, los licenciatarios siguen viendo las pantallas de antes (`legacy.tsx`).
+- **Libro de GN** (migración 000010): saldo en espera, disponible, retenido en canjes y por cubrir; libro de solo
+  inserción con claves de idempotencia; lotes FIFO que vencen a los 12 meses con avisos a 60 y 30 días; espera de
+  7 días con señales de fraude (ráfaga, monto repetido, mismo comprador, pico, precio) que mandan la venta a revisión.
+  Modo por prenda: 12 GN por prenda con PVP ≥ $15, tope 20 prendas/día. Misiones con GN (D01 = 12, D02 = 4, resto 0;
+  tope 20 GN/día). Devoluciones: dentro de la espera se anulan solas; después, solo el administrador.
+- **Rango con doble candado** (000011): XP + ventas verificadas + requisitos de identidad; nunca baja. Cabecera,
+  Perfil, Ruta de rangos y «siguiente jugada» muestran este mismo rango cuando el programa está activo.
+- **Tienda Clan** (000012): ediciones mensuales, niveles Calle a Élite, vista previa bloqueada, meta, hoja de canje
+  con datos de entrega, términos obligatorios, flujo de estados, límite de canjes, pausa por tope mensual de costo.
+  Secciones Catálogo · Mis canjes · Movimientos. Tres premios de demostración (solo los ve la lista de prueba).
+- **Recompensas:** tarjeta de rango con dos barras e identidad, camino de 5 rangos con hoja, beneficios, próximo
+  desbloqueo, «Cómo funciona» con ejemplos calculados desde la configuración y preguntas frecuentes.
+- **Admin › Recompensas GN** (000013): resumen y costo del mes, catálogo con ayuda en vivo y vista previa móvil,
+  cola de canjes, ventas en revisión y devoluciones, validaciones (enviada → en revisión → aprobada / rechazada /
+  requiere corrección, plazo 72 h, límite semanal, duplicados), GN por misión, licenciatarios (saldo, libro,
+  ajuste con motivo, identidad) y configuración con BORRADOR. Todo queda en la auditoría. Tarea diaria con pg_cron.
+- Chip de GN en Misiones (solo con el programa activo).
+
 ## 0.11.0 — 2026-10-28
 
 - **Perfil con enfoque comercial:** debajo de la cabecera va el botón grande «Punto de venta y registro» (ancho

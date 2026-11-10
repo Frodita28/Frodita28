@@ -40,6 +40,7 @@ export function StoreShell({
   storeName,
   roleLabel,
   totalXp,
+  nivel = null,
   misionesPendientes = false,
   isAdmin = false,
   children,
@@ -48,12 +49,14 @@ export function StoreShell({
   storeName: string;
   roleLabel: string;
   totalXp: number;
+  /** Rango del programa de GN (si está activo); si no, se calcula por XP. */
+  nivel?: number | null;
   /** Punto amarillo sobre «Misiones» en la barra inferior. */
   misionesPendientes?: boolean;
   isAdmin?: boolean;
   children: React.ReactNode;
 }) {
-  const { rango } = estadoRango(totalXp);
+  const { rango } = estadoRango(totalXp, undefined, nivel);
   return (
     <div className={`gn-panel ${panelFonts} flex min-h-full flex-1 flex-col`}>
       <header className="border-b border-line bg-bg pt-[env(safe-area-inset-top)] print:hidden">

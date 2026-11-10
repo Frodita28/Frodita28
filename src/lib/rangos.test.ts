@@ -59,3 +59,23 @@ describe("rangosAlcanzados", () => {
     assert.deepEqual(rangosAlcanzados(5000, 100), []);
   });
 });
+
+describe("estadoRango con rango compartido (GN)", () => {
+  it("muestra el nivel del programa aunque los XP den para más", () => {
+    // 6.000 XP darían Centurión por XP, pero sin ventas el rango compartido es Vigía.
+    const e = estadoRango(6000, undefined, 2);
+    assert.equal(e.rango.nivel, 2);
+    assert.equal(e.siguiente?.nivel, 3);
+    assert.equal(e.progreso, 1);
+    assert.equal(e.xpRestantes, 0);
+  });
+  it("el rango alcanzado no baja aunque los XP sean menos", () => {
+    const e = estadoRango(100, undefined, 3);
+    assert.equal(e.rango.nivel, 3);
+    assert.equal(e.xpEnRango, 0);
+    assert.equal(e.progreso, 0);
+  });
+  it("sin nivel calcula por XP como antes", () => {
+    assert.equal(estadoRango(6000, undefined, null).rango.nivel, 3);
+  });
+});

@@ -36,6 +36,8 @@ export type ParticipationRow = {
   period_end: string;
   target_value: number;
   xp_reward: number;
+  /** GN del club que da la misión (0 = ninguno). */
+  gn_reward?: number;
   current_progress: number | null;
   status: ParticipationStatus;
   evidence_url: string | null;

@@ -65,6 +65,7 @@ export function TiendaJuego({
   semana,
   hoy,
   totalXp,
+  nivel = null,
   tieneLicencia,
   userId,
   acciones,
@@ -76,6 +77,8 @@ export function TiendaJuego({
   semana: DiaRacha[];
   hoy: string;
   totalXp: number;
+  /** Rango del programa de GN (si está activo). */
+  nivel?: number | null;
   tieneLicencia: boolean;
   userId: string;
   acciones: React.ReactNode;
@@ -86,7 +89,7 @@ export function TiendaJuego({
 
   // Las evidencias en envío se ven ya «En revisión» (si el envío falla, vuelven a su estado).
   const lista = misiones.map((m) => (enviadas.includes(m.id) ? { ...m, status: "pending_review" as const, canSend: false } : m));
-  const jugada = siguienteJugada(lista, estadoRango(totalXp));
+  const jugada = siguienteJugada(lista, estadoRango(totalXp, undefined, nivel));
 
   const abrir = (m: MisionHoy) => {
     setAviso(null);

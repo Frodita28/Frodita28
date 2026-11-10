@@ -2,6 +2,7 @@ import { ROLE_LABEL, StoreShell, panelTabs } from "@/components/club";
 import { Flash } from "@/components/flash";
 import { PageBanner } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
+import { getSharedRankLevel } from "@/lib/clan-server";
 import { hayDiariasPendientes } from "@/lib/panel-nav";
 import { getMyTotalXp } from "@/lib/xp";
 import { updatePassword } from "../login/actions";
@@ -14,13 +15,14 @@ export const metadata = { title: "Cambiar contraseña" };
  */
 export default async function NewPasswordPage({ searchParams }: PageProps<"/nueva-clave">) {
   const user = await requireUser("/nueva-clave");
-  const [sp, totalXp, misionesPendientes] = await Promise.all([searchParams, getMyTotalXp(user.id), hayDiariasPendientes(user.id)]);
+  const [sp, totalXp, misionesPendientes, nivel] = await Promise.all([searchParams, getMyTotalXp(user.id), hayDiariasPendientes(user.id), getSharedRankLevel()]);
   return (
     <StoreShell
       tabs={panelTabs(user.role)}
       storeName={user.storeName ?? user.publicAlias ?? user.fullName ?? "Tu Tienda"}
       roleLabel={ROLE_LABEL[user.role]}
       totalXp={totalXp}
+      nivel={nivel}
       misionesPendientes={misionesPendientes}
       isAdmin={user.role === "admin"}
     >

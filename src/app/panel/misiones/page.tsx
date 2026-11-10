@@ -18,6 +18,8 @@ import { daysAgoIso, formatDateTime } from "@/lib/time";
 import type { EvidenceRow, LedgerRow, MissionRow, ParticipationRow } from "@/lib/types";
 import { createClient } from "@/lib/supabase/server";
 import { EvidenceForm } from "./evidence-form";
+import { formatGn } from "@/lib/gn";
+import { getRecompensasV3 } from "@/lib/gn-server";
 
 export const metadata = { title: "Misiones" };
 
@@ -41,7 +43,7 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
   const supabase = await createClient();
 
   // Abre los períodos actuales y actualiza estados (idempotente, en el servidor).
-  const { error: refreshError } = await supabase.rpc("refresh_my_missions");
+  const [{ error: refreshError }, verGn] = await Promise.all([supabase.rpc("refresh_my_missions"), getRecompensasV3()]);
 
   const since = daysAgoIso(62);
   const [{ data: rowsData }, { data: ledgerData }, { data: balance }, { data: license }] = await Promise.all([
@@ -130,7 +132,7 @@ export default async function MissionsPage({ searchParams }: PageProps<"/panel/m
         ) : (
           <div className="grid gap-4">
             {byTab[tab].map((r) => (
-              <MissionCard key={r.id} row={r} evidences={r.mission_evidences} returnTo={`/panel/misiones?tab=${tab}`} />
+              <MissionCard key={r.id} row={r} evidences={r.mission_evidences} returnTo={`/panel/misiones?tab=${tab}`} verGn={verGn} />
             ))}
           </div>
         )}
@@ -149,7 +151,7 @@ const STATUS_TONE: Record<ParticipationStatus, BadgeTone> = {
   expired: "neutral",
 };
 
-function MissionCard({ row, evidences, returnTo }: { row: Row; evidences: EvidenceRow[]; returnTo: string }) {
+function MissionCard({ row, evidences, returnTo, verGn }: { row: Row; evidences: EvidenceRow[]; returnTo: string; verGn: boolean }) {
   const m = row.missions;
   const status = row.status as ParticipationStatus;
   const progress = row.current_progress === null ? null : Number(row.current_progress);
@@ -167,6 +169,7 @@ function MissionCard({ row, evidences, returnTo }: { row: Row; evidences: Eviden
           <p className="flex flex-wrap items-center gap-2">
             <Badge>{m.category}</Badge>
             <span className="ui-num text-[13px]">+{row.xp_reward} XP</span>
+            {verGn && (row.gn_reward ?? 0) > 0 && <Badge tone="accent">+{formatGn(row.gn_reward ?? 0)}</Badge>}
             <span className="text-[13px] text-fg-2">{m.code} · {FREQUENCY_LABEL[m.frequency as Frequency]}</span>
           </p>
           <h3 className="ui-title-card mt-3">{m.title}</h3>

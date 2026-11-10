@@ -155,3 +155,7 @@ insert into public.badges (code, name, description, unlock_rule) values
   ('centurion', 'Centurión', 'Alcanzar 100 unidades vendidas.', '{"type": "verified_units", "min": 100}'),
   ('leyenda', 'Leyenda Gallo Negro', 'Completar ocho misiones semanales durante un mes.', '{"type": "mission_completed", "missions": ["M10"]}')
 on conflict (code) do nothing;
+
+-- GN por misión (Recompensas v3): solo estas dos; las demás quedan en 0 hasta que el administrador las defina.
+update public.missions set gn_reward = 12 where code = 'D01';
+update public.missions set gn_reward = 4 where code = 'D02';

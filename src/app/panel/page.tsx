@@ -1,6 +1,7 @@
 import type { LicenseCardData } from "@/components/license-card";
 import type { DiaRacha } from "@/components/tienda-juego";
 import { requireUser } from "@/lib/auth";
+import { getSharedRankLevel } from "@/lib/clan-server";
 import { parseBoard, xpToNextPlace } from "@/lib/leaderboard";
 import { canSubmitEvidence, isPeriodOpen, todayIn, type Frequency, type ParticipationStatus } from "@/lib/missions";
 import { ultimos7Dias, type MisionHoy } from "@/lib/misiones-hoy";
@@ -40,7 +41,7 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
   const sp = await searchParams;
   const user = await requireUser();
   const supabase = await createClient();
-  const [{ data: license }, { data: rawSummary }, { data: rawBoard }, { data: missionsData }, totalXp, { error: refreshError }] = await Promise.all([
+  const [{ data: license }, { data: rawSummary }, { data: rawBoard }, { data: missionsData }, totalXp, { error: refreshError }, nivel] = await Promise.all([
     supabase
       .from("licenses")
       .select("status, territory, starts_at, ends_at, contract_ref, license_plans(name, status, is_demo)")
@@ -59,6 +60,7 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
     getMyTotalXp(user.id),
     // Abre los períodos actuales y actualiza estados (lo mismo que hace /panel/misiones al cargar).
     supabase.rpc("refresh_my_missions"),
+    getSharedRankLevel(),
   ]);
   // Participaciones del período actual y de las últimas semanas (para la racha), con sus evidencias.
   // Ventas verificadas de los últimos 31 días, para la vista «1 mes» de la gráfica de Perfil.
@@ -170,6 +172,7 @@ export default async function StoreHome({ searchParams }: PageProps<"/panel">) {
       ventasDiarias={puntosDiarios(porDia, todayIn(DEFAULT_TZ), 30)}
       ranking={me ? { place: me.place, tiendas: board.length, next } : null}
       totalXp={totalXp}
+      nivel={nivel}
       misiones={misiones}
       diasConDiaria={diasConDiaria}
       semana={semana}

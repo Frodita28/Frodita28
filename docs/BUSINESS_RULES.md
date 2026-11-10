@@ -31,3 +31,19 @@
   registró. Sin datos se muestra 0. La inversión acumulada no implica ni promete retorno.
 - Recompensas: no se muestran ni se canjean hasta que Gallo Negro las apruebe; nunca canje de XP por dinero sin
   decisión expresa de la empresa.
+
+
+## GN del club (Recompensas v3)
+
+- Los GN se ganan solo con ventas verificadas y misiones, y se gastan solo en Tienda Clan. En pantalla se dice
+  «GN», «saldo», «canjear» y «premios».
+- Modo por prenda (BORRADOR: 12 GN por prenda con PVP ≥ $15, hasta 20 prendas por día). La venta es el ticket del
+  punto de venta; cuenta el PVP configurado por categoría ($35 por defecto), no la etiqueta del admin.
+- Espera de 7 días. Venta con señales → en revisión hasta que el admin la apruebe. Anulada dentro de la espera:
+  sus GN se anulan solos. Después: solo el admin registra la devolución; si ya se gastaron, queda saldo por cubrir,
+  que bloquea los canjes y se paga con los próximos GN.
+- Vencimiento a 12 meses desde que quedan disponibles, FIFO, con avisos a 60 y 30 días.
+- Rango = XP + ventas verificadas + requisitos de identidad, sin saltar rangos; lo alcanzado no baja.
+- Canje: términos aceptados, rango, stock, límite por persona, máx. 3 por día y 30 s entre canjes, sin saldo por
+  cubrir. Los GN quedan retenidos; rechazar o cancelar los devuelve a sus lotes; Entregado los descuenta.
+- Tope mensual de costo de premios: al alcanzarlo el catálogo se pausa.

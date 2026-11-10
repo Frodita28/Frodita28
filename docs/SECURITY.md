@@ -45,3 +45,15 @@
 - **Clasificación:** `store_leaderboard` (security definer, sin acceso anónimo) solo expone el nombre visible
   (`public_alias`) y los XP de cada tienda; nunca el nombre de la tienda, ventas, ingresos, stock ni datos personales.
 - **Pruebas de autorización:** `tests/db/accounts.test.ts`, `tests/db/stores.test.ts`, `tests/db/applications.test.ts`, `tests/db/security.test.ts`, `tests/db/leaderboard.test.ts`, `sales.test.ts` y el paso 10 de `tests/e2e/flow.mjs`.
+
+
+## GN del club
+
+- El navegador nunca cambia saldos: todo pasa por funciones `security definer` que bloquean la cuenta (y el premio,
+  en ese orden) con `FOR UPDATE`, dentro de una transacción y con clave de idempotencia (doble toque = un canje).
+- Tablas del programa sin `insert/update/delete` para `anon`/`authenticated`; libro, eventos y logros inmutables.
+- RLS: cada licenciatario solo lee su cuenta, libro, lotes, canjes, avisos y aprobaciones; el costo real y el
+  proveedor de los premios solo los lee el administrador.
+- La administración usa el rol `admin` (`is_admin()`), comprobado en el servidor y en cada función; nadie gestiona
+  sus propios canjes, ventas ni evidencias. Cada acción administrativa queda en `audit_log`.
+- Límite de canjes por día y segundos mínimos entre canjes; las señales de fraude marcan, no bloquean.

@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { Client } from "pg";
 
@@ -22,6 +23,10 @@ export type Db = {
   /** Llama funciones internas (sin permiso para la API) con la identidad de un usuario. */
   internalAs<T = Record<string, unknown>>(userId: string, text: string, params?: unknown[]): Promise<T[]>;
   close(): Promise<void>;
+  /** Otra conexión a la misma base (para probar operaciones simultáneas). */
+  fork(): Promise<Db>;
+  /** Cierra solo la conexión de un fork. */
+  closeFork(): Promise<void>;
 };
 
 /** Crea una base de datos nueva a partir de la plantilla, aislada para un archivo de pruebas. */
@@ -32,6 +37,10 @@ export async function freshDb(): Promise<Db> {
   await admin.query(`create database ${name} template ${TEMPLATE_DB}`);
   await admin.end();
 
+  return connectDb(name);
+}
+
+async function connectDb(name: string): Promise<Db> {
   const client = new Client({ connectionString: urlFor(name) });
   await client.connect();
 
@@ -64,6 +73,8 @@ export async function freshDb(): Promise<Db> {
       await a.query(`drop database if exists ${name} with (force)`);
       await a.end();
     },
+    fork: () => connectDb(name),
+    closeFork: () => client.end(),
   };
 }
 
@@ -182,3 +193,34 @@ export async function posCheckout(db: Db, userId: string, codes: string[], custo
   const [row] = await db.as<{ id: string }>(userId, `select public.pos_checkout($1, 'presencial', $2, null) as id`, [codes, customer]);
   return row.id;
 }
+
+// -----------------------------------------------------------------------------
+// GN del club
+// -----------------------------------------------------------------------------
+export type Account = { available: number; pending: number; held: number; debt: number };
+
+export async function account(d: Db, userId: string): Promise<Account> {
+  const [a] = await d.sql<Account>(`select available, pending, held, debt from public.gn_accounts where user_id = $1`, [userId]);
+  return a ?? { available: 0, pending: 0, held: 0, debt: 0 };
+}
+
+/** El saldo guardado coincide con la suma del libro y con los lotes. */
+export async function assertConsistent(d: Db, userId: string) {
+  const [l] = await d.sql<Account & { lots: number }>(
+    `select coalesce(sum(d_available), 0)::int as available, coalesce(sum(d_pending), 0)::int as pending,
+            coalesce(sum(d_held), 0)::int as held, coalesce(sum(d_debt), 0)::int as debt,
+            (select coalesce(sum(remaining), 0)::int from public.gn_lots where user_id = $1) as lots
+     from public.gn_ledger where user_id = $1`,
+    [userId],
+  );
+  const a = await account(d, userId);
+  assert.deepEqual({ available: l.available, pending: l.pending, held: l.held, debt: l.debt }, a);
+  assert.equal(l.lots, a.available, "los lotes suman el disponible");
+}
+
+/** Simula que pasaron los días de espera y liquida. */
+export async function ageAndSettle(d: Db, userId: string) {
+  await d.sql(`update public.gn_sale_holds set hold_until = now() - interval '1 second' where licensee_id = $1 and status in ('en_espera', 'en_revision')`, [userId]);
+  await d.sql(`select public.gn_settle($1)`, [userId]);
+}
+
