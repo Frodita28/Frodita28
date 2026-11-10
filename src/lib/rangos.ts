@@ -35,14 +35,21 @@ export function rangosConUmbral(rangos: Rango[] = RANGOS): RangoConUmbral[] {
 
 const UMBRALES = rangosConUmbral();
 
-/** Rango, progreso y XP restantes para un total de XP. Los XP negativos o no numéricos cuentan como 0. */
-export function estadoRango(totalXp: number, rangos: RangoConUmbral[] = UMBRALES): EstadoRango {
+/**
+ * Rango, progreso y XP restantes para un total de XP. Los XP negativos o no numéricos cuentan como 0.
+ * Con `nivel` (rango del programa de GN: XP + ventas + identidad, nunca baja) se muestra ese rango
+ * y la barra solo mide los XP dentro de él; así todas las pantallas enseñan el mismo rango.
+ */
+export function estadoRango(totalXp: number, rangos: RangoConUmbral[] = UMBRALES, nivel?: number | null): EstadoRango {
   const xp = Number.isFinite(totalXp) ? Math.max(0, Math.floor(totalXp)) : 0;
   const ultimo = rangos.length - 1;
-  const i = Math.max(0, rangos.findIndex((r, idx) => xp < r.xpFin || idx === ultimo));
+  const i =
+    nivel != null && Number.isFinite(nivel)
+      ? Math.min(ultimo, Math.max(0, rangos.findIndex((r) => r.nivel === nivel)))
+      : Math.max(0, rangos.findIndex((r, idx) => xp < r.xpFin || idx === ultimo));
   const rango = rangos[i];
   const tramo = rango.xpFin - rango.xpInicio;
-  const xpEnRango = Math.min(xp - rango.xpInicio, tramo);
+  const xpEnRango = Math.max(0, Math.min(xp - rango.xpInicio, tramo));
   const maximoCompletado = i === ultimo && xp >= rango.xpFin;
   return {
     rango,

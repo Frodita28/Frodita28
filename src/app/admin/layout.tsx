@@ -14,6 +14,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
     { href: "/admin/licencias", label: "Licencias" },
     { href: "/admin/tiendas", label: "Tiendas" },
     { href: "/admin/planes", label: "Planes" },
+    { href: "/admin/recompensas", label: "Recompensas GN" },
     { href: "/admin/xp", label: "XP y alertas" },
     { href: "/admin/auditoria", label: "Auditoría" },
     { href: "/panel", label: "Volver al panel" },

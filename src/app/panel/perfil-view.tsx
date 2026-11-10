@@ -19,6 +19,8 @@ export type PerfilData = {
   /** Puesto en la clasificación (null sin licencia activa). */
   ranking: { place: number; tiendas: number; next: { gap: number; place: number } | null } | null;
   totalXp: number;
+  /** Rango compartido del programa de GN (null = por XP). */
+  nivel: number | null;
   misiones: MisionHoy[];
   diasConDiaria: string[];
   semana: DiaRacha[];
@@ -40,6 +42,7 @@ export function PerfilView({
   ventasDiarias,
   ranking,
   totalXp,
+  nivel,
   misiones,
   diasConDiaria,
   semana,
@@ -114,7 +117,7 @@ export function PerfilView({
         <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
           {/* Ventas vive dentro de Perfil: gráfica con selector de período y acceso al registro. */}
           <VentasPanel diarias={ventasDiarias} mensuales={puntosMensuales(summary.monthly)} />
-          <RankCompact totalXp={totalXp} />
+          <RankCompact totalXp={totalXp} nivel={nivel} />
         </div>
 
         <Accordion
@@ -131,6 +134,7 @@ export function PerfilView({
             semana={semana}
             hoy={hoy}
             totalXp={totalXp}
+            nivel={nivel}
             tieneLicencia={tieneLicencia}
             userId={userId}
             acciones={null}

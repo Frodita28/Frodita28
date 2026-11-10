@@ -68,3 +68,25 @@ faltan entregas por registrar), inversión = suma de `store_investments`, y seri
 Tabla de clasificación (`store_leaderboard(p_limit)`, cualquier usuario autenticado): tiendas `licensee` con licencia
 `active` ordenadas por XP con `rank()` (empates comparten puesto). Devuelve solo `place`, `alias` (`public_alias`, o
 «Tienda Gallo Negro» si no tiene), `total_xp` e `is_me`; incluye siempre la fila propia aunque quede fuera del límite.
+
+
+## GN del club y Tienda Clan (migraciones 000010 a 000013)
+
+| Tabla | Para qué |
+|---|---|
+| `gn_config` | Todas las cifras del programa (clave → JSON, `is_draft` = BORRADOR). Solo admin la lee completa; `gn_public_config()` entrega lo necesario a las pantallas. |
+| `gn_accounts` | Saldo en caché por usuario: `available`, `pending`, `held`, `debt` (todas ≥ 0). Se bloquea con `FOR UPDATE` en cada movimiento. |
+| `gn_ledger` | Libro de solo inserción con deltas `d_pending/d_available/d_held/d_debt` y `idempotency_key` única. La suma del libro = la cuenta. |
+| `gn_lots`, `gn_lot_moves` | Lotes FIFO de GN disponibles (vencen a los N meses) y qué canje/vencimiento consumió cada uno. |
+| `gn_sale_holds` | Una fila por venta verificada: GN en espera, señales, revisión, liberación o anulación. |
+| `gn_mission_credits` | GN de misión ligados a una venta (siguen su espera) o directos, con tope diario. |
+| `notifications` | Avisos in-app con `dedupe_key`. |
+| `identity_requirements`, `identity_approvals`, `rank_achievements` | Requisitos de identidad por rango, aprobaciones del admin y rangos alcanzados (nunca baja). |
+| `clan_editions`, `clan_products`, `clan_product_costs` | Ediciones mensuales, premios y su costo real (solo admin). |
+| `clan_redemptions`, `clan_redemption_events`, `clan_redemption_costs` | Canjes, historial de estados (inmutable) y costo congelado. |
+| `clan_goals`, `gn_terms`, `gn_terms_acceptances` | Meta del licenciatario, términos versionados y su aceptación. |
+| `mission_validation_rules` | Criterios, límite semanal y plazo por tipo de misión manual. |
+
+Columnas nuevas: `missions.gn_reward`, `mission_participations.gn_reward`, `mission_evidences.review_started_at/by`,
+`mission_evidences.needs_changes`. Funciones clave: `gn_post`, `gn_settle`, `clan_redeem`, `clan_admin_set_status`,
+`rank_state`, `admin_gn_dashboard`, `gn_daily_maintenance` (pg_cron 04:10 UTC).
