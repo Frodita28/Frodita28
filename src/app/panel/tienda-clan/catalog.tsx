@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { BottomSheet } from "@/components/bottom-sheet";
 import { Icon } from "@/components/icons";
 import { Badge, ProgressBar } from "@/components/ui";
-import { TEXTOS_CLAN as T, TIERS, type TierSlug } from "@/content/recompensas";
+import { CATEGORIAS, TEXTOS_CLAN as T, type CategoriaSlug, type TierSlug } from "@/content/recompensas";
 import { formatGn, formatNum, type EstadoTarjeta } from "@/lib/gn";
 import { acceptTerms, redeemProduct, setGoal } from "./actions";
 
@@ -16,6 +16,7 @@ export type CatalogItem = {
   description: string;
   photo: string | null;
   tier: TierSlug;
+  category: CategoriaSlug;
   minRank: number;
   minRankName: string;
   price: number;
@@ -37,9 +38,9 @@ type Props = {
   defaultName: string;
 };
 
-/** Catálogo de la Tienda Clan con filtro por nivel, meta y panel de canje. */
+/** Catálogo de la Tienda Clan agrupado por categoría, con filtro, meta y panel de canje. */
 export function ClanCatalog({ items, available, goalId, unidadVenta, paused, blocked, terms, defaultName }: Props) {
-  const [nivel, setNivel] = useState<TierSlug | "todos">("todos");
+  const [categoria, setCategoria] = useState<CategoriaSlug | "todos">("todos");
   const [open, setOpen] = useState<CatalogItem | null>(null);
   const [goal, setGoalState] = useOptimistic(goalId);
   // Saldo optimista: baja al confirmar un canje y vuelve solo si el servidor lo rechaza.
@@ -47,8 +48,8 @@ export function ClanCatalog({ items, available, goalId, unidadVenta, paused, blo
   const [, startGoal] = useTransition();
   const goalItem = items.find((i) => i.id === goal) ?? null;
 
-  const visibles = nivel === "todos" ? items : items.filter((i) => i.tier === nivel);
-  const grupos = TIERS.map((t) => ({ ...t, items: visibles.filter((i) => i.tier === t.slug) })).filter((g) => g.items.length > 0);
+  const visibles = categoria === "todos" ? items : items.filter((i) => i.category === categoria);
+  const grupos = CATEGORIAS.map((c) => ({ ...c, items: visibles.filter((i) => i.category === c.slug) })).filter((g) => g.items.length > 0);
 
   const toggleGoal = (id: string | null) =>
     startGoal(async () => {
@@ -86,13 +87,13 @@ export function ClanCatalog({ items, available, goalId, unidadVenta, paused, blo
       <p className="ui-num -mb-3 text-[13px] text-fg-2" aria-live="polite">
         Saldo para canjear: <span className="text-fg">{formatGn(avail)}</span>
       </p>
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:px-0" role="group" aria-label="Filtrar por nivel">
-        <button type="button" className="ui-chip" aria-pressed={nivel === "todos"} onClick={() => setNivel("todos")}>
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:px-0" role="group" aria-label="Filtrar por categoría">
+        <button type="button" className="ui-chip" aria-pressed={categoria === "todos"} onClick={() => setCategoria("todos")}>
           {T.todos}
         </button>
-        {TIERS.map((t) => (
-          <button key={t.slug} type="button" className="ui-chip" aria-pressed={nivel === t.slug} onClick={() => setNivel(t.slug)}>
-            {t.nombre}
+        {CATEGORIAS.map((c) => (
+          <button key={c.slug} type="button" className="ui-chip shrink-0" aria-pressed={categoria === c.slug} onClick={() => setCategoria(c.slug)}>
+            {c.nombre}
           </button>
         ))}
       </div>
@@ -103,8 +104,8 @@ export function ClanCatalog({ items, available, goalId, unidadVenta, paused, blo
         <p className="ui-card text-fg-2">{T.sinPremiosNivel}</p>
       ) : (
         grupos.map((g) => (
-          <section key={g.slug} aria-labelledby={`nivel-${g.slug}`} className="flex flex-col gap-3">
-            <h3 id={`nivel-${g.slug}`} className="ui-title-section">{g.nombre}</h3>
+          <section key={g.slug} aria-labelledby={`categoria-${g.slug}`} className="flex flex-col gap-3">
+            <h3 id={`categoria-${g.slug}`} className="ui-title-section">{g.nombre}</h3>
             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
               {g.items.map((item) => (
                 <ProductCard

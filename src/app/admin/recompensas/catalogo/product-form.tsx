@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { RANGOS } from "@/content/rangos";
-import { TIERS, type TierSlug } from "@/content/recompensas";
+import { CATEGORIAS, TIERS, type CategoriaSlug, type TierSlug } from "@/content/recompensas";
 import { ayudaProducto, formatGn, formatNum, formatUsd, type GnConfig } from "@/lib/gn";
 import { ProductCard } from "@/app/panel/tienda-clan/catalog";
 import { saveProduct } from "../actions";
@@ -14,6 +14,7 @@ export type ProductDraft = {
   description: string;
   photos: string[];
   tier: TierSlug;
+  category: CategoriaSlug;
   min_rank: number;
   price_gn: number | null;
   cost_usd: number | null;
@@ -105,6 +106,13 @@ export function ProductForm({
             <p className="text-parchment">Valor interno de control: {formatUsd(ayuda.valorGnUsd, true)}.</p>
           </div>
         )}
+
+        <div>
+          <label className="label" htmlFor="category">Categoría en la tienda</label>
+          <select className="input text-base" id="category" name="category" defaultValue={draft.category}>
+            {CATEGORIAS.map((c) => <option key={c.slug} value={c.slug}>{c.nombre}</option>)}
+          </select>
+        </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -203,6 +211,7 @@ export function ProductForm({
               description: "",
               photo: draft.photos[0] ?? null,
               tier,
+              category: draft.category,
               minRank: rank,
               minRankName: rangoNombre,
               price: Number.isFinite(precio) && precio > 0 ? precio : 0,

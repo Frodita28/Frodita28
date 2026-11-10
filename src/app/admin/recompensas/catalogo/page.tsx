@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Flash } from "@/components/flash";
 import { PageTitle } from "@/components/nav";
 import { RANGOS } from "@/content/rangos";
-import { TIERS, type TierSlug } from "@/content/recompensas";
+import { CATEGORIAS, TIERS, type CategoriaSlug, type TierSlug } from "@/content/recompensas";
 import { formatGn, formatNum, formatUsd, leerConfig } from "@/lib/gn";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime, utcToZonedLocal } from "@/lib/time";
@@ -18,6 +18,7 @@ type Product = {
   description: string;
   photos: string[];
   tier: TierSlug;
+  category: CategoriaSlug;
   min_rank: number;
   price_gn: number;
   stock: number | null;
@@ -72,7 +73,7 @@ export default async function CatalogoAdmin({ searchParams }: PageProps<"/admin/
           available_until: editing.available_until ? utcToZonedLocal(new Date(editing.available_until)) : "",
         }
       : {
-          id: null, name: "", description: "", photos: [], tier: "calle", min_rank: 1, price_gn: null, cost_usd: null, stock: null,
+          id: null, name: "", description: "", photos: [], tier: "calle", category: "accesorios", min_rank: 1, price_gn: null, cost_usd: null, stock: null,
           limit_per_user: null, is_permanent: false, needs_address: true, available_from: "", available_until: "", status: "borrador",
           kind: "fisico", supplier: "", lead_days: null, edition_id: editions[0]?.id ?? null,
         };
@@ -143,13 +144,14 @@ export default async function CatalogoAdmin({ searchParams }: PageProps<"/admin/
         <div className="table-wrap">
           <table className="table">
             <thead>
-              <tr><th>Premio</th><th>Nivel</th><th>Rango</th><th className="text-right">GN</th><th className="text-right">Costo</th><th>Unidades</th><th>Edición</th><th>Estado</th><th></th></tr>
+              <tr><th>Premio</th><th>Categoría</th><th>Nivel</th><th>Rango</th><th className="text-right">GN</th><th className="text-right">Costo</th><th>Unidades</th><th>Edición</th><th>Estado</th><th></th></tr>
             </thead>
             <tbody>
-              {products.length === 0 && <tr><td colSpan={9} className="text-parchment">Sin premios.</td></tr>}
+              {products.length === 0 && <tr><td colSpan={10} className="text-parchment">Sin premios.</td></tr>}
               {products.map((p) => (
                 <tr key={p.id}>
                   <td className="font-semibold">{p.name}{p.is_demo ? <span className="ml-1 text-xs text-parchment">(demo)</span> : null}</td>
+                  <td className="whitespace-nowrap">{CATEGORIAS.find((c) => c.slug === p.category)?.nombre}</td>
                   <td>{TIERS.find((t) => t.slug === p.tier)?.nombre}</td>
                   <td>{RANGOS.find((r) => r.nivel === p.min_rank)?.nombre}</td>
                   <td className="text-right whitespace-nowrap">{formatGn(p.price_gn)}</td>
