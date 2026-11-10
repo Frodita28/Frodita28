@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
 import { RANGOS } from "@/content/rangos";
 import { TIERS, type TierSlug } from "@/content/recompensas";
 import { ayudaProducto, formatGn, formatNum, formatUsd, type GnConfig } from "@/lib/gn";
@@ -189,7 +190,7 @@ export function ProductForm({
           <textarea className="input text-base" id="photos" name="photos" rows={2} defaultValue={draft.photos.join("\n")} />
         </div>
 
-        <button className="btn-bronze min-h-11">{draft.id ? "Guardar cambios" : "Crear premio"}</button>
+        <GuardarBoton nuevo={!draft.id} />
       </form>
 
       <aside aria-label="Vista previa en el móvil" className="space-y-2">
@@ -220,5 +221,15 @@ export function ProductForm({
         </div>
       </aside>
     </div>
+  );
+}
+
+/** Se desactiva mientras se guarda (la foto puede tardar unos segundos) para no crear el premio dos veces. */
+function GuardarBoton({ nuevo }: { nuevo: boolean }) {
+  const { pending } = useFormStatus();
+  return (
+    <button className="btn-bronze min-h-11 disabled:opacity-60" disabled={pending} aria-busy={pending}>
+      {pending ? "Guardando…" : nuevo ? "Crear premio" : "Guardar cambios"}
+    </button>
   );
 }

@@ -54,7 +54,8 @@ describe("Interruptor y visibilidad", () => {
     try {
       assert.equal((await db.as(u, `select * from public.clan_products where is_demo`)).length, 0);
       const t = await tester();
-      assert.equal((await db.as(t, `select * from public.clan_products where is_demo`)).length, 3);
+      // El viaje de demostración quedó archivado al cargar el viaje real (000015).
+      assert.equal((await db.as(t, `select * from public.clan_products where is_demo`)).length, 2);
     } finally {
       await db.sql(`update public.gn_config set value = 'false' where key = 'recompensas_v3_activa'`);
     }

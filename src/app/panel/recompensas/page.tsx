@@ -47,7 +47,14 @@ export default async function RecompensasPage() {
 
   const proximo = products.filter((p) => p.min_rank > nivel).sort((a, b) => a.min_rank - b.min_rank || a.price_gn - b.price_gn)[0];
   const proximoRango = proximo ? rangos.find((r) => r.nivel === proximo.min_rank) : null;
-  const beneficios = cfg.beneficios_rango[String(nivel)] ?? [];
+  // Los beneficios se acumulan: el rango actual conserva los de los anteriores (salvo el marco del avatar, que cambia).
+  const beneficios = [
+    ...(cfg.beneficios_rango[String(nivel)] ?? []),
+    ...rangos
+      .filter((r) => r.nivel < nivel)
+      .reverse()
+      .flatMap((r) => (cfg.beneficios_rango[String(r.nivel)] ?? []).filter((b) => !b.startsWith("Marco "))),
+  ].filter((b, i, todos) => todos.indexOf(b) === i);
 
   return (
     <>
