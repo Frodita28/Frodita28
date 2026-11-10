@@ -68,6 +68,7 @@ export default async function TiendaClanPage({ searchParams }: PageProps<"/panel
     description: p.description,
     photo: p.photos[0] ?? null,
     tier: p.tier,
+    category: p.category,
     minRank: p.min_rank,
     minRankName: nombreRango(p.min_rank),
     price: p.price_gn,

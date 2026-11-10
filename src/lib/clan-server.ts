@@ -9,6 +9,7 @@ export type ClanProduct = {
   description: string;
   photos: string[];
   tier: "calle" | "medio" | "alto" | "premium" | "elite";
+  category: "accesorios" | "vestimenta" | "herramientas" | "exclusivos";
   min_rank: number;
   price_gn: number;
   stock: number | null;
@@ -58,7 +59,7 @@ export type RankState = {
 export type Terms = { version: number; clauses: string[]; is_draft: boolean; accepted_at: string | null };
 
 const PRODUCT_COLUMNS =
-  "id, name, description, photos, tier, min_rank, price_gn, stock, limit_per_user, is_permanent, available_until, kind, needs_address, lead_days, edition_id, is_demo";
+  "id, name, description, photos, tier, category, min_rank, price_gn, stock, limit_per_user, is_permanent, available_until, kind, needs_address, lead_days, edition_id, is_demo";
 
 /** Premios visibles para el usuario (la política de la tabla decide qué ve). */
 export const getCatalog = cache(async (): Promise<ClanProduct[]> => {

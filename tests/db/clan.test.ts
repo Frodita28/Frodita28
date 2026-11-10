@@ -388,3 +388,30 @@ async function redeemWith(d: Db, userId: string, product: string) {
     await d.closeFork();
   }
 }
+
+describe("Categorías de la Tienda Clan", () => {
+  it("carga los 20 productos iniciales en sus cuatro categorías", async () => {
+    const rows = await db.sql<{ category: string; n: number }>(
+      `select category::text, count(*)::int as n from public.clan_products
+       where not is_demo and min_rank = 1 and status = 'activo' group by 1 order by 1`,
+    );
+    assert.deepEqual(rows, [
+      { category: "accesorios", n: 5 },
+      { category: "exclusivos", n: 5 },
+      { category: "herramientas", n: 5 },
+      { category: "vestimenta", n: 5 },
+    ]);
+    const [p] = await db.sql<{ price_gn: number }>(`select price_gn from public.clan_products where name = 'Hoodie Clan'`);
+    assert.equal(p.price_gn, 385);
+  });
+
+  it("solo el administrador cambia la categoría", async () => {
+    const id = await demo("Pin Metálico Gallo Negro");
+    const u = await createLicensee(db, `cat-${randomUUID()}@test.com`);
+    await assert.rejects(db.as(u, `select public.clan_admin_set_product_category($1, 'vestimenta')`, [id]), /administrador/);
+    await db.as(admin, `select public.clan_admin_set_product_category($1, 'vestimenta')`, [id]);
+    const [p] = await db.sql<{ category: string }>(`select category::text from public.clan_products where id = $1`, [id]);
+    assert.equal(p.category, "vestimenta");
+    await db.as(admin, `select public.clan_admin_set_product_category($1, 'accesorios')`, [id]);
+  });
+});

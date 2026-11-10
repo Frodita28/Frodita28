@@ -12,6 +12,15 @@ export const TIERS = [
 ] as const;
 export type TierSlug = (typeof TIERS)[number]["slug"];
 
+/** Categorías de la Tienda Clan (así se agrupa el catálogo). */
+export const CATEGORIAS = [
+  { slug: "accesorios", nombre: "Accesorios" },
+  { slug: "vestimenta", nombre: "Vestimenta exclusiva" },
+  { slug: "herramientas", nombre: "Herramientas comerciales" },
+  { slug: "exclusivos", nombre: "Exclusivos del Clan" },
+] as const;
+export type CategoriaSlug = (typeof CATEGORIAS)[number]["slug"];
+
 export const TEXTOS_CLAN = {
   titulo: "Tienda Clan",
   bajada: "Canjea tus GN por premios del club. Se ganan vendiendo y completando misiones.",
@@ -42,7 +51,7 @@ export const TEXTOS_CLAN = {
   metaVacia: "Fija un premio como meta y sigue tu progreso aquí.",
   metaLista: "¡Ya puedes canjear tu meta!",
   sinPremios: "Todavía no hay premios en esta edición. Gallo Negro los publicará pronto.",
-  sinPremiosNivel: "No hay premios en este nivel.",
+  sinPremiosNivel: "No hay premios en esta categoría.",
   vistaPrevia: "Vista previa",
   // Panel de canje
   confirmarTitulo: "Confirmar canje",

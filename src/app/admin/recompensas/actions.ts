@@ -68,6 +68,11 @@ export async function saveProduct(fd: FormData) {
   };
   const { data, error } = await supabase.rpc("clan_admin_save_product", { p: payload });
   if (error) back(to, "error", dbMessage(error));
+  const categoria = str(fd, "category");
+  if (categoria) {
+    const { error: e2 } = await supabase.rpc("clan_admin_set_product_category", { p_product: data, p_category: categoria });
+    if (e2) back(`${BASE}/catalogo?editar=${data}`, "error", dbMessage(e2));
+  }
   revalidatePath(`${BASE}/catalogo`);
   revalidatePath("/panel/tienda-clan");
   back(`${BASE}/catalogo?editar=${data}`, "ok", "Premio guardado");
@@ -81,6 +86,9 @@ export async function duplicateProduct(fd: FormData) {
     p_edition: str(fd, "edition_id") || null,
   });
   if (error) back(`${BASE}/catalogo`, "error", dbMessage(error));
+  // La copia conserva la categoría del original.
+  const { data: original } = await supabase.from("clan_products").select("category").eq("id", str(fd, "id")).maybeSingle();
+  if (original?.category) await supabase.rpc("clan_admin_set_product_category", { p_product: data, p_category: original.category });
   revalidatePath(`${BASE}/catalogo`);
   back(`${BASE}/catalogo?editar=${data}`, "ok", "Premio duplicado como borrador");
 }

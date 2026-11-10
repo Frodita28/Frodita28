@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.12.1 — 2026-11-10
+
+- **Tienda Clan por categorías** (migración 000016): Accesorios, Vestimenta exclusiva, Herramientas comerciales y
+  Exclusivos del Clan, con filtro por categoría. 20 productos iniciales que se canjean solo con GN (de 30 a 1.500 GN).
+  La categoría se elige en Admin › Recompensas GN › Catálogo.
+- **Recompensas por rango** (000015): beneficios que se activan al desbloquear cada rango y premios de rango con GN.
+  Los beneficios se acumulan con los de rangos anteriores.
+- Admin › Catálogo: el botón de guardar se desactiva mientras guarda (evita premios duplicados).
+
 ## 0.12.0 — 2026-11-10
 
 - **GN del club (Recompensas v3), detrás del interruptor `recompensas_v3_activa` (apagado) y una lista de prueba.**
