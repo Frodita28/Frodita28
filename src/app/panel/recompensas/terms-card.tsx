@@ -2,10 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { BottomSheet } from "@/components/bottom-sheet";
 import { TEXTOS_CLAN as T, TEXTOS_RECOMPENSAS as R } from "@/content/recompensas";
 import { acceptTerms } from "../tienda-clan/actions";
 
-/** Términos de GN: se aceptan una vez por versión y son obligatorios para canjear. */
+/** Términos de GN: ventana emergente al entrar hasta que se aceptan (una vez por versión); obligatorios para canjear. */
 export function TermsCard({
   terms,
   acceptedAt,
@@ -17,6 +18,7 @@ export function TermsCard({
   const [busy, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [check, setCheck] = useState(false);
+  const [open, setOpen] = useState(!terms.accepted);
 
   if (terms.accepted) {
     return (
@@ -29,34 +31,44 @@ export function TermsCard({
     );
   }
 
+  // Sin aceptar: ventana emergente al entrar. Si se cierra sin aceptar, queda un aviso para abrirla de nuevo.
   return (
-    <section className="ui-card flex flex-col gap-3 border-gold/60" aria-labelledby="terminos-titulo">
-      <h2 id="terminos-titulo" className="ui-title-section">
-        {T.terminosTitulo} · v{terms.version}
-      </h2>
-      <p className="text-[15px]">{R.terminosPendientes}</p>
-      {terms.isDraft && <p className="text-[13px] text-fg-2">{R.borrador}</p>}
-      <Clausulas terms={terms} />
-      <label className="flex min-h-11 items-center gap-3 text-[15px]">
-        <input type="checkbox" checked={check} onChange={(e) => setCheck(e.target.checked)} className="h-5 w-5 accent-[var(--accent)]" />
-        {T.aceptar}
-      </label>
-      {error && <p role="alert" className="text-[15px]">{error}</p>}
-      <button
-        type="button"
-        className="ui-btn-primary w-full sm:w-auto sm:self-start"
-        disabled={!check || busy}
-        onClick={() =>
-          start(async () => {
-            const res = await acceptTerms(terms.version);
-            if (res.ok) router.refresh();
-            else setError(res.error);
-          })
-        }
-      >
-        Aceptar términos
-      </button>
-    </section>
+    <>
+      <section className="ui-card flex flex-wrap items-center justify-between gap-3 border-gold/60">
+        <p className="text-[15px]">{R.terminosPendientes}</p>
+        <button type="button" className="ui-btn-primary" onClick={() => setOpen(true)}>
+          Ver términos
+        </button>
+      </section>
+      <BottomSheet open={open} onClose={() => setOpen(false)} title={`${T.terminosTitulo} · v${terms.version}`}>
+        <div className="flex flex-col gap-3">
+          <p className="text-[15px]">{R.terminosPendientes}</p>
+          {terms.isDraft && <p className="text-[13px] text-fg-2">{R.borrador}</p>}
+          <Clausulas terms={terms} />
+          <label className="flex min-h-11 items-center gap-3 text-[15px]">
+            <input type="checkbox" checked={check} onChange={(e) => setCheck(e.target.checked)} className="h-5 w-5 accent-[var(--accent)]" />
+            {T.aceptar}
+          </label>
+          {error && <p role="alert" className="text-[15px]">{error}</p>}
+          <button
+            type="button"
+            className="ui-btn-primary w-full"
+            disabled={!check || busy}
+            onClick={() =>
+              start(async () => {
+                const res = await acceptTerms(terms.version);
+                if (res.ok) {
+                  setOpen(false);
+                  router.refresh();
+                } else setError(res.error);
+              })
+            }
+          >
+            Aceptar términos
+          </button>
+        </div>
+      </BottomSheet>
+    </>
   );
 }
 
