@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { GnBalance, GnDisclaimer, noticeViews } from "@/components/gn";
-import { GnNotices } from "@/components/gn-notices";
+import { GnBalance, GnDisclaimer } from "@/components/gn";
 import { Icon } from "@/components/icons";
 import { PageBanner } from "@/components/ui";
 import { RANGOS } from "@/content/rangos";
@@ -12,7 +11,6 @@ import {
   getCurrentEdition,
   getMyGoal,
   getMyLedger,
-  getMyNotices,
   getMyRank,
   getMyRedemptions,
   getTerms,
@@ -43,7 +41,7 @@ export default async function TiendaClanPage({ searchParams }: PageProps<"/panel
 
   // El saldo se pide primero: el servidor libera lo que ya cumplió la espera.
   const resumen = await getGnResumen();
-  const [cfg, rank, products, edition, goal, terms, paused, notices, redemptions, ledger] = await Promise.all([
+  const [cfg, rank, products, edition, goal, terms, paused, redemptions, ledger] = await Promise.all([
     getGnConfig(),
     getMyRank(),
     getCatalog(),
@@ -51,7 +49,6 @@ export default async function TiendaClanPage({ searchParams }: PageProps<"/panel
     getMyGoal(user.id),
     getTerms(),
     getClanPaused(),
-    getMyNotices(user.id),
     seccion === "canjes" || seccion === "catalogo" ? getMyRedemptions(user.id) : Promise.resolve([]),
     seccion === "movimientos" ? getMyLedger(user.id) : Promise.resolve([] as LedgerEntry[]),
   ]);
@@ -90,7 +87,6 @@ export default async function TiendaClanPage({ searchParams }: PageProps<"/panel
         <GnDisclaimer />
         <GnBalance resumen={resumen} diasEspera={cfg.gn_dias_espera} />
         {paused && <p className="ui-card border-gold text-[15px]">{T.pausado}</p>}
-        <GnNotices items={noticeViews(notices)} />
 
         <nav className="-mx-4 flex gap-1 overflow-x-auto px-4 md:mx-0 md:px-0" aria-label="Secciones de Tienda Clan">
           {SECCIONES.map((s) => (

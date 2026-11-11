@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { GnDisclaimer, noticeViews } from "@/components/gn";
-import { GnNotices } from "@/components/gn-notices";
+import { GnDisclaimer } from "@/components/gn";
 import { Icon } from "@/components/icons";
 import { RankEmblem } from "@/components/rangos";
 import { Accordion, PageBanner, ProgressBar } from "@/components/ui";
 import { TEXTOS_RECOMPENSAS as R } from "@/content/recompensas";
 import { requireUser } from "@/lib/auth";
-import { getCatalog, getMyNotices, getMyRank, getTerms } from "@/lib/clan-server";
+import { getCatalog, getMyRank, getTerms } from "@/lib/clan-server";
 import { faltaPara, formatGn, formatNum, formatUsd, gnPorVentaTipica, ventasParaGn, type GnConfig } from "@/lib/gn";
 import { getGnConfig, getRecompensasV3 } from "@/lib/gn-server";
 import { estadoRango, todosLosRangos } from "@/lib/rangos";
@@ -18,10 +17,10 @@ import { TermsCard } from "./terms-card";
 export const metadata = { title: "Recompensas" };
 
 export default async function RecompensasPage() {
-  const user = await requireUser("/panel/recompensas");
+  await requireUser("/panel/recompensas");
   if (!(await getRecompensasV3())) return <RecompensasLegacy />;
 
-  const [cfg, rank, products, terms, notices] = await Promise.all([getGnConfig(), getMyRank(), getCatalog(), getTerms(), getMyNotices(user.id)]);
+  const [cfg, rank, products, terms] = await Promise.all([getGnConfig(), getMyRank(), getCatalog(), getTerms()]);
   const nivel = rank?.level ?? 1;
   const xp = rank?.xp ?? 0;
   const ventas = rank?.sales_usd ?? 0;
@@ -61,7 +60,6 @@ export default async function RecompensasPage() {
       <PageBanner title={R.titulo}>{R.bajada}</PageBanner>
       <div className="-mt-6 flex flex-col gap-6 sm:-mt-8">
         <GnDisclaimer />
-        <GnNotices items={noticeViews(notices)} />
         {terms && (
           <TermsCard
             terms={{ version: terms.version, clauses: terms.clauses, isDraft: terms.is_draft, accepted: terms.accepted_at !== null }}

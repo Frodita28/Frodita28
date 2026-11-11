@@ -3,6 +3,8 @@ import { signOut } from "@/app/login/actions";
 import { panelFonts } from "@/app/panel/fonts";
 import type { AppRole as Role } from "@/lib/auth";
 import { estadoRango } from "@/lib/rangos";
+import type { NoticeView } from "./gn-notices";
+import { HeaderGn } from "./header-gn";
 import { BottomNav } from "./bottom-nav";
 import { ClubTabs, type ClubTab } from "./club-tabs";
 import { Icon } from "./icons";
@@ -30,8 +32,8 @@ export function panelTabs(role: Role): ClubTab[] {
 /**
  * Estructura del panel de las tiendas ("Club de licenciatarios"): cabecera con la
  * marca y la tienda, pestañas de secciones y el contenido (secciones separadas 48 px).
- * El avatar lleva el marco del rango de la tienda; el cambio de contraseña (/nueva-clave)
- * está junto a «Salir».
+ * El avatar lleva el marco del rango de la tienda. Con el programa de GN activo, la cabecera muestra
+ * el saldo de GN y la campana de avisos.
  * En el teléfono (< 768 px) la cabecera se compacta (logo, tienda y avatar) y las secciones
  * pasan a la barra inferior (BottomNav), que también lleva contraseña y «Salir» en «Más».
  */
@@ -43,6 +45,7 @@ export function StoreShell({
   nivel = null,
   misionesPendientes = false,
   isAdmin = false,
+  gn = null,
   children,
 }: {
   tabs: ClubTab[];
@@ -54,6 +57,8 @@ export function StoreShell({
   /** Punto amarillo sobre «Misiones» en la barra inferior. */
   misionesPendientes?: boolean;
   isAdmin?: boolean;
+  /** Saldo de GN y avisos en la cabecera (solo con el programa de GN activo para la tienda). */
+  gn?: { available: number; notices: NoticeView[] } | null;
   children: React.ReactNode;
 }) {
   const { rango } = estadoRango(totalXp, undefined, nivel);
@@ -62,7 +67,8 @@ export function StoreShell({
       <header className="border-b border-line bg-bg pt-[env(safe-area-inset-top)] print:hidden">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2 md:gap-4 md:px-6 md:py-4">
           <Link href="/panel" className="flex min-w-0 items-center gap-3 rounded-ui">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-ui bg-accent font-title text-lg font-black text-black">GN</span>
+            {/* eslint-disable-next-line @next/next/no-img-element -- logo pequeño y estático */}
+            <img src="/brand/gallo-negro-logo.png" alt="" width={40} height={40} className="h-10 w-10 shrink-0 rounded-ui" />
             {/* Teléfono: nombre de la tienda junto al logo. */}
             <span className="min-w-0 md:hidden">
               <span className="block font-title text-[15px] leading-tight font-extrabold uppercase">Gallo Negro</span>
@@ -76,10 +82,10 @@ export function StoreShell({
                 <span className="font-title text-lg leading-none font-extrabold uppercase">Gallo Negro</span>
                 <Badge>Licencias</Badge>
               </span>
-              <span className="mt-1 block text-[11px] leading-tight font-bold tracking-[0.08em] text-fg-2 uppercase">Club de licenciatarios</span>
             </span>
           </Link>
-          <div className="flex shrink-0 items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 md:gap-3">
+            {gn && <HeaderGn available={gn.available} notices={gn.notices} />}
             <div className="hidden min-w-0 text-right md:block">
               <p className="ui-label">{roleLabel}</p>
               <p className="mt-1 flex items-center justify-end gap-2 text-[15px] font-medium">
@@ -92,10 +98,6 @@ export function StoreShell({
               <RankAvatar nivel={rango.nivel} label={initials(storeName)} />
               <span className="sr-only">Rango {rango.nombre}</span>
             </span>
-            <Link href="/nueva-clave" className="ui-btn-sm hidden px-3 md:inline-flex" aria-label="Cambiar contraseña">
-              <Icon name="key" className="h-4 w-4" />
-              <span>Cambiar contraseña</span>
-            </Link>
             <form action={signOut} className="hidden md:block">
               <button className="ui-btn-sm">Salir</button>
             </form>

@@ -43,8 +43,7 @@ export async function acceptTerms(version: number): Promise<ActionResult> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("gn_accept_terms", { p_version: version });
   if (error) return { ok: false, error: dbMessage(error) };
-  revalidatePath("/panel/tienda-clan");
-  revalidatePath("/panel/recompensas");
+  revalidatePath("/panel", "layout");
   return { ok: true };
 }
 
